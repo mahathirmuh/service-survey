@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  service-survey-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: service-survey-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    tty: true
+    networks:
+      - service-survey-dev-network
+
+networks:
+  service-survey-dev-network:
+    driver: bridge

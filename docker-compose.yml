@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  service-survey:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: service-survey-app
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - service-survey-network
+
+  # Optional: Add a reverse proxy (uncomment if needed)
+  # nginx-proxy:
+  #   image: nginx:alpine
+  #   container_name: service-survey-proxy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./proxy.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - service-survey
+  #   networks:
+  #     - service-survey-network
+
+networks:
+  service-survey-network:
+    driver: bridge
+
+# Optional: Add volumes for persistent data
+# volumes:
+#   service-survey-data:
