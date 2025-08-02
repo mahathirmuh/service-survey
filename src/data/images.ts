@@ -146,7 +146,7 @@ export const departmentSections = {
           •	Employee transport management, travel booking and ticketing, vehicle maintenance, travel policy compliance.`,
         team: {
           src: hr_ss,
-          description: "Site Service team.",
+          description: "Site Service Team : Maulidha Prasetiyo, Ahmad Fauzi, Aryo Wanadri Bahariantomo, Diza Laila Barokah, Eka Izdihar Hafizhah, Faiz Al Farizah, Joshua Hein Hendrik Lumintang & Muchammad Rezqi Zunove.",
         },
         result: {
           src: hr_ss_chart,
@@ -159,7 +159,7 @@ export const departmentSections = {
           •	Training programs, training need analysis, performance management, competency assessments, certification management, Organizational Development.`,
         team: {
           src: hr_pd,
-          description: "People Development team.",
+          description: "People Development Team: Muh Irfan & Riska Novitasari Resdiansah.",
         },
         result: {
           src: hr_pd_chart,
@@ -172,7 +172,7 @@ export const departmentSections = {
           •	Salary and benefits administration, regulatory compliance, health insurance management, incentive programs.`,
         team: {
           src: hr_cnb,
-          description: "Compensation & Benefit team",
+          description: "Compensation & Benefit Team : Liberty Malsi, Astrifo Kabangnga, Isma'ilia Khoirun Nasta'in & Obed Pwiyii.",
         },
         result: {
           src: hr_cnb_chart,
@@ -185,7 +185,7 @@ export const departmentSections = {
           •	Document translation, real-time interpretation, localization of communication materials, multilingual support.`,
         team: {
           src: hr_translator,
-          description: "Translator team.",
+          description: "Translator Team : Ach Sukhaemi Kurniawan, Achmad Chabibulloh, Alex William Pangestu, Alfares Christian, Ayu Nirmala, Dimas Alifando Wasa, Ezra Dea Kristianto, Gerasimos Aria Junianto, Hendri Setiyawan, Hudiono Alim, Muhamad Dafa Santoso, Nizamul Anam, Nur Rohman Mauluddin, Nurul Hasanah, Reyhan Dayu Ramadhani, Ronaldo Cliford Wolah, Sultan Jorgi & Willy.",
         },
         result: {
           src: hr_translator_chart,
@@ -198,7 +198,7 @@ export const departmentSections = {
           •	Recruitment planning, candidate screening, interviewing, onboarding, employer branding.`,
         team: {
           src: hr_ta,
-          description: "Talent Acquisition team.",
+          description: "Talent Acquisition Team : Ade Prastya Nugraha, Alvin Andrean Syahputra, Maulana Ihsan Rurianda & Novia Indri Yanti Yunitazami.",
         },
         result: {
           src: hr_ta_chart,
@@ -211,7 +211,7 @@ export const departmentSections = {
           •	Grievance handling, labour law compliance, mediation and arbitration.`,
         team: {
           src: hr_ir,
-          description: "Industrial Relation Team.",
+          description: "Industrial Relation Team : Ade Prastya Nugraha, M Abdullah Najib & Rezkita Bagas Prakasih.",
         },
         result: {
           src: hr_ir_chart,

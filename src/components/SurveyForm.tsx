@@ -590,12 +590,15 @@ const SurveyForm = () => {
                             <>
                                 <div className="grid grid-cols-1 gap-8">
                                     <div className="space-y-6">
-                                        <h3 className="text-lg font-semibold text-primary">{section} Overview</h3>
+                                        <h3 className="text-xl font-bold text-primary tracking-wide flex items-center">
+                                            <div className="w-1 h-6 bg-primary rounded-full mr-3"></div>
+                                            {section} Overview
+                                        </h3>
                                         {/* Grid for Team Picture + Work Summary */}
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                             {/* Team Picture */}
                                             {teamImageSrc && (
-                                                <div className="bg-muted rounded-lg p-6 transition-all duration-300 hover:scale-[1.01] cursor-pointer">
+                                                <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer border border-slate-200">
                                                     <div
                                                         className="relative group cursor-pointer"
                                                         onClick={() => setEnlargedImage(teamImageSrc)}
@@ -603,14 +606,14 @@ const SurveyForm = () => {
                                                         <img
                                                             src={teamImageSrc}
                                                             alt={`${section} Team Picture`}
-                                                            className="w-full h-48 object-cover rounded-lg mb-4 transition-all duration-300 group-hover:brightness-75"
+                                                            className="w-full h-48 object-cover rounded-lg mb-4 transition-all duration-300 group-hover:brightness-75 shadow-md"
                                                         />
                                                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                             <ZoomIn className="h-8 w-8 text-white" />
                                                         </div>
                                                     </div>
-                                                    <h4 className="font-semibold text-primary mb-2">{section} Team Picture</h4>
-                                                    <p className="text-sm text-muted-foreground text-justify">
+                                                    <h4 className="font-bold text-lg text-primary mb-3 tracking-wide">{section} Team Picture</h4>
+                                                    <p className="text-sm text-slate-600 leading-relaxed font-medium tracking-wide text-justify">
                                                         {getImageDescriptionForSection(deptName, section, "team")}
                                                     </p>
                                                 </div>
@@ -618,7 +621,7 @@ const SurveyForm = () => {
 
                                             {/* Work Summary */}
                                             {resultImageSrc && (
-                                                <div className="bg-muted rounded-lg p-6 transition-all duration-300 hover:scale-[1.01]">
+                                                <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg border border-slate-200">
                                                     <div
                                                         className="relative group cursor-pointer"
                                                         onClick={() => setEnlargedImage(resultImageSrc)}
@@ -626,14 +629,14 @@ const SurveyForm = () => {
                                                         <img
                                                             src={resultImageSrc}
                                                             alt={`${section} Work Summary`}
-                                                            className="w-full h-48 object-cover rounded-lg mb-4 transition-all duration-300 group-hover:brightness-75"
+                                                            className="w-full h-48 object-cover rounded-lg mb-4 transition-all duration-300 group-hover:brightness-75 shadow-md"
                                                         />
                                                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                             <ZoomIn className="h-8 w-8 text-white" />
                                                         </div>
                                                     </div>
-                                                    <h4 className="font-semibold text-primary mb-2">{section} Work Summary</h4>
-                                                    <p className="text-sm text-muted-foreground text-justify">
+                                                    <h4 className="font-bold text-lg text-primary mb-3 tracking-wide">{section} Work Summary</h4>
+                                                    <p className="text-sm text-slate-600 leading-relaxed font-medium tracking-wide text-justify">
                                                         {getImageDescriptionForSection(deptName, section, "result")}
                                                     </p>
                                                 </div>
@@ -642,9 +645,12 @@ const SurveyForm = () => {
                                         
                                         {/* Move this OUTSIDE the grid */}
                                         {overviewText && (
-                                            <div className="mt-6 bg-muted rounded-lg p-6 max-w-4xl">
-                                                <h4 className="font-semibold text-primary mb-2">Role Overview</h4>
-                                                <p className="text-sm text-muted-foreground whitespace-pre-line text-justify">
+                                            <div className="mt-6 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-8 max-w-4xl border border-slate-200 shadow-sm">
+                                                <h4 className="font-bold text-xl text-primary mb-4 tracking-wide flex items-center">
+                                                    <div className="w-1 h-6 bg-primary rounded-full mr-3"></div>
+                                                    Role Overview
+                                                </h4>
+                                                <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed font-medium tracking-wide text-justify">
                                                     {overviewText}
                                                 </p>
                                             </div>
@@ -653,7 +659,10 @@ const SurveyForm = () => {
                                 </div>
                                 {/* Questions Section */}
                                 <div className="mt-8 space-y-6 max-w-4xl">
-                                    <h3 className="text-lg font-semibold text-primary">{section} Evaluation</h3>
+                                    <h3 className="text-xl font-bold text-primary tracking-wide flex items-center">
+                                        <div className="w-1 h-6 bg-primary rounded-full mr-3"></div>
+                                        {section} Evaluation
+                                    </h3>
                                     {/* Question 1 */}
                                     <div className="space-y-3">
                                         <Label className="text-sm font-medium">
