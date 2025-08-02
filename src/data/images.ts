@@ -41,7 +41,7 @@ export const departmentSections = {
           `This section is responsible for monitoring various environmental parameters, including domestic and industrial wastewater, groundwater, ambient air, noise, odor, emissions from generators, stacks, and mobile sources, as well as TCLP testing. It also oversees the operation of supporting fleets such as vacuum trucks and water trucks, and implements internal inspection initiatives through the Environmental Inspection Program (Eco Hero).`,
         team: {
           src: env_mon,
-          description: "Environmental Monitoring: MAHRIVAI B HAMISI, JATE’US POSMARIANO, ALEXANDER THEFENDIO P.",
+          description: "Environmental Monitoring: Mahrivai B Hamisi, Jate’us Posmariano, Alexander Thefendio P.",
         },
         result: {
           src: env_mon_chart,
@@ -53,7 +53,7 @@ export const departmentSections = {
           `The Management section focuses on the handling and transportation of various waste streams, including hazardous waste (B3), domestic waste, inert waste, and metal scrap. This ensures that all waste is managed safely, efficiently, and in full compliance with environmental standards.`,
         team: {
           src: env_mgt,
-          description: "Environmental Management: SYAHRUL GUNAWAN",
+          description: "Environmental Management: Syahrul Gunawan",
         },
         result: {
           src: env_mgt_chart,
@@ -65,7 +65,7 @@ export const departmentSections = {
           `This section handles environmental audits such as ISO audits, AEPR audits, lender (bank) audits, and government-conducted audits. It also manages the submission of mandatory environmental reports to the Ministry of Environment through electronic systems such as SIMPEL KLH, including Festronic and APPEL platform`,
         team: {
           src: env_audit,
-          description: "Environmental Audit & Compulsory: IMAN ABDUL R, TIO KATARINA MARPAUNG​.",
+          description: "Environmental Audit & Compulsory: Iman Abdul R, Tio Katarina Marapaung​.",
         },
         result: {
           src: env_audit_chart,
@@ -77,7 +77,7 @@ export const departmentSections = {
           `The Study & Project section leads environmental assessments and the development of environmental initiatives, including environmental permits and technical studies (Pertek), as well as greening and conservation programs such as mangrove restoration and hydroseeding. This section also organizes environmental campaigns and events to raise awareness and engage stakeholders.`,
         team: {
           src: env_study,
-          description: "Environmental Study & Project: VERONICA A. SARAGIH​",
+          description: "Environmental Study & Project: Veronica A. Saragih​",
         },
         result: {
           src: env_study_chart,
@@ -271,31 +271,8 @@ export const departmentSections = {
     },
   },
   "Supply Chain Management": {
-    sections: ["Inventory", "Procurement", "Logistic", "Warehouse"],
+    sections: ["Logistic", "Warehouse"],
     images: {
-      Inventory: {
-        overview:
-          "Inventory team manages stock levels and ensures supply availability.",
-        team: {
-          src: dep1_img,
-          description: "SCM Inventory team discussion",
-        },
-        result: {
-          src: dep1_img,
-          description: "SCM Inventory performance report",
-        },
-      },
-      Procurement: {
-        overview: "Procurement team handles purchasing and supplier relations.",
-        team: {
-          src: dep1_img,
-          description: "Procurement team managing contracts",
-        },
-        result: {
-          src: dep1_img,
-          description: "Procurement order fulfillment summary",
-        },
-      },
       Logistic: {
         overview:
           "Logistic team oversees transportation and distribution of goods.",
