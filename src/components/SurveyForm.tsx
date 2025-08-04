@@ -525,7 +525,16 @@ const SurveyForm = () => {
                             Your survey has been submitted successfully. We appreciate your
                             valuable feedback.
                         </p>
-                        <p className="text-sm text-muted-foreground">You can now close the page.</p>
+                        <div className="space-y-4">
+                            <Button 
+                                onClick={() => window.open('/results', '_blank')}
+                                className="w-full max-w-xs mx-auto"
+                                variant="outline"
+                            >
+                                View Survey Results
+                            </Button>
+                            <p className="text-sm text-muted-foreground">You can now close the page.</p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
