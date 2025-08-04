@@ -23,7 +23,7 @@ This application enables employees to evaluate different departments within thei
 - **External Affairs**: Community Relations, Asset Protection, Government Relations
 - **Finance**: Finance, Contract Management, Cost Control
 - **ICT**: Infrastructure, Data Center, Support services
-- **Supply Chain Management**: Logistics, Warehouse operations
+- **Supply Chain Management**: Logistics, Warehouse & Inventory operations
 - **Personal Data**: Data protection and management
 
 ## 🚀 Getting Started

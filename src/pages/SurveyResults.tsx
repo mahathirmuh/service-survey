@@ -105,7 +105,7 @@ const SurveyResults = () => {
     },
     scm: {
       "logistic": "Logistic",
-      "warehouse": "Warehouse"
+      "warehouse": "Warehouse & Inventory"
     }
   };
 

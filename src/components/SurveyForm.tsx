@@ -425,7 +425,7 @@ const SurveyForm = () => {
                     "Inventory": "inventory",
                     "Procurement": "procurement",
                     "Logistic": "logistic",
-                    "Warehouse": "warehouse",
+                    "Warehouse & Inventory": "warehouse",
                 };
                 sectionsInForm &&
                     Object.entries(sectionsInForm).forEach(([sectionLabel, sectionData]) => {

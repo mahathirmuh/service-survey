@@ -271,7 +271,7 @@ export const departmentSections = {
     },
   },
   "Supply Chain Management": {
-    sections: ["Logistic", "Warehouse"],
+    sections: ["Logistic", "Warehouse & Inventory"],
     images: {
       Logistic: {
         overview:
@@ -285,16 +285,16 @@ export const departmentSections = {
           description: "Logistic delivery performance charts",
         },
       },
-      Warehouse: {
+      "Warehouse & Inventory": {
         overview:
-          "Warehouse team manages storage, inventory control, and dispatching.",
+          "Warehouse & Inventory team manages storage, inventory control, and dispatching.",
         team: {
           src: dep1_img,
-          description: "Warehouse team organizing stock",
+          description: "Warehouse & Inventory team organizing stock",
         },
         result: {
           src: dep1_img,
-          description: "Warehouse throughput and error reports",
+          description: "Warehouse & Inventory throughput and error reports",
         },
       },
     },
