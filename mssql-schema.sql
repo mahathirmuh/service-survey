@@ -140,11 +140,22 @@ CREATE TABLE survey_responses (
     ohs_training_question1 INT DEFAULT 0 CHECK (ohs_training_question1 >= 0 AND ohs_training_question1 <= 5),
     ohs_training_question2 INT DEFAULT 0 CHECK (ohs_training_question2 >= 0 AND ohs_training_question2 <= 5),
     
-    -- SCM sections (Note: Inventory and Procurement were removed, but keeping for data integrity)
+    -- SCM sections
+    scm_logistic_question1 INT DEFAULT 0 CHECK (scm_logistic_question1 >= 0 AND scm_logistic_question1 <= 5),
+    scm_logistic_question2 INT DEFAULT 0 CHECK (scm_logistic_question2 >= 0 AND scm_logistic_question2 <= 5),
+    scm_logistic_feedback NTEXT,
+    
+    scm_warehouse_question1 INT DEFAULT 0 CHECK (scm_warehouse_question1 >= 0 AND scm_warehouse_question1 <= 5),
+    scm_warehouse_question2 INT DEFAULT 0 CHECK (scm_warehouse_question2 >= 0 AND scm_warehouse_question2 <= 5),
+    scm_warehouse_feedback NTEXT,
+    
+    -- Legacy SCM sections (keeping for data integrity)
     scm_inventory_question1 INT DEFAULT 0 CHECK (scm_inventory_question1 >= 0 AND scm_inventory_question1 <= 5),
     scm_inventory_question2 INT DEFAULT 0 CHECK (scm_inventory_question2 >= 0 AND scm_inventory_question2 <= 5),
+    scm_inventory_feedback NTEXT,
     scm_procurement_question1 INT DEFAULT 0 CHECK (scm_procurement_question1 >= 0 AND scm_procurement_question1 <= 5),
     scm_procurement_question2 INT DEFAULT 0 CHECK (scm_procurement_question2 >= 0 AND scm_procurement_question2 <= 5),
+    scm_procurement_feedback NTEXT,
     
     -- Timestamps
     created_at DATETIME2 NOT NULL DEFAULT GETDATE(),
