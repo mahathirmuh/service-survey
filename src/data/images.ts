@@ -140,10 +140,10 @@ export const departmentSections = {
       },
       "Site Service": {
         overview:
-          `Camp Service: 
+          `Camp Service :
           •	Focused on managing residential facilities for employees, especially in remote operational areas, this section ensures that living conditions meet company standards and contribute to employee well-being.
           •	Camp maintenance, accommodation allocation, recreational facilities management, basic amenities provisioning.
-          Transport & Ticketing: 
+          Transport & Ticketing : 
           •	This section coordinates transportation needs for the organization, managing the logistics of employee travel and commuting. It ensures efficient, safe, and timely travel arrangements for employee and visitor.
           •	Employee transport management, travel booking and ticketing, vehicle maintenance, travel policy compliance.`,
         team: {
@@ -152,7 +152,7 @@ export const departmentSections = {
         },
         result: {
           src: hr_ss_chart,
-          description: "Site Service Ticketing",
+          description: "Manage and oversee site service operations including facility management, transportation, camp services, catering, and ticketing to ensure employee services well. Control and optimize the OPEX and CAPEX budgets for HR site services, while maintaining efficient lead times for ticket orders and camp facility repairs. Continuously improve the facility management application to enhance service delivery and operational efficiency.",
         },
       },
       "People Development": {
@@ -181,22 +181,22 @@ export const departmentSections = {
           description: "Work Report",
         },
       },
-      Translator: {
+      "Translator": {
         overview:
-          `•	Supporting global workforce operations, this section provides translation and interpretation services for operations materials, ensuring all employees have access to information in their preferred language.
-          •	Document translation, real-time interpretation, localization of communication materials, multilingual support.`,
+          `• Supporting global workforce operations, this section provides translation and interpretation services for operations materials, ensuring all employees have access to information in their preferred language.
+          • Document translation, real-time interpretation, localization of communication materials, multilingual support.`,
         team: {
           src: hr_translator,
           description: "Translator Team : Ach Sukhaemi Kurniawan, Achmad Chabibulloh, Alex William Pangestu, Alfares Christian, Ayu Nirmala, Dimas Alifando Wasa, Ezra Dea Kristianto, Gerasimos Aria Junianto, Hendri Setiyawan, Hudiono Alim, Muhamad Dafa Santoso, Nizamul Anam, Nur Rohman Mauluddin, Nurul Hasanah, Reyhan Dayu Ramadhani, Ronaldo Cliford Wolah, Sultan Jorgi & Willy.",
         },
         result: {
           src: hr_translator_chart,
-          description: "Translation work matrix",
+          description: "Provide high-quality Mandarin translation and facilitate clear communication with expatriates to support cultural adaptation. Maintain translation service, ensuring accuracy and document quality. Manage translation workload efficiently to meet volume demands while supporting effective cross-cultural understanding within the organization.",
         },
       },
       "Talent Acquisition": {
         overview:
-          `•	As the gateway for new talent, this section handles all aspects of the recruitment process from sourcing candidates to hiring. It focuses on aligning talent acquisition strategies with business needs to attract and retain high-quality employees.
+          `• As the gateway for new talent, this section handles all aspects of the recruitment process from sourcing candidates to hiring. It focuses on aligning talent acquisition strategies with business needs to attract and retain high-quality employees.
           •	Recruitment planning, candidate screening, interviewing, onboarding, employer branding.`,
         team: {
           src: hr_ta,
@@ -217,7 +217,7 @@ export const departmentSections = {
         },
         result: {
           src: hr_ir_chart,
-          description: "Industrial Team Report.",
+          description: "Analyze employee turnover trends to identify root causes and risks, while proactively implementing positive engagement initiatives like LKS Bipartit to strengthen labor-management relations. Drive programs that enhance employee satisfaction and retention by fostering open communication, resolving disputes collaboratively, and promoting a supportive workplace culture. Additionally, ensure efficient service by maintaining a comprehensive database to monitor and manage visa documentation for foreign workers, ensuring compliance and timely renewals.",
         },
       },
     },

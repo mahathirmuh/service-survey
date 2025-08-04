@@ -720,7 +720,7 @@ const SurveyForm = () => {
                                     </div>
                                     {/* Feedback */}
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Additional Feedback for {section}</Label>
+                                        <Label className="text-sm font-medium">Additional Feedback</Label>
                                         <FeedbackTextarea
                                             value={questions.feedback || ""}
                                             onChange={(val) => onQuestionChange("feedback", val)}
