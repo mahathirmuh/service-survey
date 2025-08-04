@@ -31,6 +31,8 @@ import ict_infra from "@/assets/ict-infra.png"
 import ict_infra_chart from "@/assets/ict-infra-chart.png"
 import ict_support from "@/assets/ict-support.png"
 import ict_support_chart from "@/assets/ict-support-chart.png"
+import scm_chart from "@/assets/scm-chart.png"
+import scm_mon_chart from "@/assets/scm-mon.png"
 
 export const departmentSections = {
   Environmental: {
@@ -271,30 +273,30 @@ export const departmentSections = {
     },
   },
   "Supply Chain Management": {
-    sections: ["Logistic", "Warehouse & Inventory"],
+    sections: ["Logistic & Distribution", "Warehouse & Inventory"],
     images: {
-      Logistic: {
+      "Logistic & Distribution": {
         overview:
-          "Logistic team oversees transportation and distribution of goods.",
+          "Logistics and Distribution Roles and Responsibilities is supervise, coordinate, and implement inbound and outbound shipping logistics functions in accordance with the operational demands of PT Merdeka Battery Material, effectively and efficiently in line with company policies, procedures, and standards in the areas of supply, occupational safety, and environmental management to achieve production targets.",
         team: {
           src: dep1_img,
-          description: "Logistic team coordinating shipments",
+          description: "Logistic Team : Donald Richardson Marolop, Fuad Amrul Huda, Stevi Makausi, Muhammad Fadel, Reno Hadi Mulyana, Febriand Madika Mangori, Yuliana & Syathira Indriani",
         },
         result: {
-          src: dep1_img,
-          description: "Logistic delivery performance charts",
+          src: scm_chart,
+          description: "Logistics and distribution effectively manage all heavy equipment supporting plant operations in accordance with Logistic Excellence best practices, ensuring that goods are delivered safely and punctually at an efficient cost in accordance with company SOPs.",
         },
       },
       "Warehouse & Inventory": {
         overview:
-          "Warehouse and inventory roles encompass a wide range of responsibilities focused on managing the flow of goods in and out of a storage facility. These roles include receiving, storing, picking, packing, and shipping inventory, as well as maintaining accurate records and ensuring a safe and organized work environment. In essence, warehouse and inventory roles are vital for ensuring the smooth and efficient operation of a business's supply chain, requiring a combination of physical and technical skills, attention to detail, and a commitment to safety and accuracy.",
+          "Warehouse and inventory roles encompass a wide range of responsibilities focused on  managing the flow of goods in and out of a storage facility. These roles include receiving, storing, picking, packing, and shipping inventory, as well as maintaining accurate records and ensuring a safe and organized work environment. In essence, warehouse and inventory roles are vital for ensuring the smooth and efficient operation of a business's supply chain, requiring a combination of physical and technical skills, attention to detail, and a commitment to safety and accuracy.",
         team: {
           src: dep1_img,
-          description: "Warehouse & Inventory team organizing stock",
+          description: "Warehouse & Inventory Team : Debby Anggara, Aris Sukirman, Alan Dahlan, Nada Triana, Firdaus Malik, Arnold Sulineto, Muhammad Agung Kinanzar, Febrian Triyoga, Gilang Ramadhan & Nur fiqalbi.",
         },
         result: {
-          src: dep1_img,
-          description: "Warehouse & Inventory throughput and error reports",
+          src: scm_mon_chart,
+          description: "Warehouse roles and responsibilities generally involve managing the flow of goods in and out of a warehouse, including receiving, storing, and issuing.",
         },
       },
     },

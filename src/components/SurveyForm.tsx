@@ -424,7 +424,7 @@ const SurveyForm = () => {
                     "Government Relations": "govrel",
                     "Inventory": "inventory",
                     "Procurement": "procurement",
-                    "Logistic": "logistic",
+                    "Logistic & Distribution": "logistic",
                     "Warehouse & Inventory": "warehouse",
                 };
                 sectionsInForm &&

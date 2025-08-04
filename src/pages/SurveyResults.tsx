@@ -104,7 +104,7 @@ const SurveyResults = () => {
       "govrel": "Government Relations"
     },
     scm: {
-      "logistic": "Logistic",
+      "logistic": "Logistic & Distribution",
       "warehouse": "Warehouse & Inventory"
     }
   };
