@@ -1,4 +1,4 @@
-import dep1_img from "@/assets/dep1_sec1.jpg";
+import dep1_img from "@/assets/dep1_sec1.png";
 import env_audit from "@/assets/env-audit.png"
 import env_study from "@/assets/env-study.png"
 import env_mgt from "@/assets/env-mgt.png"
@@ -287,7 +287,7 @@ export const departmentSections = {
       },
       "Warehouse & Inventory": {
         overview:
-          "Warehouse & Inventory team manages storage, inventory control, and dispatching.",
+          "Warehouse and inventory roles encompass a wide range of responsibilities focused on managing the flow of goods in and out of a storage facility. These roles include receiving, storing, picking, packing, and shipping inventory, as well as maintaining accurate records and ensuring a safe and organized work environment. In essence, warehouse and inventory roles are vital for ensuring the smooth and efficient operation of a business's supply chain, requiring a combination of physical and technical skills, attention to detail, and a commitment to safety and accuracy.",
         team: {
           src: dep1_img,
           description: "Warehouse & Inventory team organizing stock",
