@@ -299,6 +299,7 @@ export const departmentSections = {
           description: "Warehouse roles and responsibilities generally involve managing the flow of goods in and out of a warehouse, including receiving, storing, and issuing.",
         },
       },
+
     },
   },
 };

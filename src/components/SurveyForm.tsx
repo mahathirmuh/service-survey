@@ -374,11 +374,55 @@ const SurveyForm = () => {
                 setIsSubmitting(false);
                 return;
             }
-            // Prepare insert data
+            // Prepare insert data with default values for all required columns
             const insertData: any = {
                 name: formData.name,
                 id_badge_number: formData.idBadgeNumber,
                 department: formData.department,
+                
+                // Default values for all required HR columns
+                hr_documentcontrol_question1: 0,
+                hr_documentcontrol_question2: 0,
+                hr_itsupport_question1: 0,
+                hr_itsupport_question2: 0,
+                hr_itfield_question1: 0,
+                hr_itfield_question2: 0,
+                hr_siteservice_question1: 0,
+                hr_siteservice_question2: 0,
+                hr_peopledev_question1: 0,
+                hr_peopledev_question2: 0,
+                hr_comben_question1: 0,
+                hr_comben_question2: 0,
+                hr_translator_question1: 0,
+                hr_translator_question2: 0,
+                hr_talentacquisition_question1: 0,
+                hr_talentacquisition_question2: 0,
+                hr_ir_question1: 0,
+                hr_ir_question2: 0,
+                
+                // Default values for all required Environmental columns
+                environmental_monitoring_question1: 0,
+                environmental_monitoring_question2: 0,
+                environmental_management_question1: 0,
+                environmental_management_question2: 0,
+                environmental_audit_question1: 0,
+                environmental_audit_question2: 0,
+                environmental_study_question1: 0,
+                environmental_study_question2: 0,
+                
+                // Default values for all required External columns
+                external_communityrelations_question1: 0,
+                external_communityrelations_question2: 0,
+                
+                // Default values for all required SCM columns (including obsolete ones)
+                scm_logistic_question1: 0,
+                scm_logistic_question2: 0,
+                scm_warehouse_question1: 0,
+                scm_warehouse_question2: 0,
+                scm_inventory_question1: 0,
+                scm_inventory_question2: 0,
+                scm_procurement_question1: 0,
+                scm_procurement_question2: 0,
             };
             const deptConfig = [
                 { formKey: "hr_sections", prefix: "hr", deptName: "Human Resources" },
@@ -422,8 +466,7 @@ const SurveyForm = () => {
                     "Asset Protection": "assetprotection",
                     "Community Relations": "communityrelations",
                     "Government Relations": "govrel",
-                    "Inventory": "inventory",
-                    "Procurement": "procurement",
+
                     "Logistic & Distribution": "logistic",
                     "Warehouse & Inventory": "warehouse",
                 };
