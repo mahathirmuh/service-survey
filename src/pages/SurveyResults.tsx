@@ -80,8 +80,8 @@ const SurveyResults = () => {
     "Supply Chain Management": "scm"
   };
 
-  const sectionMapping = {
-    hr: {
+  const sectionMapping: { [key: string]: { [key: string]: string } } = {
+    "hr": {
       "documentcontrol": "Document Control",
       "itsupport": "ICT System & Support",
       "itfield": "ICT Infrastructure & Network Security",
@@ -92,20 +92,22 @@ const SurveyResults = () => {
       "talentacquisition": "Talent Acquisition",
       "ir": "Industrial Relation"
     },
-    environmental: {
+    "environmental": {
       "monitoring": "Monitoring",
       "management": "Management",
       "audit": "Audit & Compulsory",
       "study": "Study & Project"
     },
-    external: {
+    "external": {
       "assetprotection": "Asset Protection",
       "communityrelations": "Community Relations",
       "govrel": "Government Relations"
     },
-    scm: {
+    "scm": {
       "logistic": "Logistic & Distribution",
-      "warehouse": "Warehouse & Inventory"
+      "warehouse": "Warehouse & Inventory",
+      "inventory": "Inventory",
+      "procurement": "Procurement"
     }
   };
 
@@ -137,14 +139,84 @@ const SurveyResults = () => {
     }
   };
 
+  // Function to convert database column names to proper display names
+  const getSectionDisplayName = (sectionKey: string): string => {
+    const sectionMapping: { [key: string]: string } = {
+      // HR sections
+      'documentcontrol': 'Document Control',
+      'itsupport': 'ICT System & Support',
+      'itfield': 'ICT Infrastructure & Network Security',
+      'siteservice': 'Site Service',
+      'peopledev': 'People Development',
+      'comben': 'Compensation & Benefit',
+      'translator': 'Translator',
+      'talentacquisition': 'Talent Acquisition',
+      'ir': 'Industrial Relation',
+      
+      // Environmental sections
+      'monitoring': 'Monitoring',
+      'management': 'Management',
+      'audit': 'Audit & Compulsory',
+      'study': 'Study & Project',
+      
+      // External sections
+      'assetprotection': 'Asset Protection',
+      'communityrelations': 'Community Relations',
+      'govrel': 'Government Relations',
+      
+      // SCM sections
+      'logistic': 'Logistic & Distribution',
+      'warehouse': 'Warehouse & Inventory',
+      'inventory': 'Warehouse & Inventory',
+      'procurement': 'Procurement'
+    };
+    
+    return sectionMapping[sectionKey] || sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
+  };
+
   const processStatistics = (data: SurveyResponse[]) => {
+    console.log("Processing statistics for data:", data);
+    
     const deptStats: { [key: string]: DepartmentStats } = {};
     let totalRatings = 0;
     let totalRatingCount = 0;
     const sectionRatings: { [key: string]: number[] } = {};
 
+    // Define all possible rating columns
+    const allRatingColumns = [
+      // HR columns
+      'hr_documentcontrol_question1', 'hr_documentcontrol_question2',
+      'hr_itsupport_question1', 'hr_itsupport_question2',
+      'hr_itfield_question1', 'hr_itfield_question2',
+      'hr_siteservice_question1', 'hr_siteservice_question2',
+      'hr_peopledev_question1', 'hr_peopledev_question2',
+      'hr_comben_question1', 'hr_comben_question2',
+      'hr_translator_question1', 'hr_translator_question2',
+      'hr_talentacquisition_question1', 'hr_talentacquisition_question2',
+      'hr_ir_question1', 'hr_ir_question2',
+      
+      // Environmental columns
+      'environmental_monitoring_question1', 'environmental_monitoring_question2',
+      'environmental_management_question1', 'environmental_management_question2',
+      'environmental_audit_question1', 'environmental_audit_question2',
+      'environmental_study_question1', 'environmental_study_question2',
+      
+      // External columns
+      'external_assetprotection_question1', 'external_assetprotection_question2',
+      'external_communityrelations_question1', 'external_communityrelations_question2',
+      'external_govrel_question1', 'external_govrel_question2',
+      
+      // SCM columns
+      'scm_logistic_question1', 'scm_logistic_question2',
+      'scm_warehouse_question1', 'scm_warehouse_question2',
+      'scm_inventory_question1', 'scm_inventory_question2',
+      'scm_procurement_question1', 'scm_procurement_question2'
+    ];
+
     // Process each response
     data.forEach((response) => {
+      console.log("Processing response:", response);
+      
       const dept = response.department;
       if (!deptStats[dept]) {
         deptStats[dept] = {
@@ -157,44 +229,48 @@ const SurveyResults = () => {
 
       deptStats[dept].totalResponses++;
 
-      // Process ratings for each department's sections
-      const deptKey = departmentMapping[dept as keyof typeof departmentMapping];
-      if (deptKey && sectionMapping[deptKey as keyof typeof sectionMapping]) {
-        const sections = sectionMapping[deptKey as keyof typeof sectionMapping];
+      // Process all rating columns for this response
+      for (let i = 0; i < allRatingColumns.length; i += 2) {
+        const question1Key = allRatingColumns[i];
+        const question2Key = allRatingColumns[i + 1];
         
-        Object.entries(sections).forEach(([sectionKey, sectionName]) => {
-          const question1Key = `${deptKey}_${sectionKey}_question1`;
-          const question2Key = `${deptKey}_${sectionKey}_question2`;
+        const rating1 = response[question1Key];
+        const rating2 = response[question2Key];
+        
+        console.log(`Checking ${question1Key} and ${question2Key}:`, rating1, rating2);
+        
+        if (rating1 > 0 && rating2 > 0) {
+          const avgRating = (rating1 + rating2) / 2;
+          console.log("Average rating calculated:", avgRating);
           
-          const rating1 = response[question1Key];
-          const rating2 = response[question2Key];
+          // Extract section name from column name and get proper display name
+          const sectionKey = question1Key.replace(/_question1$/, '').replace(/^(hr|environmental|external|scm)_/, '');
+          const displaySectionName = getSectionDisplayName(sectionKey);
           
-          if (rating1 && rating2) {
-            const avgRating = (rating1 + rating2) / 2;
-            
-            if (!deptStats[dept].sections[sectionName]) {
-              deptStats[dept].sections[sectionName] = {
-                averageRating: 0,
-                responseCount: 0,
-                ratings: []
-              };
-            }
-            
-            deptStats[dept].sections[sectionName].ratings.push(avgRating);
-            deptStats[dept].sections[sectionName].responseCount++;
-            
-            // For overall stats
-            totalRatings += avgRating;
-            totalRatingCount++;
-            
-            if (!sectionRatings[sectionName]) {
-              sectionRatings[sectionName] = [];
-            }
-            sectionRatings[sectionName].push(avgRating);
+          if (!deptStats[dept].sections[displaySectionName]) {
+            deptStats[dept].sections[displaySectionName] = {
+              averageRating: 0,
+              responseCount: 0,
+              ratings: []
+            };
           }
-        });
+          
+          deptStats[dept].sections[displaySectionName].ratings.push(avgRating);
+          deptStats[dept].sections[displaySectionName].responseCount++;
+          
+          // For overall stats
+          totalRatings += avgRating;
+          totalRatingCount++;
+          
+          if (!sectionRatings[displaySectionName]) {
+            sectionRatings[displaySectionName] = [];
+          }
+          sectionRatings[displaySectionName].push(avgRating);
+        }
       }
     });
+
+    console.log("Total ratings:", totalRatings, "Total count:", totalRatingCount);
 
     // Calculate averages
     Object.values(deptStats).forEach((dept) => {
@@ -213,6 +289,7 @@ const SurveyResults = () => {
 
     // Calculate overall stats
     const overallAverage = totalRatingCount > 0 ? totalRatings / totalRatingCount : 0;
+    console.log("Overall average calculated:", overallAverage);
     
     let topSection = "";
     let lowestSection = "";
@@ -241,23 +318,194 @@ const SurveyResults = () => {
     });
   };
 
-  const exportResults = () => {
-    const csvContent = [
-      ["Name", "ID Badge", "Department", "Submission Date", "Average Rating"].join(","),
-      ...surveyData.map(response => [
-        response.name,
-        response.id_badge_number,
-        response.department,
-        new Date(response.created_at).toLocaleDateString(),
-        "N/A" // You can calculate this based on the response data
-      ].join(","))
-    ].join("\n");
+  const calculateResponseAverageRating = (response: SurveyResponse): number => {
+    const allRatingColumns = [
+      // HR columns
+      'hr_documentcontrol_question1', 'hr_documentcontrol_question2',
+      'hr_itsupport_question1', 'hr_itsupport_question2',
+      'hr_itfield_question1', 'hr_itfield_question2',
+      'hr_siteservice_question1', 'hr_siteservice_question2',
+      'hr_peopledev_question1', 'hr_peopledev_question2',
+      'hr_comben_question1', 'hr_comben_question2',
+      'hr_translator_question1', 'hr_translator_question2',
+      'hr_talentacquisition_question1', 'hr_talentacquisition_question2',
+      'hr_ir_question1', 'hr_ir_question2',
+      
+      // Environmental columns
+      'environmental_monitoring_question1', 'environmental_monitoring_question2',
+      'environmental_management_question1', 'environmental_management_question2',
+      'environmental_audit_question1', 'environmental_audit_question2',
+      'environmental_study_question1', 'environmental_study_question2',
+      
+      // External columns
+      'external_assetprotection_question1', 'external_assetprotection_question2',
+      'external_communityrelations_question1', 'external_communityrelations_question2',
+      'external_govrel_question1', 'external_govrel_question2',
+      
+      // SCM columns
+      'scm_logistic_question1', 'scm_logistic_question2',
+      'scm_warehouse_question1', 'scm_warehouse_question2',
+      'scm_inventory_question1', 'scm_inventory_question2',
+      'scm_procurement_question1', 'scm_procurement_question2'
+    ];
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
+    let totalRating = 0;
+    let ratingCount = 0;
+
+    // Process all rating columns for this response
+    for (let i = 0; i < allRatingColumns.length; i += 2) {
+      const question1Key = allRatingColumns[i];
+      const question2Key = allRatingColumns[i + 1];
+      
+      const rating1 = response[question1Key];
+      const rating2 = response[question2Key];
+      
+      if (rating1 > 0 && rating2 > 0) {
+        const avgRating = (rating1 + rating2) / 2;
+        totalRating += avgRating;
+        ratingCount++;
+      }
+    }
+
+    return ratingCount > 0 ? totalRating / ratingCount : 0;
+  };
+
+  const exportResults = () => {
+    // Create detailed CSV with section-wise ratings
+    const headers = [
+      "Name",
+      "ID Badge", 
+      "Department",
+      "Submission Date",
+      "Overall Average Rating",
+      // HR Sections - Ratings
+      "Document Control",
+      "Document Control Feedback",
+      "ICT System & Support", 
+      "ICT System & Support Feedback",
+      "ICT Infrastructure & Network Security",
+      "ICT Infrastructure & Network Security Feedback",
+      "Site Service",
+      "Site Service Feedback",
+      "People Development",
+      "People Development Feedback",
+      "Compensation & Benefit",
+      "Compensation & Benefit Feedback",
+      "Translator",
+      "Translator Feedback",
+      "Talent Acquisition",
+      "Talent Acquisition Feedback",
+      "Industrial Relation",
+      "Industrial Relation Feedback",
+      // Environmental Sections - Ratings
+      "Environmental Monitoring",
+      "Environmental Monitoring Feedback",
+      "Environmental Management", 
+      "Environmental Management Feedback",
+      "Environmental Audit & Compulsory",
+      "Environmental Audit & Compulsory Feedback",
+      "Environmental Study & Project",
+      "Environmental Study & Project Feedback",
+      // External Sections - Ratings
+      "Asset Protection",
+      "Asset Protection Feedback",
+      "Community Relations",
+      "Community Relations Feedback",
+      "Government Relations",
+      "Government Relations Feedback",
+      // SCM Sections - Ratings
+      "Logistic & Distribution",
+      "Logistic & Distribution Feedback",
+      "Warehouse & Inventory",
+      "Warehouse & Inventory Feedback",
+      "SCM Inventory",
+      "SCM Inventory Feedback",
+      "SCM Procurement",
+      "SCM Procurement Feedback"
+    ];
+
+    const csvRows = [
+      headers.join(","),
+      ...surveyData.map(response => {
+        const overallRating = calculateResponseAverageRating(response);
+        
+        // Calculate section ratings
+        const getSectionRating = (q1Key: string, q2Key: string) => {
+          const rating1 = response[q1Key];
+          const rating2 = response[q2Key];
+          if (rating1 > 0 && rating2 > 0) {
+            return ((rating1 + rating2) / 2).toFixed(2);
+          }
+          return "N/A";
+        };
+
+        const getFeedback = (feedbackKey: string) => {
+          const feedback = response[feedbackKey];
+          return feedback ? `"${feedback.replace(/"/g, '""')}"` : "N/A";
+        };
+
+        const row = [
+          `"${response.name}"`,
+          response.id_badge_number,
+          `"${response.department}"`,
+          new Date(response.created_at).toLocaleDateString(),
+          overallRating.toFixed(2),
+          // HR Sections
+          getSectionRating('hr_documentcontrol_question1', 'hr_documentcontrol_question2'),
+          getFeedback('hr_documentcontrol_feedback'),
+          getSectionRating('hr_itsupport_question1', 'hr_itsupport_question2'),
+          getFeedback('hr_itsupport_feedback'),
+          getSectionRating('hr_itfield_question1', 'hr_itfield_question2'),
+          getFeedback('hr_itfield_feedback'),
+          getSectionRating('hr_siteservice_question1', 'hr_siteservice_question2'),
+          getFeedback('hr_siteservice_feedback'),
+          getSectionRating('hr_peopledev_question1', 'hr_peopledev_question2'),
+          getFeedback('hr_peopledev_feedback'),
+          getSectionRating('hr_comben_question1', 'hr_comben_question2'),
+          getFeedback('hr_comben_feedback'),
+          getSectionRating('hr_translator_question1', 'hr_translator_question2'),
+          getFeedback('hr_translator_feedback'),
+          getSectionRating('hr_talentacquisition_question1', 'hr_talentacquisition_question2'),
+          getFeedback('hr_talentacquisition_feedback'),
+          getSectionRating('hr_ir_question1', 'hr_ir_question2'),
+          getFeedback('hr_ir_feedback'),
+          // Environmental Sections
+          getSectionRating('environmental_monitoring_question1', 'environmental_monitoring_question2'),
+          getFeedback('environmental_monitoring_feedback'),
+          getSectionRating('environmental_management_question1', 'environmental_management_question2'),
+          getFeedback('environmental_management_feedback'),
+          getSectionRating('environmental_audit_question1', 'environmental_audit_question2'),
+          getFeedback('environmental_audit_feedback'),
+          getSectionRating('environmental_study_question1', 'environmental_study_question2'),
+          getFeedback('environmental_study_feedback'),
+          // External Sections
+          getSectionRating('external_assetprotection_question1', 'external_assetprotection_question2'),
+          getFeedback('external_assetprotection_feedback'),
+          getSectionRating('external_communityrelations_question1', 'external_communityrelations_question2'),
+          getFeedback('external_communityrelations_feedback'),
+          getSectionRating('external_govrel_question1', 'external_govrel_question2'),
+          getFeedback('external_govrel_feedback'),
+          // SCM Sections
+          getSectionRating('scm_logistic_question1', 'scm_logistic_question2'),
+          getFeedback('scm_logistic_feedback'),
+          getSectionRating('scm_warehouse_question1', 'scm_warehouse_question2'),
+          getFeedback('scm_warehouse_feedback'),
+          getSectionRating('scm_inventory_question1', 'scm_inventory_question2'),
+          getFeedback('scm_inventory_feedback'),
+          getSectionRating('scm_procurement_question1', 'scm_procurement_question2'),
+          getFeedback('scm_procurement_feedback')
+        ];
+        
+        return row.join(",");
+      })
+    ];
+
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `survey-results-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `survey-results-detailed-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };

@@ -167,6 +167,25 @@ const AdminDashboard = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Validate required fields
+        if (!formData.name.trim()) {
+            toast({
+                title: "Validation Error",
+                description: "Employee name is required",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (!formData.department) {
+            toast({
+                title: "Validation Error",
+                description: "Department selection is required",
+                variant: "destructive",
+            });
+            return;
+        }
+
         // Validate ID badge number format
         if (!formData.id_badge_number.startsWith("MTI")) {
             toast({
@@ -868,7 +887,6 @@ const AdminDashboard = () => {
                                                 onValueChange={(value) =>
                                                     setFormData({ ...formData, department: value })
                                                 }
-                                                required
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select department" />
