@@ -29,10 +29,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, AlertTriangle } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import ManualEmployeeEntry from "@/components/ManualEmployeeEntry";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Employee {
     id: string;
@@ -63,6 +65,8 @@ const AdminDashboard = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
     const [isImporting, setIsImporting] = useState(false);
+    const [showManualEntry, setShowManualEntry] = useState(false);
+    const [showRLSWarning, setShowRLSWarning] = useState(false);
     const [formData, setFormData] = useState({
         id_badge_number: "",
         name: "",
@@ -683,6 +687,14 @@ const AdminDashboard = () => {
 
                     if (error) {
                         console.error("Database insert error:", error);
+                        
+                        // Check for RLS policy violation
+                        if (error.code === '42501') {
+                            setShowRLSWarning(true);
+                            setShowManualEntry(true);
+                            throw new Error(`Row Level Security policy violation: ${error.message}. The database is blocking INSERT operations. Try using the Manual Entry option below.`);
+                        }
+                        
                         throw error;
                     } else {
                         successCount = newEmployees.length;
@@ -1005,6 +1017,43 @@ const AdminDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* RLS Warning Alert */}
+            {showRLSWarning && (
+                <div className="mt-6">
+                    <Alert className="border-orange-200 bg-orange-50">
+                        <AlertTriangle className="h-4 w-4 text-orange-600" />
+                        <AlertDescription className="text-orange-800">
+                            <strong>Database Policy Issue:</strong> Excel import failed due to Row Level Security policies blocking INSERT operations. 
+                            Use the Manual Entry option below as a workaround, or consider switching to the MSSQL alternative database.
+                            <div className="mt-2">
+                                <Button 
+                                    onClick={() => setShowManualEntry(!showManualEntry)}
+                                    variant="outline"
+                                    size="sm"
+                                    className="mr-2"
+                                >
+                                    {showManualEntry ? 'Hide' : 'Show'} Manual Entry
+                                </Button>
+                                <Button 
+                                    onClick={() => setShowRLSWarning(false)}
+                                    variant="outline"
+                                    size="sm"
+                                >
+                                    Dismiss
+                                </Button>
+                            </div>
+                        </AlertDescription>
+                    </Alert>
+                </div>
+            )}
+
+            {/* Manual Employee Entry Component */}
+            {showManualEntry && (
+                <div className="mt-6">
+                    <ManualEmployeeEntry onEmployeeAdded={fetchEmployees} />
+                </div>
+            )}
         </div>
     );
 };
