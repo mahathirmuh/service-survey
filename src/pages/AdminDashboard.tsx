@@ -822,7 +822,7 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
+            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 flex flex-col`}>
                 <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
           <div className="flex items-center space-x-3">
             <div className="bg-white p-2 rounded-lg shadow-sm">
@@ -923,7 +923,7 @@ const AdminDashboard = () => {
             )}
 
             {/* Main Content */}
-            <div className="flex-1 lg:ml-0">
+            <div className="flex-1 lg:ml-64">
                 {/* Header */}
                 <div className="bg-white shadow-sm border-b">
                     <div className="w-full px-6 py-4">
