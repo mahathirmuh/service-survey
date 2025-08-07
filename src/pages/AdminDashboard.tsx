@@ -44,14 +44,17 @@ interface Employee {
 }
 
 const departments = [
-    "Environmental Department",
-    "Finance Department",
+    "AIM Construction",
+    "AIM Operation",
+    "Environment",
+    "External Affair",
+    "Finance",
     "Human Resources",
-    "External Affair Department",
-    "Supply Chain Management",
-    "Personal Data",
-    "ICT Department",
-    "OHS Department"
+    "Maintenance",
+    "Management",
+    "Occupational Health and Safety",
+    "Pyrite Plant",
+    "Supply Chain Management"
 ];
 
 const AdminDashboard = () => {
