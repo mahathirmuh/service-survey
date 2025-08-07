@@ -50,6 +50,7 @@ interface Employee {
     id_badge_number: string;
     name: string;
     department: string;
+    status?: string;
     created_at: string;
     updated_at: string;
 }
@@ -73,6 +74,7 @@ const AdminDashboard = () => {
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
+    const [submissionFilter, setSubmissionFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -127,18 +129,36 @@ const AdminDashboard = () => {
         return () => clearInterval(sessionCheckInterval);
     }, [navigate, toast]);
 
-    // Fetch employees
+    // Fetch employees with submission status
     const fetchEmployees = async () => {
         setIsLoading(true);
         try {
-            const { data, error } = await supabase
+            // First get all employees
+            const { data: employeesData, error: employeesError } = await supabase
                 .from("employees")
                 .select("*")
                 .order("created_at", { ascending: false });
 
-            if (error) throw error;
-            setEmployees(data || []);
-            setFilteredEmployees(data || []);
+            if (employeesError) throw employeesError;
+
+            // Get all survey responses to check submission status
+            const { data: responsesData, error: responsesError } = await supabase
+                .from("survey_responses")
+                .select("id_badge_number");
+
+            if (responsesError) throw responsesError;
+
+            // Create a set of submitted ID badge numbers for quick lookup
+            const submittedIds = new Set(responsesData?.map(r => r.id_badge_number) || []);
+
+            // Add submission status to employees
+            const employeesWithStatus = (employeesData || []).map(employee => ({
+                ...employee,
+                status: submittedIds.has(employee.id_badge_number) ? 'Submitted' : 'Not Submitted'
+            }));
+
+            setEmployees(employeesWithStatus);
+            setFilteredEmployees(employeesWithStatus);
         } catch (error) {
             console.error("Error fetching employees:", error);
             toast({
@@ -171,8 +191,12 @@ const AdminDashboard = () => {
             filtered = filtered.filter((emp) => emp.department === selectedDepartment);
         }
 
+        if (submissionFilter !== "all") {
+            filtered = filtered.filter((emp) => emp.status === submissionFilter);
+        }
+
         setFilteredEmployees(filtered);
-    }, [employees, searchTerm, selectedDepartment]);
+    }, [employees, searchTerm, selectedDepartment, submissionFilter]);
 
     const handleLogout = () => {
         sessionStorage.removeItem("adminAuthenticated");
@@ -933,250 +957,415 @@ const AdminDashboard = () => {
 
                 <div className="w-full p-6">
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{employees.length}</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Departments</CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {new Set(employees.map(emp => emp.department)).size}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Filtered Results</CardTitle>
-                            <Search className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{filteredEmployees.length}</div>
-                        </CardContent>
-                    </Card>
-                </div>
+                {activeMenuItem === "dashboard" && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{employees.length}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Departments</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    {new Set(employees.map(emp => emp.department)).size}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Filtered Results</CardTitle>
+                                <Search className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{filteredEmployees.length}</div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
+
+                {/* Submission Stats Cards */}
+                {activeMenuItem === "submission" && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{employees.length}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Submitted</CardTitle>
+                                <FileText className="h-4 w-4 text-green-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-green-600">
+                                    {employees.filter(emp => emp.status === 'Submitted').length}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Not Submitted</CardTitle>
+                                <FileText className="h-4 w-4 text-red-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-red-600">
+                                    {employees.filter(emp => emp.status === 'Not Submitted').length}
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+                                <BarChart3 className="h-4 w-4 text-blue-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {employees.length > 0 
+                                        ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100)
+                                        : 0}%
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
 
                 {/* Main Content */}
-                <Card>
-                    <CardHeader>
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <CardTitle className="text-xl font-semibold">Employee Management</CardTitle>
-                            <div className="flex flex-wrap gap-2">
-                                {/* Download Template Button */}
-                                <Button
-                                    onClick={handleDownloadTemplate}
-                                    variant="outline"
-                                    className="flex items-center gap-2"
-                                >
-                                    <Download className="h-4 w-4" />
-                                    Template
-                                </Button>
-
-                                {/* Export Button */}
-                                <Button
-                                    onClick={handleExportToExcel}
-                                    variant="outline"
-                                    className="flex items-center gap-2"
-                                    disabled={employees.length === 0}
-                                >
-                                    <Download className="h-4 w-4" />
-                                    Export Excel
-                                </Button>
-                                
-                                {/* Import Button */}
-                                <div className="relative">
-                                    <input
-                                        type="file"
-                                        accept=".xlsx,.xls"
-                                        onChange={handleImportFromExcel}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        disabled={isImporting}
-                                    />
+                {activeMenuItem === "dashboard" && (
+                    <Card>
+                        <CardHeader>
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <CardTitle className="text-xl font-semibold">Employee Management</CardTitle>
+                                <div className="flex flex-wrap gap-2">
+                                    {/* Download Template Button */}
                                     <Button
+                                        onClick={handleDownloadTemplate}
                                         variant="outline"
                                         className="flex items-center gap-2"
-                                        disabled={isImporting}
                                     >
-                                        <Upload className="h-4 w-4" />
-                                        {isImporting ? "Importing..." : "Import Excel"}
+                                        <Download className="h-4 w-4" />
+                                        Template
                                     </Button>
-                                </div>
 
-                                {/* Add Employee Button */}
-                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button onClick={() => openDialog()} className="flex items-center gap-2">
-                                            <Plus className="h-4 w-4" />
-                                            Add Employee
+                                    {/* Export Button */}
+                                    <Button
+                                        onClick={handleExportToExcel}
+                                        variant="outline"
+                                        className="flex items-center gap-2"
+                                        disabled={employees.length === 0}
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Export Excel
+                                    </Button>
+                                    
+                                    {/* Import Button */}
+                                    <div className="relative">
+                                        <input
+                                            type="file"
+                                            accept=".xlsx,.xls"
+                                            onChange={handleImportFromExcel}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            disabled={isImporting}
+                                        />
+                                        <Button
+                                            variant="outline"
+                                            className="flex items-center gap-2"
+                                            disabled={isImporting}
+                                        >
+                                            <Upload className="h-4 w-4" />
+                                            {isImporting ? "Importing..." : "Import Excel"}
                                         </Button>
-                                     </DialogTrigger>
-                                     <DialogContent className="sm:max-w-md">
-                                    <DialogHeader>
-                                        <DialogTitle>
-                                            {editingEmployee ? "Edit Employee" : "Add New Employee"}
-                                        </DialogTitle>
-                                    </DialogHeader>
-                                    <form onSubmit={handleSubmit} className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="id_badge_number">ID Badge Number</Label>
-                                            <Input
-                                                id="id_badge_number"
-                                                placeholder="MTI001"
-                                                value={formData.id_badge_number}
-                                                onChange={(e) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        id_badge_number: e.target.value.toUpperCase(),
-                                                    })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="name">Full Name</Label>
-                                            <Input
-                                                id="name"
-                                                placeholder="John Doe"
-                                                value={formData.name}
-                                                onChange={(e) =>
-                                                    setFormData({ ...formData, name: e.target.value })
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="department">Department</Label>
-                                            <Select
-                                                value={formData.department}
-                                                onValueChange={(value) =>
-                                                    setFormData({ ...formData, department: value })
-                                                }
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select department" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {departments.map((dept) => (
-                                                        <SelectItem key={dept} value={dept}>
-                                                            {dept}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="flex justify-end space-x-2 pt-4">
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                onClick={closeDialog}
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button type="submit">
-                                                {editingEmployee ? "Update" : "Create"}
-                                            </Button>
-                                        </div>
-                                    </form>
-                                </DialogContent>
-                            </Dialog>
-                        </div>
-                    </div>
+                                    </div>
 
-                        {/* Filters */}
-                        <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                            <div className="flex-1">
-                                <Input
-                                    placeholder="Search by name or ID badge number..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="max-w-sm"
-                                />
+                                    {/* Add Employee Button */}
+                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                        <DialogTrigger asChild>
+                                            <Button onClick={() => openDialog()} className="flex items-center gap-2">
+                                                <Plus className="h-4 w-4" />
+                                                Add Employee
+                                            </Button>
+                                         </DialogTrigger>
+                                         <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                {editingEmployee ? "Edit Employee" : "Add New Employee"}
+                                            </DialogTitle>
+                                        </DialogHeader>
+                                        <form onSubmit={handleSubmit} className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="id_badge_number">ID Badge Number</Label>
+                                                <Input
+                                                    id="id_badge_number"
+                                                    placeholder="MTI001"
+                                                    value={formData.id_badge_number}
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            id_badge_number: e.target.value.toUpperCase(),
+                                                        })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="name">Full Name</Label>
+                                                <Input
+                                                    id="name"
+                                                    placeholder="John Doe"
+                                                    value={formData.name}
+                                                    onChange={(e) =>
+                                                        setFormData({ ...formData, name: e.target.value })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="department">Department</Label>
+                                                <Select
+                                                    value={formData.department}
+                                                    onValueChange={(value) =>
+                                                        setFormData({ ...formData, department: value })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select department" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {departments.map((dept) => (
+                                                            <SelectItem key={dept} value={dept}>
+                                                                {dept}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="flex justify-end space-x-2 pt-4">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={closeDialog}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit">
+                                                    {editingEmployee ? "Update" : "Create"}
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
-                            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                                <SelectTrigger className="w-full sm:w-[200px]">
-                                    <SelectValue placeholder="Filter by department" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Departments</SelectItem>
-                                    {departments.map((dept) => (
-                                        <SelectItem key={dept} value={dept}>
-                                            {dept}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        {isLoading ? (
-                            <div className="text-center py-8">Loading employees...</div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>ID Badge</TableHead>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Department</TableHead>
-                                            <TableHead>Created</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {filteredEmployees.length === 0 ? (
+
+                            {/* Filters */}
+                            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Search by name or ID badge number..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="max-w-sm"
+                                    />
+                                </div>
+                                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                                    <SelectTrigger className="w-full sm:w-[200px]">
+                                        <SelectValue placeholder="Filter by department" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Departments</SelectItem>
+                                        {departments.map((dept) => (
+                                            <SelectItem key={dept} value={dept}>
+                                                {dept}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {isLoading ? (
+                                <div className="text-center py-8">Loading employees...</div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                        <TableHeader>
                                             <TableRow>
-                                                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                                    No employees found
-                                                </TableCell>
+                                                <TableHead>ID Badge</TableHead>
+                                                <TableHead>Name</TableHead>
+                                                <TableHead>Department</TableHead>
+                                                <TableHead>Created</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
-                                        ) : (
-                                            filteredEmployees.map((employee) => (
-                                                <TableRow key={employee.id}>
-                                                    <TableCell className="font-medium">
-                                                        {employee.id_badge_number}
-                                                    </TableCell>
-                                                    <TableCell>{employee.name}</TableCell>
-                                                    <TableCell>{employee.department}</TableCell>
-                                                    <TableCell>
-                                                        {new Date(employee.created_at).toLocaleDateString()}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <div className="flex justify-end space-x-2">
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => openDialog(employee)}
-                                                            >
-                                                                <Edit className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => handleDelete(employee)}
-                                                                className="text-red-600 hover:text-red-700"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {filteredEmployees.length === 0 ? (
+                                                <TableRow>
+                                                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                                        No employees found
                                                     </TableCell>
                                                 </TableRow>
-                                            ))
-                                        )}
-                                    </TableBody>
-                                </Table>
+                                            ) : (
+                                                filteredEmployees.map((employee) => (
+                                                    <TableRow key={employee.id}>
+                                                        <TableCell className="font-medium">
+                                                            {employee.id_badge_number}
+                                                        </TableCell>
+                                                        <TableCell>{employee.name}</TableCell>
+                                                        <TableCell>{employee.department}</TableCell>
+                                                        <TableCell>
+                                                            {new Date(employee.created_at).toLocaleDateString()}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <div className="flex justify-end space-x-2">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => openDialog(employee)}
+                                                                >
+                                                                    <Edit className="h-4 w-4" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => handleDelete(employee)}
+                                                                    className="text-red-600 hover:text-red-700"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Submission View */}
+                {activeMenuItem === "submission" && (
+                    <Card>
+                        <CardHeader>
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <CardTitle className="text-xl font-semibold">Survey Submission Status</CardTitle>
+                                <div className="flex flex-wrap gap-2">
+                                    {/* Export Submission Report Button */}
+                                    <Button
+                                        onClick={handleExportToExcel}
+                                        variant="outline"
+                                        className="flex items-center gap-2"
+                                        disabled={employees.length === 0}
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        Export Report
+                                    </Button>
+                                </div>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
+
+                            {/* Submission Filters */}
+                            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Search by name or ID badge number..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="max-w-sm"
+                                    />
+                                </div>
+                                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                                    <SelectTrigger className="w-full sm:w-[200px]">
+                                        <SelectValue placeholder="Filter by department" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Departments</SelectItem>
+                                        {departments.map((dept) => (
+                                            <SelectItem key={dept} value={dept}>
+                                                {dept}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select value={submissionFilter} onValueChange={setSubmissionFilter}>
+                                    <SelectTrigger className="w-full sm:w-[200px]">
+                                        <SelectValue placeholder="Filter by status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="Submitted">Submitted</SelectItem>
+                                        <SelectItem value="Not Submitted">Not Submitted</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {isLoading ? (
+                                <div className="text-center py-8">Loading submission status...</div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <Table>
+                                         <TableHeader>
+                                             <TableRow>
+                                                 <TableHead>ID Badge</TableHead>
+                                                 <TableHead>Name</TableHead>
+                                                 <TableHead>Department</TableHead>
+                                                 <TableHead>Submission Date</TableHead>
+                                                 <TableHead>Status</TableHead>
+                                             </TableRow>
+                                         </TableHeader>
+                                         <TableBody>
+                                             {filteredEmployees.length === 0 ? (
+                                                 <TableRow>
+                                                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                                         No employees found
+                                                     </TableCell>
+                                                 </TableRow>
+                                             ) : (
+                                                 filteredEmployees.map((employee) => (
+                                                     <TableRow key={employee.id}>
+                                                         <TableCell className="font-medium">
+                                                             {employee.id_badge_number}
+                                                         </TableCell>
+                                                         <TableCell>{employee.name}</TableCell>
+                                                         <TableCell>{employee.department}</TableCell>
+                                                         <TableCell>
+                                                             {employee.status === 'Submitted' 
+                                                                 ? new Date(employee.created_at).toLocaleDateString()
+                                                                 : '-'
+                                                             }
+                                                         </TableCell>
+                                                         <TableCell>
+                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                                 employee.status === 'Submitted' 
+                                                                     ? 'bg-green-100 text-green-800' 
+                                                                     : 'bg-red-100 text-red-800'
+                                                             }`}>
+                                                                 {employee.status || 'Not Submitted'}
+                                                             </span>
+                                                         </TableCell>
+                                                     </TableRow>
+                                                 ))
+                                             )}
+                                         </TableBody>
+                                     </Table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </div>
     </div>
