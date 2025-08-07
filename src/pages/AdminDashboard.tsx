@@ -74,13 +74,44 @@ const AdminDashboard = () => {
     const { toast } = useToast();
     const navigate = useNavigate();
 
-    // Check authentication
+    // Check authentication and session timeout
     useEffect(() => {
-        const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
-        if (!isAuthenticated) {
-            navigate("/admin/login");
-        }
-    }, [navigate]);
+        const checkSession = () => {
+            const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
+            const loginTime = sessionStorage.getItem("adminLoginTime");
+            
+            if (!isAuthenticated) {
+                navigate("/admin/login");
+                return;
+            }
+            
+            if (loginTime) {
+                const loginTimestamp = new Date(loginTime).getTime();
+                const currentTime = new Date().getTime();
+                const sessionDuration = currentTime - loginTimestamp;
+                const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
+                
+                if (sessionDuration > fifteenMinutes) {
+                    sessionStorage.removeItem("adminAuthenticated");
+                    sessionStorage.removeItem("adminLoginTime");
+                    toast({
+                        title: "Session Expired",
+                        description: "Your session has expired. Please login again.",
+                        variant: "destructive",
+                    });
+                    navigate("/admin/login");
+                }
+            }
+        };
+        
+        // Check session immediately
+        checkSession();
+        
+        // Set up interval to check session every minute
+        const sessionCheckInterval = setInterval(checkSession, 60000);
+        
+        return () => clearInterval(sessionCheckInterval);
+    }, [navigate, toast]);
 
     // Fetch employees
     const fetchEmployees = async () => {
