@@ -732,7 +732,7 @@ const SurveyResults = () => {
       {/* Main Content */}
       <div className="lg:ml-64 h-full overflow-y-auto">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b">
+        <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white shadow-sm border-b z-30">
           <div className="w-full px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -762,7 +762,7 @@ const SurveyResults = () => {
           </div>
         </div>
 
-        <div className="w-full p-6">
+        <div className="w-full p-6 pt-24">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

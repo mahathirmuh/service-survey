@@ -929,7 +929,7 @@ const AdminDashboard = () => {
             {/* Main Content */}
             <div className="flex-1 lg:ml-64">
                 {/* Header */}
-                <div className="bg-white shadow-sm border-b">
+                <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white shadow-sm border-b z-30">
                     <div className="w-full px-6 py-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
@@ -959,7 +959,7 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                <div className="w-full p-6">
+                <div className="w-full p-6 pt-24">
                 {/* Stats Cards */}
                 {activeMenuItem === "dashboard" && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
