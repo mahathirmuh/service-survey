@@ -599,53 +599,65 @@ const AdminDashboard = () => {
                     // Validate department - be more flexible with department names
                     const trimmedDepartment = String(department).trim();
                     const departmentMap: { [key: string]: string } = {
-                        'ICT': 'ICT Department',
-                        'ICT Department': 'ICT Department',
-                        'ICT Dept': 'ICT Department',
-                        'Information Technology': 'ICT Department',
-                        'IT': 'ICT Department',
+                        // Environment mappings
+                        'Environment': 'Environment',
+                        'Environmental': 'Environment',
+                        'Environmental Department': 'Environment',
+                        'Environmental Dept': 'Environment',
+                        'Env': 'Environment',
                         
+                        // External Affair mappings
+                        'External Affair': 'External Affair',
+                        'External Affairs': 'External Affair',
+                        'External Affair Department': 'External Affair',
+                        'External Affairs Department': 'External Affair',
+                        'EA': 'External Affair',
+                        
+                        // Finance mappings
+                        'Finance': 'Finance',
+                        'Finance Department': 'Finance',
+                        'Finance Dept': 'Finance',
+                        'Fin': 'Finance',
+                        
+                        // Human Resources mappings
                         'HR': 'Human Resources',
                         'Human Resource': 'Human Resources',
                         'Human Resources': 'Human Resources',
                         'HR Dept': 'Human Resources',
                         
-                        'Environment': 'Environmental Department',
-                        'Environmental': 'Environmental Department',
-                        'Environmental Department': 'Environmental Department',
-                        'Environmental Dept': 'Environmental Department',
-                        'Env': 'Environmental Department',
+                        // Maintenance mappings
+                        'Maintenance': 'Maintenance',
+                        'Maintenance Department': 'Maintenance',
+                        'Maintenance Dept': 'Maintenance',
+                        'Maint': 'Maintenance',
                         
-                        'External Affair': 'External Affair Department',
-                        'External Affairs': 'External Affair Department',
-                        'External Affair Department': 'External Affair Department',
-                        'External Affairs Department': 'External Affair Department',
-                        'EA': 'External Affair Department',
+                        // Management mappings
+                        'Management': 'Management',
+                        'Management Department': 'Management',
+                        'Management Dept': 'Management',
+                        'Mgmt': 'Management',
                         
-                        'Finance': 'Finance Department',
-                        'Finance Department': 'Finance Department',
-                        'Finance Dept': 'Finance Department',
-                        'Fin': 'Finance Department',
+                        // Occupational Health and Safety mappings
+                        'OHS': 'Occupational Health and Safety',
+                        'OHS Department': 'Occupational Health and Safety',
+                        'OHS Dept': 'Occupational Health and Safety',
+                        'Occupational Health': 'Occupational Health and Safety',
+                        'Occupational Health and Safety': 'Occupational Health and Safety',
+                        'Safety': 'Occupational Health and Safety',
+                        'Health and Safety': 'Occupational Health and Safety',
                         
+                        // Pyrite Plant mappings
+                        'Pyrite Plant': 'Pyrite Plant',
+                        'Pyrite': 'Pyrite Plant',
+                        'Pyrite Plant Department': 'Pyrite Plant',
+                        'Pyrite Dept': 'Pyrite Plant',
+                        
+                        // Supply Chain Management mappings
                         'Supply Chain': 'Supply Chain Management',
                         'Supply Chain Management': 'Supply Chain Management',
                         'SCM': 'Supply Chain Management',
                         'Supply': 'Supply Chain Management',
-                        
-                        'Personal Data': 'Personal Data',
-                        'Personal Data Dept': 'Personal Data',
-                        'PD': 'Personal Data',
-                        
-                        'OHS': 'OHS Department',
-                        'OHS Department': 'OHS Department',
-                        'OHS Dept': 'OHS Department',
-                        'Occupational Health': 'OHS Department',
-                        'Safety': 'OHS Department',
-                        
-                        'Maintenance': 'Maintenance Department',
-                        'Maintenance Department': 'Maintenance Department',
-                        'Maintenance Dept': 'Maintenance Department',
-                        'Maint': 'Maintenance Department'
+                        'Supply Chain Dept': 'Supply Chain Management'
                     };
 
                     const mappedDepartment = departmentMap[trimmedDepartment] || trimmedDepartment;
