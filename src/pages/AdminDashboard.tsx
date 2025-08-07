@@ -40,7 +40,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3 } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -787,16 +787,21 @@ const AdminDashboard = () => {
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
             {/* Sidebar */}
             <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
-                <div className="flex items-center justify-between h-16 px-6 border-b flex-shrink-0">
-                    <div className="flex items-center space-x-3">
-                        <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
-                        <span className="text-lg font-semibold text-gray-900">Admin</span>
-                    </div>
+                <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
+          <div className="flex items-center space-x-3">
+            <div className="bg-white p-2 rounded-lg shadow-sm">
+              <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
+            </div>
+            <div className="text-white">
+              <div className="text-lg font-bold">Employee Satisfaction</div>
+              <div className="text-sm opacity-90">Survey System</div>
+            </div>
+          </div>
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden"
+                        className="lg:hidden text-white hover:bg-white/20"
                     >
                         <Menu className="h-4 w-4" />
                     </Button>
@@ -814,6 +819,17 @@ const AdminDashboard = () => {
                         >
                             <LayoutDashboard className="mr-3 h-4 w-4" />
                             Dashboard
+                        </button>
+                        <button
+                            onClick={() => setActiveMenuItem("submission")}
+                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem === "submission"
+                                    ? "text-purple-600 bg-purple-50"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            }`}
+                        >
+                            <FileText className="mr-3 h-4 w-4" />
+                            Submission
                         </button>
                         <button
                             onClick={() => {
