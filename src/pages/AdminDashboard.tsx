@@ -40,7 +40,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3 } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -79,6 +79,7 @@ const AdminDashboard = () => {
     const [isImporting, setIsImporting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+    const [activeMenuItem, setActiveMenuItem] = useState("dashboard");
     const [formData, setFormData] = useState({
         id_badge_number: "",
         name: "",
@@ -785,8 +786,8 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-                <div className="flex items-center justify-between h-16 px-6 border-b">
+            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}>
+                <div className="flex items-center justify-between h-16 px-6 border-b flex-shrink-0">
                     <div className="flex items-center space-x-3">
                         <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
                         <span className="text-lg font-semibold text-gray-900">Admin</span>
@@ -801,14 +802,64 @@ const AdminDashboard = () => {
                     </Button>
                 </div>
                 
-                <nav className="mt-6 px-3">
+                <nav className="flex-1 mt-6 px-3 overflow-y-auto">
                     <div className="space-y-1">
-                        <div className="flex items-center px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-md">
+                        <button
+                            onClick={() => setActiveMenuItem("dashboard")}
+                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem === "dashboard"
+                                    ? "text-purple-600 bg-purple-50"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            }`}
+                        >
                             <LayoutDashboard className="mr-3 h-4 w-4" />
                             Dashboard
-                        </div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setActiveMenuItem("results");
+                                navigate("/admin/results");
+                            }}
+                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem === "results"
+                                    ? "text-purple-600 bg-purple-50"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            }`}
+                        >
+                            <BarChart3 className="mr-3 h-4 w-4" />
+                            Results
+                        </button>
                     </div>
                 </nav>
+                
+                {/* Logout Button at Bottom */}
+                <div className="p-3 border-t flex-shrink-0">
+                    <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="w-full flex items-center justify-center gap-2"
+                            >
+                                <LogOut className="h-4 w-4" />
+                                Logout
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to logout? You will need to login again to access the admin dashboard.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={confirmLogout}>
+                                    Logout
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
             </div>
 
             {/* Overlay for mobile */}
@@ -848,31 +899,6 @@ const AdminDashboard = () => {
                                     <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
                                 </div>
                             </div>
-                            <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
-                                <AlertDialogTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="flex items-center gap-2"
-                                    >
-                                        <LogOut className="h-4 w-4" />
-                                        Logout
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Are you sure you want to logout? You will need to login again to access the admin dashboard.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={confirmLogout}>
-                                            Logout
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
                         </div>
                     </div>
                 </div>
