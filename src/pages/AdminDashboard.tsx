@@ -14,6 +14,17 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
     Table,
     TableBody,
     TableCell,
@@ -29,7 +40,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -66,6 +77,8 @@ const AdminDashboard = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
     const [isImporting, setIsImporting] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const [formData, setFormData] = useState({
         id_badge_number: "",
         name: "",
@@ -168,6 +181,11 @@ const AdminDashboard = () => {
             description: "You have been successfully logged out",
         });
         navigate("/admin/login");
+    };
+
+    const confirmLogout = () => {
+        setLogoutDialogOpen(false);
+        handleLogout();
     };
 
     const resetForm = () => {
@@ -765,34 +783,101 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-                <div className="w-full px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <img src={mtiLogo} alt="MTI Logo" className="h-10 w-auto" />
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                    <Shield className="h-6 w-6 text-purple-600" />
-                                    Admin Dashboard
-                                </h1>
-                                <p className="text-gray-600">Employee Management System</p>
-                            </div>
-                        </div>
-                        <Button
-                            onClick={handleLogout}
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            Logout
-                        </Button>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
+            {/* Sidebar */}
+            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+                <div className="flex items-center justify-between h-16 px-6 border-b">
+                    <div className="flex items-center space-x-3">
+                        <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
+                        <span className="text-lg font-semibold text-gray-900">Admin</span>
                     </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSidebarOpen(false)}
+                        className="lg:hidden"
+                    >
+                        <Menu className="h-4 w-4" />
+                    </Button>
                 </div>
+                
+                <nav className="mt-6 px-3">
+                    <div className="space-y-1">
+                        <div className="flex items-center px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-md">
+                            <LayoutDashboard className="mr-3 h-4 w-4" />
+                            Dashboard
+                        </div>
+                    </div>
+                </nav>
             </div>
 
-            <div className="w-full p-6">
+            {/* Overlay for mobile */}
+            {sidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
+            {/* Main Content */}
+            <div className="flex-1 lg:ml-0">
+                {/* Header */}
+                <div className="bg-white shadow-sm border-b">
+                    <div className="w-full px-6 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setSidebarOpen(true)}
+                                    className="lg:hidden"
+                                >
+                                    <Menu className="h-5 w-5" />
+                                </Button>
+                                <div className="lg:flex items-center space-x-4 hidden">
+                                    <img src={mtiLogo} alt="MTI Logo" className="h-10 w-auto" />
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                            <Shield className="h-6 w-6 text-purple-600" />
+                                            Admin Dashboard
+                                        </h1>
+                                        <p className="text-gray-600">Employee Management System</p>
+                                    </div>
+                                </div>
+                                <div className="lg:hidden">
+                                    <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+                                </div>
+                            </div>
+                            <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="flex items-center gap-2"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        Logout
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Are you sure you want to logout? You will need to login again to access the admin dashboard.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={confirmLogout}>
+                                            Logout
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="w-full p-6">
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <Card>
@@ -1040,7 +1125,8 @@ const AdminDashboard = () => {
                 </Card>
             </div>
         </div>
-    );
+    </div>
+);
 };
 
 export default AdminDashboard;
