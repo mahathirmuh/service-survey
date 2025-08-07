@@ -81,7 +81,11 @@ const AdminDashboard = () => {
     const [isImporting, setIsImporting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
-    const [activeMenuItem, setActiveMenuItem] = useState("dashboard");
+    const [activeMenuItem, setActiveMenuItem] = useState(() => {
+        // Check if we're coming from the results page with submission intent
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('menu') || "dashboard";
+    });
     const [formData, setFormData] = useState({
         id_badge_number: "",
         name: "",

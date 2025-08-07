@@ -664,7 +664,10 @@ const SurveyResults = () => {
               Dashboard
             </button>
             <button
-              onClick={() => setActiveMenuItem("submission")}
+              onClick={() => {
+                setActiveMenuItem("submission");
+                navigate("/admin/dashboard?menu=submission");
+              }}
               className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                 activeMenuItem === "submission"
                   ? "text-purple-600 bg-purple-50"
