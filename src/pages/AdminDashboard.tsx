@@ -945,14 +945,30 @@ const AdminDashboard = () => {
                                     <img src={mtiLogo} alt="MTI Logo" className="h-10 w-auto" />
                                     <div>
                                         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                                            <Shield className="h-6 w-6 text-purple-600" />
-                                            Admin Dashboard
+                                            {activeMenuItem === "dashboard" && (
+                                                <>
+                                                    <Shield className="h-6 w-6 text-purple-600" />
+                                                    Employee Dashboard
+                                                </>
+                                            )}
+                                            {activeMenuItem === "submission" && (
+                                                <>
+                                                    <FileText className="h-6 w-6 text-purple-600" />
+                                                    Survey Submission Status
+                                                </>
+                                            )}
                                         </h1>
-                                        <p className="text-gray-600">Employee Management System</p>
+                                        <p className="text-gray-600">
+                                            {activeMenuItem === "dashboard" && "Employee Management System"}
+                                            {activeMenuItem === "submission" && "Survey Completion Tracking"}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="lg:hidden">
-                                    <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+                                    <h1 className="text-xl font-bold text-gray-900">
+                                        {activeMenuItem === "dashboard" && "Employee Dashboard"}
+                                        {activeMenuItem === "submission" && "Survey Status"}
+                                    </h1>
                                 </div>
                             </div>
                         </div>

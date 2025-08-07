@@ -749,13 +749,13 @@ const SurveyResults = () => {
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       <BarChart3 className="h-6 w-6 text-purple-600" />
-                      Survey Results
+                      Survey Analytics Dashboard
                     </h1>
-                    <p className="text-gray-600">Employee Satisfaction Analysis</p>
+                    <p className="text-gray-600">Employee Satisfaction Analysis & Insights</p>
                   </div>
                 </div>
                 <div className="lg:hidden">
-                  <h1 className="text-xl font-bold text-gray-900">Results</h1>
+                  <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
                 </div>
               </div>
             </div>
