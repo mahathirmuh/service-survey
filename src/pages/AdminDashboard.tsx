@@ -1090,17 +1090,17 @@ const AdminDashboard = () => {
                                     </Button>
                                     
                                     {/* Import Button */}
-                                    <div className="relative">
+                                    <div className="relative inline-block">
                                         <input
                                             type="file"
                                             accept=".xlsx,.xls"
                                             onChange={handleImportFromExcel}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                             disabled={isImporting}
                                         />
                                         <Button
                                             variant="outline"
-                                            className="flex items-center gap-2"
+                                            className="flex items-center gap-2 pointer-events-none"
                                             disabled={isImporting}
                                         >
                                             <Upload className="h-4 w-4" />

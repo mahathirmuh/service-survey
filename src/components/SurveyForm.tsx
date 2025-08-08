@@ -735,9 +735,14 @@ const SurveyForm = () => {
                                                 </div>
                                             ))}
                                         </RadioGroup>
-                                        <p className="text-xs text-muted-foreground">
-                                            1 = Not Critical, 5 = Extremely Critical
-                                        </p>
+                                        <div className="text-xs text-muted-foreground space-y-1 mt-2 p-3 bg-gray-50 rounded-md border-l-4 border-orange-400">
+                                            <p className="font-semibold text-gray-700 mb-2">Rating Description - Critical Level:</p>
+                                            <p><span className="font-medium">5 = Extremely Critical:</span> My department cannot function effectively without this service</p>
+                                            <p><span className="font-medium">4 = Very Critical:</span> The service significantly impacts my department performance</p>
+                                            <p><span className="font-medium">3 = Moderately Critical:</span> The service has a noticeable impact on my department</p>
+                                            <p><span className="font-medium">2 = Somewhat Critical:</span> The service has a minor impact on my department</p>
+                                            <p><span className="font-medium">1 = Not Critical:</span> The service has little to no impact on my department</p>
+                                        </div>
                                     </div>
                                     {/* Question 2 */}
                                     <div className="space-y-3">
@@ -759,7 +764,14 @@ const SurveyForm = () => {
                                                 </div>
                                             ))}
                                         </RadioGroup>
-                                        <p className="text-xs text-muted-foreground">1 = Very Poor, 5 = Excellent</p>
+                                        <div className="text-xs text-muted-foreground space-y-1 mt-2 p-3 bg-gray-50 rounded-md border-l-4 border-blue-400">
+                                            <p className="font-semibold text-gray-700 mb-2">Rating Description - Service Quality Level:</p>
+                                            <p><span className="font-medium">5 = Excellent:</span> Service exceeds expectations consistently</p>
+                                            <p><span className="font-medium">4 = Good:</span> Service meets expectations and occasionally exceeds them</p>
+                                            <p><span className="font-medium">3 = Average:</span> Service meets expectations but lacks in some areas</p>
+                                            <p><span className="font-medium">2 = Poor:</span> Service frequently falls short of expectations</p>
+                                            <p><span className="font-medium">1 = Very Poor:</span> Service is consistently below acceptable standards</p>
+                                        </div>
                                     </div>
                                     {/* Feedback */}
                                     <div className="space-y-2">
