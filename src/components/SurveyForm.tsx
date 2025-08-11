@@ -851,7 +851,7 @@ const SurveyForm = () => {
                                         <Label className="text-sm font-medium flex items-center">
                                             <span className="mr-2">💬</span>
                                             Additional Feedback
-                                            <span className="ml-2 text-xs text-muted-foreground">(Optional but highly valued)</span>
+                                            <span className="text-destructive ml-1">*</span>
                                         </Label>
                                         <FeedbackTextarea
                                             value={questions.feedback || ""}
