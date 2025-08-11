@@ -45,36 +45,97 @@ interface FormData {
     scm_sections: { [sectionName: string]: SectionQuestions };
 }
 
-// FeedbackTextarea component fully declared to fix ReferenceError
-const FeedbackTextarea = React.memo(
-    ({
-        value,
-        onChange,
-    }: {
-        value: string;
-        onChange: (val: string) => void;
-    }) => {
-        const [localValue, setLocalValue] = useState(value);
-        useEffect(() => {
-            setLocalValue(value);
-        }, [value]);
-        const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setLocalValue(e.target.value);
-        };
-        const handleBlur = () => {
-            onChange(localValue);
-        };
-        return (
-            <textarea
-                value={localValue}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Share any additional comments..."
-                className="w-full min-h-[100px] rounded-md border border-input bg-muted px-3 py-2 text-sm transition-colors placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0 resize-none"
-            />
-        );
-    }
-);
+// Enhanced FeedbackTextarea component with additional features
+    const FeedbackTextarea = React.memo(
+        ({
+            value,
+            onChange,
+        }: {
+            value: string;
+            onChange: (val: string) => void;
+        }) => {
+            const [localValue, setLocalValue] = useState(value);
+            const [charCount, setCharCount] = useState(value.length);
+            const [isFocused, setIsFocused] = useState(false);
+            const maxLength = 500;
+            
+            useEffect(() => {
+                setLocalValue(value);
+                setCharCount(value.length);
+            }, [value]);
+            
+            const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                const newValue = e.target.value;
+                if (newValue.length <= maxLength) {
+                    setLocalValue(newValue);
+                    setCharCount(newValue.length);
+                }
+            };
+            
+            const handleBlur = () => {
+                onChange(localValue);
+                setIsFocused(false);
+            };
+            
+            const handleFocus = () => {
+                setIsFocused(true);
+            };
+            
+            const getCharCountColor = () => {
+                if (charCount >= maxLength * 0.9) return "text-red-500";
+                if (charCount >= maxLength * 0.7) return "text-red-400";
+                return "text-muted-foreground";
+            };
+            
+            return (
+                <div className="space-y-2">
+                    <textarea
+                        value={localValue}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        onFocus={handleFocus}
+                        placeholder="Share any additional comments, suggestions for improvement, or specific feedback about the service..."
+                        className={`w-full min-h-[120px] rounded-md border px-3 py-2 text-sm transition-colors duration-200 placeholder:text-muted-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none ${
+                            localValue.trim() === ""
+                                ? "border-red-300 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                : "border-green-300 bg-green-50 focus:border-green-500 focus-visible:border-green-500"
+                        }`}
+                        maxLength={maxLength}
+                    />
+                    <div className="flex justify-between items-center text-xs">
+                        <div className="flex items-center space-x-4">
+                            <span className={`${getCharCountColor()} font-medium`}>
+                                {charCount}/{maxLength} characters
+                            </span>
+                            {localValue.trim() !== "" && (
+                                <span className="text-green-600 flex items-center">
+                                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    Feedback provided
+                                </span>
+                            )}
+                        </div>
+                        {isFocused && (
+                            <span className="text-blue-500 text-xs animate-pulse">
+                                Your feedback is valuable to us
+                            </span>
+                        )}
+                    </div>
+                    {/* Feedback Guidelines */}
+                    <div className="text-xs text-muted-foreground bg-blue-50 p-3 rounded-md border-l-4 border-blue-400">
+                        <p className="font-semibold text-blue-700 mb-1">💡 Feedback Guidelines:</p>
+                        <ul className="space-y-1 text-blue-600">
+                            <li>• Share specific examples of good or poor service</li>
+                            <li>• Suggest improvements or new features</li>
+                            <li>• Mention any issues or challenges you faced</li>
+                            <li>• Highlight what worked well for you</li>
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+    );
 
 const SurveyForm = () => {
     const emptySectionQuestions = useMemo(
@@ -626,7 +687,11 @@ const SurveyForm = () => {
                                 Select Section to Evaluate <span className="text-destructive">*</span>
                             </Label>
                             <Select value={section} onValueChange={onSectionChange}>
-                                <SelectTrigger className="h-11 transition-all duration-200 focus:scale-105">
+                                <SelectTrigger className={`h-11 transition-all duration-200 focus:scale-105 ${
+                                    section === "" 
+                                        ? "border-red-400 bg-red-50" 
+                                        : "border-green-400 bg-green-50"
+                                }`}>
                                     <SelectValue placeholder="Select section to evaluate" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -724,7 +789,11 @@ const SurveyForm = () => {
                                         <RadioGroup
                                             value={questions.question1 || ""}
                                             onValueChange={(value) => onQuestionChange("question1", value)}
-                                            className="flex space-x-4"
+                                            className={`flex space-x-4 p-3 rounded-md transition-all duration-200 ${
+                                                questions.question1 === "" 
+                                                    ? "bg-red-50 border border-red-200" 
+                                                    : "bg-green-50 border border-green-200"
+                                            }`}
                                         >
                                             {[1, 2, 3, 4, 5].map((rating) => (
                                                 <div key={rating} className="flex items-center space-x-2">
@@ -735,7 +804,7 @@ const SurveyForm = () => {
                                                 </div>
                                             ))}
                                         </RadioGroup>
-                                        <div className="text-xs text-muted-foreground space-y-1 mt-2 p-3 bg-gray-50 rounded-md border-l-4 border-orange-400">
+                                        <div className="text-xs text-muted-foreground space-y-1 mt-2 p-3 bg-gray-50 rounded-md border-l-4 border-gray-400">
                                             <p className="font-semibold text-gray-700 mb-2">Rating Description - Critical Level:</p>
                                             <p><span className="font-medium">5 = Extremely Critical:</span> My department cannot function effectively without this service</p>
                                             <p><span className="font-medium">4 = Very Critical:</span> The service significantly impacts my department performance</p>
@@ -753,7 +822,11 @@ const SurveyForm = () => {
                                         <RadioGroup
                                             value={questions.question2 || ""}
                                             onValueChange={(value) => onQuestionChange("question2", value)}
-                                            className="flex space-x-4"
+                                            className={`flex space-x-4 p-3 rounded-md transition-all duration-200 ${
+                                                questions.question2 === "" 
+                                                    ? "bg-red-50 border border-red-200" 
+                                                    : "bg-green-50 border border-green-200"
+                                            }`}
                                         >
                                             {[1, 2, 3, 4, 5].map((rating) => (
                                                 <div key={rating} className="flex items-center space-x-2">
@@ -775,7 +848,11 @@ const SurveyForm = () => {
                                     </div>
                                     {/* Feedback */}
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium">Additional Feedback</Label>
+                                        <Label className="text-sm font-medium flex items-center">
+                                            <span className="mr-2">💬</span>
+                                            Additional Feedback
+                                            <span className="ml-2 text-xs text-muted-foreground">(Optional but highly valued)</span>
+                                        </Label>
                                         <FeedbackTextarea
                                             value={questions.feedback || ""}
                                             onChange={(val) => onQuestionChange("feedback", val)}
@@ -866,8 +943,13 @@ const SurveyForm = () => {
                                             value={formData.idBadgeNumber}
                                             onChange={(e) => updateFormData("idBadgeNumber", e.target.value)}
                                             onBlur={(e) => validateIdBadge(e.target.value)}
-                                            className={`h-11 transition-all duration-200 focus:scale-105 ${idError ? "border-destructive" : ""
-                                                }`}
+                                            className={`h-11 transition-colors duration-200 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                                                idError 
+                                                    ? "border-destructive focus:border-destructive focus-visible:border-destructive" 
+                                                    : formData.idBadgeNumber.trim() === ""
+                                                        ? "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                                        : "border-green-400 bg-green-50 focus:border-green-500 focus-visible:border-green-500"
+                                            }`}
                                         />
                                         {idError && <p className="text-sm text-destructive animate-fade-in">{idError}</p>}
                                     </div>
@@ -952,16 +1034,43 @@ const SurveyForm = () => {
                             <Button
                                 onClick={handleSubmit}
                                 disabled={!isFormValid() || isSubmitting}
-                                className="w-full h-12 text-lg font-medium"
+                                className="w-full h-12 text-lg font-medium relative overflow-hidden group"
                                 size="lg"
                             >
-                                {isSubmitting ? "Submitting..." : "Submit Survey"}
+                                <span className="relative z-10">
+                                    {isSubmitting ? (
+                                        <div className="flex items-center justify-center">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                            Submitting Survey...
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center">
+                                            <span className="mr-2">📋</span>
+                                            Submit Survey
+                                        </div>
+                                    )}
+                                </span>
+                                {!isSubmitting && (
+                                    <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                )}
                             </Button>
+                            
                             {!isFormValid() && (
-                                <p className="text-sm text-muted-foreground text-center mt-2">
-                                    Please enter a valid ID Badge Number and complete all department
-                                    evaluations.
-                                </p>
+                                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                                    <p className="text-sm text-red-800 text-center flex items-center justify-center">
+                                        <span className="mr-2">⚠️</span>
+                                        Please enter a valid ID Badge Number and complete all department evaluations.
+                                    </p>
+                                </div>
+                            )}
+                            
+                            {isFormValid() && !isSubmitting && (
+                                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                                    <p className="text-sm text-green-800 text-center flex items-center justify-center">
+                                        <span className="mr-2">✅</span>
+                                        Survey is complete and ready to submit!
+                                    </p>
+                                </div>
                             )}
                         </div>
                     </CardContent>
