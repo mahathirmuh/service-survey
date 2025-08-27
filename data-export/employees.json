@@ -1,0 +1,434 @@
+[
+  {
+    "id": "04b730b9-6cd5-4be5-b879-bb7042dd6e9e",
+    "id_badge_number": "MTI123",
+    "name": "User MTI123",
+    "department": "Department 123",
+    "created_at": "2025-07-02T08:51:07.478594+00:00",
+    "updated_at": "2025-07-02T10:21:59.787424+00:00"
+  },
+  {
+    "id": "f1ed7fd4-b74e-4b9a-be52-9cf87dd476f1",
+    "id_badge_number": "MTI111",
+    "name": "Test",
+    "department": "Test",
+    "created_at": "2025-07-02T12:36:41.97773+00:00",
+    "updated_at": "2025-07-02T12:36:41.97773+00:00"
+  },
+  {
+    "id": "dba1bbc3-fa5e-4aed-a7b8-c9838a4fa670",
+    "id_badge_number": "MTITEST",
+    "name": "MTITEST",
+    "department": "MTITEST",
+    "created_at": "2025-07-03T03:37:07.768236+00:00",
+    "updated_at": "2025-07-03T03:37:07.768236+00:00"
+  },
+  {
+    "id": "a52419f3-fdf2-47e2-b058-037a00b259b2",
+    "id_badge_number": "MTI240369",
+    "name": "Mahathir Muhammad",
+    "department": "Human Resources",
+    "created_at": "2025-08-07T10:41:29.725472+00:00",
+    "updated_at": "2025-08-07T10:41:29.725472+00:00"
+  },
+  {
+    "id": "ea579129-71cc-47ad-88ea-eaab1001b964",
+    "id_badge_number": "MTI220135",
+    "name": "Ichsan Manzali",
+    "department": "Human Resources",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ae647956-413d-457c-8f73-7d9ae45e8d2c",
+    "id_badge_number": "MTI220151",
+    "name": "Wenby Sulaiman",
+    "department": "Management",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "c7fa048f-89b6-4233-bce6-140bc91db2d0",
+    "id_badge_number": "MTI220152",
+    "name": "Muhammad Akbar Aguda",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "4bc9ded4-5efe-4db1-a3c9-1992a85826ac",
+    "id_badge_number": "MTI220154",
+    "name": "Rustam",
+    "department": "Management",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "6537dadd-fea4-434c-8a2d-758f3af6a2f3",
+    "id_badge_number": "MTI220162",
+    "name": "Sugiharto",
+    "department": "Pyrite Plant",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ec72ea8f-d2b8-495d-8b09-71a7337c5393",
+    "id_badge_number": "MTI220174",
+    "name": "Jumali",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "6c4cd0b4-426e-42cc-aa0a-df6076b508a0",
+    "id_badge_number": "MTI220179",
+    "name": "Wachid Ramdanu Imandoyo",
+    "department": "External Affair",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "f312fd42-3009-4013-8fe8-9146832c2836",
+    "id_badge_number": "MTI220183",
+    "name": "Winda Febriana",
+    "department": "Environment",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "026390d6-e2e2-4c5e-bfa0-aff553a13144",
+    "id_badge_number": "MTI230005",
+    "name": "Alexander Delo Rante",
+    "department": "Pyrite Plant",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "2c7a1f8b-d2ad-4e6b-9c11-dce71cdab8d0",
+    "id_badge_number": "MTI230008",
+    "name": "Alberthus Pranowo Gunawan",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "a44299df-54ac-4ac0-97a3-47962f7af596",
+    "id_badge_number": "MTI230035",
+    "name": "Budi Djallaludin A. Runturambi",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ecdb7e43-e58a-4069-bf72-a08c740e7a7a",
+    "id_badge_number": "MTI230102",
+    "name": "Sulam Bungasalu",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "12554677-14c3-45a5-b4e4-fd1c77cf07d1",
+    "id_badge_number": "MTI230103",
+    "name": "Takdir",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ef59d74f-2853-4c3b-b1d2-1ca7b80f0f2a",
+    "id_badge_number": "MTI230134",
+    "name": "Hendrik Christianto",
+    "department": "Human Resources",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ac680b20-cf5c-431a-94ac-0cd72be45b0d",
+    "id_badge_number": "MTI230136",
+    "name": "Adhi Surahman",
+    "department": "Human Resources",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "21bade61-83c1-459c-b09b-27128a5036a7",
+    "id_badge_number": "MTI230187",
+    "name": "Octovianus Marcell Gilbert T",
+    "department": "Occupational Health and Safety",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "c6e686a7-02ac-40ca-861d-91cada7f3e7b",
+    "id_badge_number": "MTI230206",
+    "name": "Delfianto Djafar",
+    "department": "Supply Chain Management",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "9b8eee28-1662-4f88-99db-399539d11b54",
+    "id_badge_number": "MTI230333",
+    "name": "Hendrawan N Silondae",
+    "department": "Occupational Health and Safety",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "522082b9-c791-4d72-93b7-c08661c5ba7f",
+    "id_badge_number": "MTI240072",
+    "name": "Muhammad Al Bashir",
+    "department": "Environment",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "f3745a18-b2e8-45cb-b25a-1d75a141731f",
+    "id_badge_number": "MTI240308",
+    "name": "Kurniawan",
+    "department": "Maintenance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "b8106ff2-0373-49b5-a308-0264e374b9cf",
+    "id_badge_number": "MTI240400",
+    "name": "Fahmi Arief Hakim",
+    "department": "Occupational Health and Safety",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "94cc80dc-4c5d-429e-b523-0b983c188c74",
+    "id_badge_number": "MTI240448",
+    "name": "Mariana Syamsoeyadi",
+    "department": "Supply Chain Management",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "01357c4a-6c5c-405e-9a10-7c08247edaec",
+    "id_badge_number": "MTI240636",
+    "name": "Ari Perdana",
+    "department": "Environment",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ad8cb57b-4f57-4e26-a2c2-7f4341c94a6f",
+    "id_badge_number": "MTIBJ002",
+    "name": "Wu Yinglin",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "f19561d0-c775-4857-b44a-08991aeb4519",
+    "id_badge_number": "MTIBJ007",
+    "name": "Wang Yanhua",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "8fd0fc7e-896b-4dd8-ae8a-ac2fff7ff2f7",
+    "id_badge_number": "MTIBJ009",
+    "name": "Liu Baoguo",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "30b9bb7f-96cd-4b68-92a8-cfbe2357e3ca",
+    "id_badge_number": "MTIBJ025",
+    "name": "Yuan Zhihong",
+    "department": "AIM Construction",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "b7e672dc-4308-47fc-9ad1-19cdd99db49b",
+    "id_badge_number": "MTIBJ028",
+    "name": "Zhao Hongxu",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "7571d189-8e9e-4956-9fa4-b982277b1d02",
+    "id_badge_number": "MTIBJ029",
+    "name": "He Zhensheng",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "8e7b0d82-4bdf-45a8-a092-4b46e4a9538c",
+    "id_badge_number": "MTIBJ030",
+    "name": "Li Jihong",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "a91fdf4d-8324-4742-bef6-1041d4981d97",
+    "id_badge_number": "MTIBJ031",
+    "name": "Li Jianjun",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "de4c42fd-2f3a-4fa0-af7f-be549f71a88c",
+    "id_badge_number": "MTIBJ035",
+    "name": "Li Chunbin",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "555dc2e5-c513-48bd-8df2-78b8a33a7994",
+    "id_badge_number": "MTIBJ040",
+    "name": "Zhou Weixing",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "25c33ddb-6edb-4505-8971-228095a65bb3",
+    "id_badge_number": "MTIBJ041",
+    "name": "Chen Changyi",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "a2083111-80cf-4541-8990-6c0354a57bfa",
+    "id_badge_number": "MTIBJ065",
+    "name": "Ao Jun",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "4060b1e2-7312-4109-a817-53fea7fad562",
+    "id_badge_number": "MTIBJ072",
+    "name": "Cao Guibin",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "fbcb51a1-334b-48a0-a119-23b23c976e20",
+    "id_badge_number": "MTIBJ109",
+    "name": "Wu Changlin",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "c47bd720-232f-4a26-aafa-dd38023183ee",
+    "id_badge_number": "MTIBJ121",
+    "name": "Wang Shengshou",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "3c5f2095-7821-438a-a0c6-375949f02f3d",
+    "id_badge_number": "MTIBJ122",
+    "name": "Lu Fa",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "dd0f9fa5-569e-49da-92fc-27162815684e",
+    "id_badge_number": "MTIBJ128",
+    "name": "Wen Fengxing",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "b9a5d149-a2f0-4c88-90d2-d7f150ab8d2b",
+    "id_badge_number": "MTIBJ146",
+    "name": "Zhang Lianggang",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "6d4ae929-c45b-44cd-993b-cf7aa0ad825b",
+    "id_badge_number": "MTIBJ164",
+    "name": "Ma Chengsheng",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "e609489a-1321-4538-bc11-8168f51b5053",
+    "id_badge_number": "MTIBJ165",
+    "name": "Cai Deyou",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "aaf1a1e7-29ac-487a-9711-974df6a6f6ef",
+    "id_badge_number": "MTIBJ211",
+    "name": "Guan Ming",
+    "department": "Finance",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "f66a7471-3ceb-4199-a6f6-7282bb0d7782",
+    "id_badge_number": "MTIBJ220",
+    "name": "Wang Qiang",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "af69929c-18a1-45a8-af2a-d99d47f94a6f",
+    "id_badge_number": "MTIBJ234",
+    "name": "Xiao Wenxin",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "b073007b-e9c6-493d-8524-94e5cc5ca650",
+    "id_badge_number": "MTIBJ254",
+    "name": "Chen Yousheng",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ccdc3dc0-fbb6-4b3b-988a-435cf708c5b4",
+    "id_badge_number": "MTIBJ260",
+    "name": "Li Xiangye",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "ba69d2c9-f283-4ff8-8f3b-4efc1fa9ed38",
+    "id_badge_number": "MTIBJ294",
+    "name": "Ning Zuoyun",
+    "department": "AIM Operation",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  },
+  {
+    "id": "9be0d9ef-c7b9-4c4e-aa0f-c6c2fdc75760",
+    "id_badge_number": "MTIBJ297",
+    "name": "Liu Cungui",
+    "department": "Environment",
+    "created_at": "2025-08-07T13:46:47.95864+00:00",
+    "updated_at": "2025-08-07T13:46:47.95864+00:00"
+  }
+]

@@ -10,8 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Old Supabase project credentials (from commit 99366bf)
-const OLD_SUPABASE_URL = 'https://hnqvnpqvkqjxqjqvkqjx.supabase.co';
-const OLD_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucXZucHF2a3FqeHFqcXZrcWp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjAwNzY3NzEsImV4cCI6MjAzNTY1Mjc3MX0.VQxkR6X8zQJ2QJ2QJ2QJ2QJ2QJ2QJ2QJ2QJ2QJ2QJ2Q';
+const OLD_SUPABASE_URL = 'https://tbuuysrvoxhsgcuwmilk.supabase.co';
+const OLD_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRidXV5c3J2b3hoc2djdXdtaWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0MTM4MjgsImV4cCI6MjA2Njk4OTgyOH0.bsR1gq8CWpOP_ceYgMGi_IksSltuvSkPMO0VpK_rBNM';
 
 // Initialize old Supabase client
 const oldSupabase = createClient(OLD_SUPABASE_URL, OLD_SUPABASE_ANON_KEY);
@@ -27,15 +27,25 @@ if (!fs.existsSync(exportDir)) {
 // Function to export employees data
 async function exportEmployees() {
   try {
-    console.log('Exporting employees data...');
+    console.log('🔍 Connecting to old Supabase project...');
+    console.log('📍 URL:', OLD_SUPABASE_URL);
+    console.log('🔑 Key:', OLD_SUPABASE_ANON_KEY.substring(0, 50) + '...');
+    console.log('📊 Fetching employees data...');
     
     const { data, error } = await oldSupabase
       .from('employees')
       .select('*')
       .order('created_at', { ascending: true });
     
+    console.log('📋 Query result:', { dataLength: data?.length, error });
+    
     if (error) {
-      console.error('Error fetching employees:', error);
+      console.error('❌ Error fetching employees:', error);
+      return false;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('⚠️ No employees data found in old project');
       return false;
     }
     
@@ -45,7 +55,7 @@ async function exportEmployees() {
     console.log(`✅ Exported ${data.length} employees to ${filePath}`);
     return true;
   } catch (err) {
-    console.error('Error exporting employees:', err);
+    console.error('❌ Error exporting employees:', err);
     return false;
   }
 }
@@ -53,15 +63,22 @@ async function exportEmployees() {
 // Function to export survey responses data
 async function exportSurveyResponses() {
   try {
-    console.log('Exporting survey responses data...');
+    console.log('📊 Fetching survey responses data...');
     
     const { data, error } = await oldSupabase
       .from('survey_responses')
       .select('*')
       .order('created_at', { ascending: true });
     
+    console.log('📋 Query result:', { dataLength: data?.length, error });
+    
     if (error) {
-      console.error('Error fetching survey responses:', error);
+      console.error('❌ Error fetching survey responses:', error);
+      return false;
+    }
+    
+    if (!data || data.length === 0) {
+      console.log('⚠️ No survey responses data found in old project');
       return false;
     }
     
@@ -71,7 +88,7 @@ async function exportSurveyResponses() {
     console.log(`✅ Exported ${data.length} survey responses to ${filePath}`);
     return true;
   } catch (err) {
-    console.error('Error exporting survey responses:', err);
+    console.error('❌ Error exporting survey responses:', err);
     return false;
   }
 }
@@ -173,8 +190,22 @@ async function exportAllData() {
 }
 
 // Run export if this script is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+console.log('🚀 Script starting...');
+console.log('📄 Script URL:', import.meta.url);
+console.log('📄 Process argv[1]:', process.argv[1]);
+
+// More reliable check for direct execution
+const scriptPath = fileURLToPath(import.meta.url);
+const isDirectExecution = process.argv[1] === scriptPath;
+
+console.log('🔍 Script path:', scriptPath);
+console.log('🔍 Is direct execution:', isDirectExecution);
+
+if (isDirectExecution) {
+  console.log('✅ Running export...');
   exportAllData();
+} else {
+  console.log('❌ Not running - script not executed directly');
 }
 
 export {
