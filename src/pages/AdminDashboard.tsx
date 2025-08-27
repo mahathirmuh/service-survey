@@ -336,23 +336,42 @@ const AdminDashboard = () => {
     };
 
     const handleDelete = async (employee: Employee) => {
-        if (!confirm(`Are you sure you want to delete ${employee.name}?`)) {
-            return;
-        }
-
         try {
-            const { error } = await supabase
+            console.log("🗑️ Starting deletion for employee:", employee.id_badge_number);
+            
+            // First, delete any survey responses associated with this employee
+            const { data: surveyData, error: surveyError } = await supabase
+                .from("survey_responses")
+                .delete()
+                .eq("id_badge_number", employee.id_badge_number)
+                .select();
+
+            if (surveyError) {
+                console.error("Error deleting survey responses:", surveyError);
+                throw surveyError; // Don't continue if survey deletion fails
+            }
+
+            console.log("📊 Deleted survey responses:", surveyData?.length || 0);
+
+            // Then delete the employee record
+            const { error: employeeError } = await supabase
                 .from("employees")
                 .delete()
                 .eq("id", employee.id);
 
-            if (error) throw error;
+            if (employeeError) throw employeeError;
+
+            console.log("👤 Employee deleted successfully");
 
             toast({
                 title: "Success",
-                description: "Employee deleted successfully",
+                description: `Employee and ${surveyData?.length || 0} associated survey responses deleted successfully`,
             });
 
+            // Dispatch custom event to notify other components about the data change
+            console.log("📡 Dispatching surveyDataChanged event");
+            window.dispatchEvent(new CustomEvent('surveyDataChanged'));
+            
             fetchEmployees();
         } catch (error) {
             console.error("Error deleting employee:", error);
@@ -1255,14 +1274,66 @@ const AdminDashboard = () => {
                                                                 >
                                                                     <Edit className="h-4 w-4" />
                                                                 </Button>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
+                                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
+                                                        >
+                                                            <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent className="sm:max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
+                                                        <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-orange-50/30 rounded-lg" />
+                                                        <div className="relative z-10">
+                                                            <AlertDialogHeader className="text-center pb-6">
+                                                                <div className="mx-auto mb-6 relative">
+                                                                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-full blur-xl opacity-20 animate-pulse" />
+                                                                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200 border-4 border-white shadow-lg">
+                                                                        <Trash2 className="h-10 w-10 text-red-600 animate-bounce" style={{animationDuration: '2s'}} />
+                                                                    </div>
+                                                                </div>
+                                                                <AlertDialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                                                                    Delete Employee
+                                                                </AlertDialogTitle>
+                                                                <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full mx-auto mb-4" />
+                                                                <AlertDialogDescription className="text-base text-gray-700 leading-relaxed">
+                                                                    Are you sure you want to delete{' '}
+                                                                    <span className="font-bold text-gray-900 px-2 py-1 bg-gray-100 rounded-md">{employee.name}</span>?
+                                                                    <br /><br />
+                                                                    <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-r-lg p-4 shadow-sm">
+                                                                        <div className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-ping" />
+                                                                        <div className="flex items-start space-x-3">
+                                                                            <div className="flex-shrink-0 p-1 bg-amber-100 rounded-full">
+                                                                                <Shield className="h-5 w-5 text-amber-600" />
+                                                                            </div>
+                                                                            <div className="flex-1">
+                                                                                <h4 className="text-sm font-semibold text-amber-800 mb-1">⚠️ Critical Warning</h4>
+                                                                                <p className="text-sm text-amber-700 leading-relaxed">
+                                                                                    This action will <strong>permanently delete</strong> all survey responses associated with this employee. This operation is <strong>irreversible</strong> and cannot be undone.
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
+                                                                <AlertDialogCancel className="w-full sm:w-auto order-2 sm:order-1 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
+                                                                    <span className="mr-2">✕</span>
+                                                                    Cancel
+                                                                </AlertDialogCancel>
+                                                                <AlertDialogAction 
                                                                     onClick={() => handleDelete(employee)}
-                                                                    className="text-red-600 hover:text-red-700"
+                                                                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2 transition-all duration-300 hover:scale-105 font-semibold"
                                                                 >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </Button>
+                                                                    <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
+                                                                    Delete Employee
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </div>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>

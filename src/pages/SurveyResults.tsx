@@ -199,8 +199,23 @@ const SurveyResults = () => {
     fetchSurveyData();
   }, []);
 
+  // Listen for survey data changes from other components (e.g., when employee is deleted)
+  useEffect(() => {
+    const handleSurveyDataChanged = () => {
+      console.log("📡 Received surveyDataChanged event - refreshing data");
+      fetchSurveyData();
+    };
+
+    window.addEventListener('surveyDataChanged', handleSurveyDataChanged);
+
+    return () => {
+      window.removeEventListener('surveyDataChanged', handleSurveyDataChanged);
+    };
+  }, []);
+
   const fetchSurveyData = async () => {
     try {
+      console.log("🔄 Fetching survey data...");
       setLoading(true);
       const { data, error } = await supabase
         .from("survey_responses")
@@ -209,6 +224,7 @@ const SurveyResults = () => {
 
       if (error) throw error;
 
+      console.log("📊 Fetched survey responses:", data?.length || 0);
       setSurveyData(data || []);
       processStatistics(data || []);
     } catch (error: any) {
@@ -501,11 +517,7 @@ const SurveyResults = () => {
       "Logistic & Distribution",
       "Logistic & Distribution Feedback",
       "Warehouse & Inventory",
-      "Warehouse & Inventory Feedback",
-      "SCM Inventory",
-      "SCM Inventory Feedback",
-      "SCM Procurement",
-      "SCM Procurement Feedback"
+      "Warehouse & Inventory Feedback"
     ];
 
     const csvRows = [
@@ -573,11 +585,7 @@ const SurveyResults = () => {
           getSectionRating('scm_logistic_question1', 'scm_logistic_question2'),
           getFeedback('scm_logistic_feedback'),
           getSectionRating('scm_warehouse_question1', 'scm_warehouse_question2'),
-          getFeedback('scm_warehouse_feedback'),
-          getSectionRating('scm_inventory_question1', 'scm_inventory_question2'),
-          getFeedback('scm_inventory_feedback'),
-          getSectionRating('scm_procurement_question1', 'scm_procurement_question2'),
-          getFeedback('scm_procurement_feedback')
+          getFeedback('scm_warehouse_feedback')
         ];
         
         return row.join(",");
