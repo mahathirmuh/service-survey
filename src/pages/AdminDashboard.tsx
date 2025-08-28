@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -93,6 +96,16 @@ const AdminDashboard = () => {
         department: "",
         level: "Non-Managerial",
     });
+    
+    // Bulk selection state
+    const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(new Set());
+    const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
+    const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+    const [bulkFormData, setBulkFormData] = useState({
+        department: "",
+        level: "",
+    });
+    
     const { toast } = useToast();
     const navigate = useNavigate();
 
@@ -242,6 +255,113 @@ const AdminDashboard = () => {
             resetForm();
         }
         setIsDialogOpen(true);
+    };
+
+    // Bulk selection functions
+    const handleSelectEmployee = (employeeId: string) => {
+        const newSelected = new Set(selectedEmployees);
+        if (newSelected.has(employeeId)) {
+            newSelected.delete(employeeId);
+        } else {
+            newSelected.add(employeeId);
+        }
+        setSelectedEmployees(newSelected);
+    };
+
+    const handleSelectAll = () => {
+        if (selectedEmployees.size === filteredEmployees.length) {
+            setSelectedEmployees(new Set());
+        } else {
+            setSelectedEmployees(new Set(filteredEmployees.map(emp => emp.id)));
+        }
+    };
+
+    const clearSelection = () => {
+        setSelectedEmployees(new Set());
+    };
+
+    const handleBulkDelete = async () => {
+        try {
+            const selectedIds = Array.from(selectedEmployees);
+            
+            const { error } = await supabase
+                .from('employees')
+                .delete()
+                .in('id', selectedIds);
+
+            if (error) throw error;
+
+            // Update local state
+            setEmployees(prev => prev.filter(emp => !selectedEmployees.has(emp.id)));
+            clearSelection();
+            setIsBulkDeleteOpen(false);
+
+            toast({
+                title: "Success",
+                description: `Successfully deleted ${selectedIds.length} employee${selectedIds.length > 1 ? 's' : ''}`,
+            });
+        } catch (error) {
+            console.error('Error deleting employees:', error);
+            toast({
+                title: "Error",
+                description: "Failed to delete employees. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleBulkEdit = async () => {
+        try {
+            const selectedIds = Array.from(selectedEmployees);
+            const updateData: any = {};
+            
+            // Only include fields that have values
+            if (bulkFormData.department) {
+                updateData.department = bulkFormData.department;
+            }
+            if (bulkFormData.level) {
+                updateData.level = bulkFormData.level;
+            }
+
+            if (Object.keys(updateData).length === 0) {
+                toast({
+                    title: "Validation Error",
+                    description: "Please select at least one field to update",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            const { error } = await supabase
+                .from('employees')
+                .update(updateData)
+                .in('id', selectedIds);
+
+            if (error) throw error;
+
+            // Update local state
+            setEmployees(prev => prev.map(emp => 
+                selectedEmployees.has(emp.id) 
+                    ? { ...emp, ...updateData }
+                    : emp
+            ));
+            
+            clearSelection();
+            setIsBulkEditOpen(false);
+            setBulkFormData({ department: "", level: "" });
+
+            toast({
+                title: "Success",
+                description: `Successfully updated ${selectedIds.length} employee${selectedIds.length > 1 ? 's' : ''}`,
+            });
+        } catch (error) {
+            console.error('Error updating employees:', error);
+            toast({
+                title: "Error",
+                description: "Failed to update employees. Please try again.",
+                variant: "destructive",
+            });
+        }
     };
 
     const closeDialog = () => {
@@ -1167,6 +1287,41 @@ const AdminDashboard = () => {
                                         </Button>
                                     </div>
 
+                                    {/* Bulk Actions Toolbar */}
+                                    {selectedEmployees.size > 0 && (
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md">
+                                            <span className="text-sm text-blue-700 font-medium">
+                                                {selectedEmployees.size} employee{selectedEmployees.size > 1 ? 's' : ''} selected
+                                            </span>
+                                            <Button
+                                                onClick={() => setIsBulkEditOpen(true)}
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex items-center gap-1"
+                                            >
+                                                <Edit className="h-3 w-3" />
+                                                Bulk Edit
+                                            </Button>
+                                            <Button
+                                                onClick={() => setIsBulkDeleteOpen(true)}
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                                Bulk Delete
+                                            </Button>
+                                            <Button
+                                                onClick={clearSelection}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-gray-500 hover:text-gray-700"
+                                            >
+                                                Clear
+                                            </Button>
+                                        </div>
+                                    )}
+
                                     {/* Add Employee Button */}
                                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                         <DialogTrigger asChild>
@@ -1297,6 +1452,13 @@ const AdminDashboard = () => {
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
+                                                <TableHead className="w-12">
+                                                    <Checkbox
+                                                        checked={filteredEmployees.length > 0 && filteredEmployees.every(emp => selectedEmployees.has(emp.id))}
+                                                        onCheckedChange={handleSelectAll}
+                                                        aria-label="Select all employees"
+                                                    />
+                                                </TableHead>
                                                 <TableHead>ID Badge</TableHead>
                                                 <TableHead>Name</TableHead>
                                                 <TableHead>Department</TableHead>
@@ -1308,13 +1470,20 @@ const AdminDashboard = () => {
                                         <TableBody>
                                             {filteredEmployees.length === 0 ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                                                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                                                         No employees found
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
                                                 filteredEmployees.map((employee) => (
                                                     <TableRow key={employee.id}>
+                                                        <TableCell>
+                                                            <Checkbox
+                                                                checked={selectedEmployees.has(employee.id)}
+                                                                onCheckedChange={() => handleSelectEmployee(employee.id)}
+                                                                aria-label={`Select ${employee.name}`}
+                                                            />
+                                                        </TableCell>
                                                         <TableCell className="font-medium">
                                                             {employee.id_badge_number}
                                                         </TableCell>
@@ -1526,6 +1695,79 @@ const AdminDashboard = () => {
                 )}
             </div>
         </div>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={isBulkDeleteOpen} onOpenChange={setIsBulkDeleteOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Confirm Bulk Delete</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete {selectedEmployees.size} employee{selectedEmployees.size > 1 ? 's' : ''}? This action cannot be undone.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsBulkDeleteOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="destructive" onClick={handleBulkDelete}>
+                        Delete {selectedEmployees.size} Employee{selectedEmployees.size > 1 ? 's' : ''}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        {/* Bulk Edit Dialog */}
+        <Dialog open={isBulkEditOpen} onOpenChange={setIsBulkEditOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Bulk Edit Employees</DialogTitle>
+                    <DialogDescription>
+                        Edit common fields for {selectedEmployees.size} selected employee{selectedEmployees.size > 1 ? 's' : ''}.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="bulk-department" className="text-right">
+                            Department
+                        </Label>
+                        <Select value={bulkFormData.department} onValueChange={(value) => setBulkFormData(prev => ({ ...prev, department: value }))}>
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select department" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {departments.map((dept) => (
+                                    <SelectItem key={dept} value={dept}>
+                                        {dept}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="bulk-level" className="text-right">
+                            Level
+                        </Label>
+                        <Select value={bulkFormData.level} onValueChange={(value) => setBulkFormData(prev => ({ ...prev, level: value }))}>
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="Non-Managerial">Non-Managerial</SelectItem>
+                                <SelectItem value="Managerial">Managerial</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsBulkEditOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleBulkEdit}>
+                        Update {selectedEmployees.size} Employee{selectedEmployees.size > 1 ? 's' : ''}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
 );
 };
