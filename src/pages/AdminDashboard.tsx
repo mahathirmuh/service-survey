@@ -50,6 +50,7 @@ interface Employee {
     id_badge_number: string;
     name: string;
     department: string;
+    level?: string;
     status?: string;
     created_at: string;
     updated_at: string;
@@ -90,6 +91,7 @@ const AdminDashboard = () => {
         id_badge_number: "",
         name: "",
         department: "",
+        level: "Non-Managerial",
     });
     const { toast } = useToast();
     const navigate = useNavigate();
@@ -222,6 +224,7 @@ const AdminDashboard = () => {
             id_badge_number: "",
             name: "",
             department: "",
+            level: "Non-Managerial",
         });
         setEditingEmployee(null);
     };
@@ -233,6 +236,7 @@ const AdminDashboard = () => {
                 id_badge_number: employee.id_badge_number,
                 name: employee.name,
                 department: employee.department,
+                level: employee.level || "Non-Managerial",
             });
         } else {
             resetForm();
@@ -286,6 +290,7 @@ const AdminDashboard = () => {
                         id_badge_number: formData.id_badge_number.toUpperCase(),
                         name: formData.name,
                         department: formData.department,
+                        level: formData.level,
                     })
                     .eq("id", editingEmployee.id);
 
@@ -303,6 +308,7 @@ const AdminDashboard = () => {
                         id_badge_number: formData.id_badge_number.toUpperCase(),
                         name: formData.name,
                         department: formData.department,
+                        level: formData.level,
                     });
 
                 if (error) {
@@ -391,6 +397,7 @@ const AdminDashboard = () => {
                 'ID Badge Number': emp.id_badge_number,
                 'Employee Name': emp.name,
                 'Department': emp.department,
+                'Level': emp.level || 'Non-Managerial',
                 'Created Date': new Date(emp.created_at).toLocaleDateString(),
                 'Updated Date': new Date(emp.updated_at).toLocaleDateString()
             }));
@@ -404,6 +411,7 @@ const AdminDashboard = () => {
                 { wch: 15 }, // ID Badge Number
                 { wch: 25 }, // Employee Name
                 { wch: 25 }, // Department
+                { wch: 15 }, // Level
                 { wch: 12 }, // Created Date
                 { wch: 12 }  // Updated Date
             ];
@@ -441,17 +449,20 @@ const AdminDashboard = () => {
                 {
                     'ID Badge Number': 'MTI001',
                     'Employee Name': 'John Doe',
-                    'Department': 'Human Resources'
+                    'Department': 'Human Resources',
+                    'Level': 'Non-Managerial'
                 },
                 {
                     'ID Badge Number': 'MTI002',
                     'Employee Name': 'Jane Smith',
-                    'Department': 'ICT Department'
+                    'Department': 'ICT Department',
+                    'Level': 'Managerial'
                 },
                 {
                     'ID Badge Number': 'MTI003',
                     'Employee Name': 'Bob Johnson',
-                    'Department': 'Environmental Department'
+                    'Department': 'Environmental Department',
+                    'Level': 'Non-Managerial'
                 }
             ];
 
@@ -461,7 +472,7 @@ const AdminDashboard = () => {
                 { 'Instructions': '' },
                 { 'Instructions': '1. Use the "Employee Template" sheet to add your data' },
                 { 'Instructions': '2. DELETE the sample rows before adding your data' },
-                { 'Instructions': '3. Fill in ALL three columns for each employee:' },
+                { 'Instructions': '3. Fill in ALL four columns for each employee:' },
                 { 'Instructions': '' },
                 { 'Instructions': 'COLUMN REQUIREMENTS:' },
                 { 'Instructions': '' },
@@ -484,6 +495,10 @@ const AdminDashboard = () => {
                 { 'Instructions': '    • ICT Department' },
                 { 'Instructions': '    • OHS Department' },
                 { 'Instructions': '' },
+                { 'Instructions': 'Level:' },
+                { 'Instructions': '  - Must be either "Managerial" or "Non-Managerial"' },
+                { 'Instructions': '  - Case sensitive - use exact spelling' },
+                { 'Instructions': '' },
                 { 'Instructions': 'IMPORTANT NOTES:' },
                 { 'Instructions': '• Do not change column headers' },
                 { 'Instructions': '• Do not leave any cells empty' },
@@ -504,7 +519,8 @@ const AdminDashboard = () => {
             const colWidths = [
                 { wch: 20 }, // ID Badge Number
                 { wch: 25 }, // Employee Name
-                { wch: 30 }  // Department
+                { wch: 30 }, // Department
+                { wch: 15 }  // Level
             ];
             ws['!cols'] = colWidths;
             XLSX.utils.book_append_sheet(wb, ws, 'Employee Template');
@@ -562,6 +578,7 @@ const AdminDashboard = () => {
                     id_badge_number: string;
                     name: string;
                     department: string;
+                    level: string;
                 }> = [];
 
                 const errors: string[] = [];
@@ -577,11 +594,13 @@ const AdminDashboard = () => {
                     const possibleIdColumns = ['ID Badge Number', 'Employee ID', 'ID', 'Badge', 'Employee', 'ID Badge', 'Badge Number'];
                     const possibleNameColumns = ['Employee Name', 'Name', 'Full Name', 'Employee', 'Full_Name', 'EmployeeName'];
                     const possibleDeptColumns = ['Department', 'Dept', 'Department Name', 'Dep'];
+                    const possibleLevelColumns = ['Level', 'Employee Level', 'Position Level', 'Management Level'];
 
                     // Find the actual values
                     let idBadge = '';
                     let name = '';
                     let department = '';
+                    let level = '';
 
                     // Try to find ID Badge
                     for (const col of possibleIdColumns) {
@@ -607,7 +626,20 @@ const AdminDashboard = () => {
                         }
                     }
 
-                    console.log(`Row ${rowNum} extracted:`, { idBadge, name, department });
+                    // Try to find Level
+                    for (const col of possibleLevelColumns) {
+                        if (row[col] && String(row[col]).trim()) {
+                            level = String(row[col]).trim();
+                            break;
+                        }
+                    }
+
+                    // Default level if not provided
+                    if (!level) {
+                        level = 'Non-Managerial';
+                    }
+
+                    console.log(`Row ${rowNum} extracted:`, { idBadge, name, department, level });
 
                     // Skip completely empty rows
                     if (!idBadge && !name && !department) {
@@ -626,6 +658,12 @@ const AdminDashboard = () => {
                     }
                     if (!department) {
                         errors.push(`Row ${rowNum}: Missing Department`);
+                        return;
+                    }
+
+                    // Validate level
+                    if (level && !['Managerial', 'Non-Managerial'].includes(level)) {
+                        errors.push(`Row ${rowNum}: Level must be either 'Managerial' or 'Non-Managerial', got '${level}'`);
                         return;
                     }
 
@@ -717,13 +755,15 @@ const AdminDashboard = () => {
                     validEmployees.push({
                         id_badge_number: formattedIdBadge,
                         name: String(name).trim(),
-                        department: mappedDepartment
+                        department: mappedDepartment,
+                        level: level
                     });
 
                     console.log(`Row ${rowNum} validated successfully:`, {
                         id_badge_number: formattedIdBadge,
                         name: String(name).trim(),
-                        department: mappedDepartment
+                        department: mappedDepartment,
+                        level: level
                     });
                 });
 
@@ -1189,6 +1229,23 @@ const AdminDashboard = () => {
                                                     </SelectContent>
                                                 </Select>
                                             </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="level">Level</Label>
+                                                <Select
+                                                    value={formData.level}
+                                                    onValueChange={(value) =>
+                                                        setFormData({ ...formData, level: value })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select level" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Non-Managerial">Non-Managerial</SelectItem>
+                                                        <SelectItem value="Managerial">Managerial</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
                                             <div className="flex justify-end space-x-2 pt-4">
                                                 <Button
                                                     type="button"
@@ -1243,6 +1300,7 @@ const AdminDashboard = () => {
                                                 <TableHead>ID Badge</TableHead>
                                                 <TableHead>Name</TableHead>
                                                 <TableHead>Department</TableHead>
+                                                <TableHead>Level</TableHead>
                                                 <TableHead>Created</TableHead>
                                                 <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
@@ -1250,7 +1308,7 @@ const AdminDashboard = () => {
                                         <TableBody>
                                             {filteredEmployees.length === 0 ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                                    <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                                                         No employees found
                                                     </TableCell>
                                                 </TableRow>
@@ -1262,6 +1320,15 @@ const AdminDashboard = () => {
                                                         </TableCell>
                                                         <TableCell>{employee.name}</TableCell>
                                                         <TableCell>{employee.department}</TableCell>
+                                                        <TableCell>
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                                employee.level === 'Managerial' 
+                                                                    ? 'bg-blue-100 text-blue-800' 
+                                                                    : 'bg-gray-100 text-gray-800'
+                                                            }`}>
+                                                                {employee.level || 'Non-Managerial'}
+                                                            </span>
+                                                        </TableCell>
                                                         <TableCell>
                                                             {new Date(employee.created_at).toLocaleDateString()}
                                                         </TableCell>
