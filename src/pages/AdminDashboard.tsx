@@ -1061,9 +1061,6 @@ const AdminDashboard = () => {
                             <button
                                 onClick={() => {
                                     setResultsExpanded(!resultsExpanded);
-                                    if (!resultsExpanded) {
-                                        setActiveMenuItem("results");
-                                    }
                                 }}
                                 className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                     activeMenuItem.includes("results")
