@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -85,10 +85,16 @@ const AdminDashboard = () => {
     const [isImporting, setIsImporting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+    const [resultsExpanded, setResultsExpanded] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState(() => {
         // Check if we're coming from the results page with submission intent
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('menu') || "dashboard";
+        const menu = urlParams.get('menu') || "dashboard";
+        // If we're on a results sub-page, expand the results menu
+        if (menu.includes('results')) {
+            setResultsExpanded(true);
+        }
+        return menu;
     });
     const [formData, setFormData] = useState({
         id_badge_number: "",
@@ -1050,20 +1056,66 @@ const AdminDashboard = () => {
                             <FileText className="mr-3 h-4 w-4" />
                             Submission
                         </button>
-                        <button
-                            onClick={() => {
-                                setActiveMenuItem("results");
-                                navigate("/admin/results");
-                            }}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                activeMenuItem === "results"
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                            }`}
-                        >
-                            <BarChart3 className="mr-3 h-4 w-4" />
-                            Results
-                        </button>
+                        {/* Results Menu with Sub-items */}
+                        <div>
+                            <button
+                                onClick={() => {
+                                    setResultsExpanded(!resultsExpanded);
+                                    if (!resultsExpanded) {
+                                        setActiveMenuItem("results");
+                                    }
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                    activeMenuItem.includes("results")
+                                        ? "text-purple-600 bg-purple-50"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                }`}
+                            >
+                                <div className="flex items-center">
+                                    <BarChart3 className="mr-3 h-4 w-4" />
+                                    Results
+                                </div>
+                                {resultsExpanded ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                )}
+                            </button>
+                            
+                            {/* Sub-menu items */}
+                            {resultsExpanded && (
+                                <div className="ml-6 mt-1 space-y-1">
+                                    <button
+                                        onClick={() => {
+                                            setActiveMenuItem("results-managerial");
+                                            navigate("/admin/results/managerial");
+                                        }}
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                            activeMenuItem === "results-managerial"
+                                                ? "text-purple-600 bg-purple-50"
+                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        }`}
+                                    >
+                                        <Users className="mr-3 h-4 w-4" />
+                                        Managerial
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setActiveMenuItem("results-non-managerial");
+                                            navigate("/admin/results/non-managerial");
+                                        }}
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                            activeMenuItem === "results-non-managerial"
+                                                ? "text-purple-600 bg-purple-50"
+                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        }`}
+                                    >
+                                        <Shield className="mr-3 h-4 w-4" />
+                                        Non-Managerial
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </nav>
                 

@@ -397,10 +397,10 @@ const SurveyForm = () => {
         }
         setIsSubmitting(true);
         try {
-            // Validate employee
+            // Validate employee and get level
             const { data: employee } = await supabase
                 .from("employees")
-                .select("id")
+                .select("id, level")
                 .eq("id_badge_number", formData.idBadgeNumber)
                 .maybeSingle();
             if (!employee) {
@@ -553,11 +553,27 @@ const SurveyForm = () => {
             });
             const { error } = await supabase.from("survey_responses").insert(insertData);
             if (error) throw error;
+            
+            // Auto-route based on employee level
+            const employeeLevel = employee.level;
+            let redirectUrl = '/admin/results'; // Default for admin
+            
+            if (employeeLevel === 'Managerial') {
+                redirectUrl = '/admin/results/managerial';
+            } else if (employeeLevel === 'Non-Managerial') {
+                redirectUrl = '/admin/results/non-managerial';
+            }
+            
             setIsSubmitted(true);
             toast({
                 title: "Survey Submitted Successfully!",
-                description: "Thank you for your feedback.",
+                description: "Thank you for your feedback. Redirecting to results...",
             });
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                window.open(redirectUrl, '_blank');
+            }, 2000);
         } catch (error: any) {
             console.error("Error submitting survey:", error);
             /*
@@ -630,14 +646,11 @@ const SurveyForm = () => {
                             valuable feedback.
                         </p>
                         <div className="space-y-4">
-                            <Button 
-                                onClick={() => window.open('/results', '_blank')}
-                                className="w-full max-w-xs mx-auto"
-                                variant="outline"
-                            >
-                                View Survey Results
-                            </Button>
-                            <p className="text-sm text-muted-foreground">You can now close the page.</p>
+                            <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground mb-4">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                                <span>Redirecting to your results page...</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">You will be automatically redirected to view your relevant results.</p>
                         </div>
                     </CardContent>
                 </Card>

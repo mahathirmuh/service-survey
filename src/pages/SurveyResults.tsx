@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -55,7 +55,9 @@ import {
   Shield,
   Menu,
   LayoutDashboard,
-  FileText
+  FileText,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 
@@ -99,9 +101,12 @@ const SurveyResults = () => {
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [resultsExpanded, setResultsExpanded] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState("results");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Check authentication and session timeout
   useEffect(() => {
@@ -195,9 +200,27 @@ const SurveyResults = () => {
     }
   };
 
+  // Handle route-based filtering and active menu state
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/managerial')) {
+      setLevelFilter('Managerial');
+      setActiveMenuItem('results-managerial');
+      setResultsExpanded(true);
+    } else if (path.includes('/non-managerial')) {
+      setLevelFilter('Non-Managerial');
+      setActiveMenuItem('results-non-managerial');
+      setResultsExpanded(true);
+    } else if (path.includes('/results')) {
+      setLevelFilter('all');
+      setActiveMenuItem('results');
+      setResultsExpanded(true);
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     fetchSurveyData();
-  }, []);
+  }, [levelFilter]);
 
   // Listen for survey data changes from other components (e.g., when employee is deleted)
   useEffect(() => {
@@ -217,16 +240,43 @@ const SurveyResults = () => {
     try {
       console.log("🔄 Fetching survey data...");
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First, get all survey responses
+      const { data: surveyData, error: surveyError } = await supabase
         .from("survey_responses")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (surveyError) throw surveyError;
 
-      console.log("📊 Fetched survey responses:", data?.length || 0);
-      setSurveyData(data || []);
-      processStatistics(data || []);
+      // Get employee data to filter by level
+      const { data: employeeData, error: employeeError } = await supabase
+        .from("employees")
+        .select("id_badge_number, level");
+
+      if (employeeError) throw employeeError;
+
+      // Create a map of employee levels
+      const employeeLevels = new Map();
+      employeeData?.forEach(emp => {
+        employeeLevels.set(emp.id_badge_number, emp.level || 'Non-Managerial');
+      });
+
+      // Add level information to survey data
+      const enrichedData = (surveyData || []).map(response => ({
+        ...response,
+        level: employeeLevels.get(response.id_badge_number) || 'Non-Managerial'
+      }));
+
+      // Filter data based on current level filter
+      let filteredData = enrichedData;
+      if (levelFilter !== 'all') {
+        filteredData = enrichedData.filter(response => response.level === levelFilter);
+      }
+
+      console.log("📊 Fetched survey responses:", filteredData?.length || 0, "(Level filter:", levelFilter, ")");
+      setSurveyData(filteredData);
+      processStatistics(filteredData);
     } catch (error: any) {
       console.error("Error fetching survey data:", error);
       toast({
@@ -685,17 +735,66 @@ const SurveyResults = () => {
               <FileText className="mr-3 h-4 w-4" />
               Submission
             </button>
-            <button
-              onClick={() => setActiveMenuItem("results")}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeMenuItem === "results"
-                  ? "text-purple-600 bg-purple-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              <BarChart3 className="mr-3 h-4 w-4" />
-              Results
-            </button>
+            {/* Results Menu with Sub-items */}
+            <div>
+              <button
+                onClick={() => {
+                  setResultsExpanded(!resultsExpanded);
+                  if (!resultsExpanded) {
+                    setActiveMenuItem("results");
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  activeMenuItem.includes("results")
+                    ? "text-purple-600 bg-purple-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center">
+                  <BarChart3 className="mr-3 h-4 w-4" />
+                  Results
+                </div>
+                {resultsExpanded ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              
+              {/* Sub-menu items */}
+              {resultsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => {
+                      setActiveMenuItem("results-managerial");
+                      navigate("/admin/results/managerial");
+                    }}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeMenuItem === "results-managerial"
+                        ? "text-purple-600 bg-purple-50"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Users className="mr-3 h-4 w-4" />
+                    Managerial
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveMenuItem("results-non-managerial");
+                      navigate("/admin/results/non-managerial");
+                    }}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeMenuItem === "results-non-managerial"
+                        ? "text-purple-600 bg-purple-50"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Shield className="mr-3 h-4 w-4" />
+                    Non-Managerial
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
         
@@ -775,8 +874,23 @@ const SurveyResults = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-primary mb-2">Survey Results Dashboard</h1>
-                <p className="text-muted-foreground">Comprehensive analysis of employee satisfaction survey responses</p>
+                <h1 className="text-3xl font-bold text-primary mb-2">
+                  {levelFilter === 'Managerial' ? 'Managerial Results Dashboard' :
+                   levelFilter === 'Non-Managerial' ? 'Non-Managerial Results Dashboard' :
+                   'Survey Results Dashboard'}
+                </h1>
+                <p className="text-muted-foreground">
+                  {levelFilter === 'Managerial' ? 'Analysis of managerial employee satisfaction survey responses' :
+                   levelFilter === 'Non-Managerial' ? 'Analysis of non-managerial employee satisfaction survey responses' :
+                   'Comprehensive analysis of employee satisfaction survey responses'}
+                </p>
+                {levelFilter !== 'all' && (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-purple-600 border-purple-600">
+                      Filtered by: {levelFilter} Level
+                    </Badge>
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button onClick={fetchSurveyData} variant="outline" size="sm">
