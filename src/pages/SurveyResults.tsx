@@ -911,8 +911,8 @@ const SurveyResults = () => {
               </div>
             </div>
 
-            {/* Overall Statistics Cards */}
-            {overallStats && (
+            {/* Overall Statistics Cards or Zero State */}
+            {overallStats && overallStats.totalResponses > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-6">
@@ -964,6 +964,32 @@ const SurveyResults = () => {
                   </CardContent>
                 </Card>
               </div>
+            ) : (
+              <Card className="border-dashed border-2">
+                <CardContent className="p-12 text-center">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="rounded-full bg-muted p-4">
+                      <BarChart3 className="h-12 w-12 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-muted-foreground">
+                        No Survey Responses Found
+                      </h3>
+                      <p className="text-muted-foreground max-w-md">
+                        {levelFilter === 'Managerial' 
+                          ? 'There are currently no survey responses from managerial level employees. Once managerial employees submit their surveys, the analytics will appear here.'
+                          : levelFilter === 'Non Managerial'
+                          ? 'There are currently no survey responses from non-managerial level employees. Once non-managerial employees submit their surveys, the analytics will appear here.'
+                          : 'There are currently no survey responses available. Once employees start submitting their surveys, the analytics dashboard will display comprehensive insights and statistics here.'}
+                      </p>
+                    </div>
+                    <Button onClick={fetchSurveyData} variant="outline" className="mt-4">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Check for New Responses
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Department Filter */}
@@ -1000,106 +1026,146 @@ const SurveyResults = () => {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Department Response Distribution */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Response Distribution by Department</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={departmentStats.map((dept, index) => ({
-                              name: dept.department,
-                              value: dept.totalResponses,
-                              fill: COLORS[index % COLORS.length]
-                            }))}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {departmentStats.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </CardContent>
-                  </Card>
+                {overallStats && overallStats.totalResponses > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Department Response Distribution */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Response Distribution by Department</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={departmentStats.map((dept, index) => ({
+                                name: dept.department,
+                                value: dept.totalResponses,
+                                fill: COLORS[index % COLORS.length]
+                              }))}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {departmentStats.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
 
-                  {/* Average Ratings by Department */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Average Ratings by Department</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={departmentStats}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis 
-                            dataKey="department" 
-                            angle={-45}
-                            textAnchor="end"
-                            height={100}
-                          />
-                          <YAxis domain={[0, 5]} />
-                          <Tooltip />
-                          <Bar dataKey="averageRating" fill="#8884d8" />
-                        </BarChart>
-                      </ResponsiveContainer>
+                    {/* Average Ratings by Department */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Average Ratings by Department</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={departmentStats}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis 
+                              dataKey="department" 
+                              angle={-45}
+                              textAnchor="end"
+                              height={100}
+                            />
+                            <YAxis domain={[0, 5]} />
+                            <Tooltip />
+                            <Bar dataKey="averageRating" fill="#8884d8" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  <Card className="border-dashed border-2">
+                    <CardContent className="p-12 text-center">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="rounded-full bg-muted p-4">
+                          <TrendingUp className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="text-xl font-semibold text-muted-foreground">
+                            No Data Available for Charts
+                          </h3>
+                          <p className="text-muted-foreground max-w-md">
+                            Charts and analytics will be displayed here once survey responses are available.
+                          </p>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
-                </div>
+                )}
               </TabsContent>
 
               <TabsContent value="departments" className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {filteredStats.map((dept) => (
-                    <Card key={dept.department}>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Building2 className="h-5 w-5" />
-                          {dept.department}
-                        </CardTitle>
-                        <div className="flex items-center gap-4">
-                          <Badge variant="outline">
-                            {dept.totalResponses} responses
-                          </Badge>
-                          <Badge variant={getRatingBadgeVariant(dept.averageRating)}>
-                            {dept.averageRating.toFixed(2)} avg rating
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
-                            <div key={sectionName} className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium">{sectionName}</span>
-                                <span className={`text-sm font-bold ${getRatingColor(sectionData.averageRating)}`}>
-                                  {sectionData.averageRating.toFixed(2)}
-                                </span>
+                {filteredStats.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {filteredStats.map((dept) => (
+                      <Card key={dept.department}>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Building2 className="h-5 w-5" />
+                            {dept.department}
+                          </CardTitle>
+                          <div className="flex items-center gap-4">
+                            <Badge variant="outline">
+                              {dept.totalResponses} responses
+                            </Badge>
+                            <Badge variant={getRatingBadgeVariant(dept.averageRating)}>
+                              {dept.averageRating.toFixed(2)} avg rating
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
+                              <div key={sectionName} className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-medium">{sectionName}</span>
+                                  <span className={`text-sm font-bold ${getRatingColor(sectionData.averageRating)}`}>
+                                    {sectionData.averageRating.toFixed(2)}
+                                  </span>
+                                </div>
+                                <Progress 
+                                  value={(sectionData.averageRating / 5) * 100} 
+                                  className="h-2"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                  {sectionData.responseCount} responses
+                                </p>
                               </div>
-                              <Progress 
-                                value={(sectionData.averageRating / 5) * 100} 
-                                className="h-2"
-                              />
-                              <p className="text-xs text-muted-foreground">
-                                {sectionData.responseCount} responses
-                              </p>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="border-dashed border-2">
+                    <CardContent className="p-12 text-center">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="rounded-full bg-muted p-4">
+                          <Building2 className="h-12 w-12 text-muted-foreground" />
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        <div className="space-y-2">
+                          <h3 className="text-xl font-semibold text-muted-foreground">
+                            No Department Data Available
+                          </h3>
+                          <p className="text-muted-foreground max-w-md">
+                            Department-wise analysis will be displayed here once survey responses are available.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </TabsContent>
 
               <TabsContent value="sections" className="space-y-4">
@@ -1108,33 +1174,51 @@ const SurveyResults = () => {
                     <CardTitle>Section Performance Analysis</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {filteredStats.map((dept) => (
-                        <div key={dept.department}>
-                          <h4 className="font-semibold text-lg mb-3">{dept.department}</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                            {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
-                              <Card key={sectionName} className="p-4">
-                                <div className="text-center">
-                                  <h5 className="font-medium mb-2">{sectionName}</h5>
-                                  <div className={`text-2xl font-bold mb-2 ${getRatingColor(sectionData.averageRating)}`}>
-                                    {sectionData.averageRating.toFixed(2)}
+                    {filteredStats.length > 0 ? (
+                      <div className="space-y-4">
+                        {filteredStats.map((dept) => (
+                          <div key={dept.department}>
+                            <h4 className="font-semibold text-lg mb-3">{dept.department}</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                              {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
+                                <Card key={sectionName} className="p-4">
+                                  <div className="text-center">
+                                    <h5 className="font-medium mb-2">{sectionName}</h5>
+                                    <div className={`text-2xl font-bold mb-2 ${getRatingColor(sectionData.averageRating)}`}>
+                                      {sectionData.averageRating.toFixed(2)}
+                                    </div>
+                                    <Progress 
+                                      value={(sectionData.averageRating / 5) * 100} 
+                                      className="h-2 mb-2"
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                      {sectionData.responseCount} responses
+                                    </p>
                                   </div>
-                                  <Progress 
-                                    value={(sectionData.averageRating / 5) * 100} 
-                                    className="h-2 mb-2"
-                                  />
-                                  <p className="text-xs text-muted-foreground">
-                                    {sectionData.responseCount} responses
-                                  </p>
-                                </div>
-                              </Card>
-                            ))}
+                                </Card>
+                              ))}
+                            </div>
+                            <Separator />
                           </div>
-                          <Separator />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-12 text-center">
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="rounded-full bg-muted p-4">
+                            <Award className="h-12 w-12 text-muted-foreground" />
+                          </div>
+                          <div className="space-y-2">
+                            <h3 className="text-xl font-semibold text-muted-foreground">
+                              No Section Data Available
+                            </h3>
+                            <p className="text-muted-foreground max-w-md">
+                              Section performance analysis will be displayed here once survey responses are available.
+                            </p>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -1149,26 +1233,44 @@ const SurveyResults = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {surveyData.slice(0, 10).map((response) => (
-                    <div key={response.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{response.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {response.department} • ID: {response.id_badge_number}
-                        </p>
+                {surveyData.length > 0 ? (
+                  <div className="space-y-3">
+                    {surveyData.slice(0, 10).map((response) => (
+                      <div key={response.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <p className="font-medium">{response.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {response.department} • ID: {response.id_badge_number}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">
+                            {new Date(response.created_at).toLocaleDateString()}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(response.created_at).toLocaleTimeString()}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {new Date(response.created_at).toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(response.created_at).toLocaleTimeString()}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center">
+                    <div className="flex flex-col items-center space-y-3">
+                      <div className="rounded-full bg-muted p-3">
+                        <Calendar className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="font-medium text-muted-foreground">
+                          No Recent Submissions
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Recent survey submissions will appear here.
                         </p>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
