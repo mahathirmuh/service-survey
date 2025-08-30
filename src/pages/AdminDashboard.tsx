@@ -1792,6 +1792,7 @@ const AdminDashboard = () => {
                                                  <TableHead>ID Badge</TableHead>
                                                  <TableHead>Name</TableHead>
                                                  <TableHead>Department</TableHead>
+                                                 <TableHead>Level</TableHead>
                                                  <TableHead>Submission Date</TableHead>
                                                  <TableHead>Status</TableHead>
                                              </TableRow>
@@ -1799,7 +1800,7 @@ const AdminDashboard = () => {
                                          <TableBody>
                                              {currentPageSubmissions.length === 0 ? (
                                                  <TableRow>
-                                                     <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                                                     <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                                                          {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
                                                      </TableCell>
                                                  </TableRow>
@@ -1811,6 +1812,15 @@ const AdminDashboard = () => {
                                                          </TableCell>
                                                          <TableCell>{employee.name}</TableCell>
                                                          <TableCell>{employee.department}</TableCell>
+                                                         <TableCell>
+                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                                 employee.level === 'Managerial' 
+                                                                     ? 'bg-blue-100 text-blue-800' 
+                                                                     : 'bg-gray-100 text-gray-800'
+                                                             }`}>
+                                                                 {employee.level || 'Non Managerial'}
+                                                             </span>
+                                                         </TableCell>
                                                          <TableCell>
                                                              {employee.status === 'Submitted' 
                                                                  ? new Date(employee.created_at).toLocaleDateString()
