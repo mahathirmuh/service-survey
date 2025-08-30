@@ -451,72 +451,22 @@ const SurveyResults = () => {
     const overallAverage = totalRatingCount > 0 ? totalRatings / totalRatingCount : 0;
     console.log("Overall average calculated:", overallAverage);
     
-    // Helper function to calculate variance
-    const calculateVariance = (ratings: number[]): number => {
-      if (ratings.length <= 1) return 0;
-      const mean = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-      const variance = ratings.reduce((sum, rating) => sum + Math.pow(rating - mean, 2), 0) / ratings.length;
-      return variance;
-    };
-    
-    // Find top rated section with tie handling
-    let topSections: Array<{name: string, avg: number, count: number, variance: number}> = [];
-    let lowestSections: Array<{name: string, avg: number, count: number, variance: number}> = [];
+    let topSection = "";
+    let lowestSection = "";
     let highestAvg = 0;
     let lowestAvg = 5;
     
-    // First pass: find highest and lowest averages
     Object.entries(sectionRatings).forEach(([sectionName, ratings]) => {
       const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-      const count = ratings.length;
-      const variance = calculateVariance(ratings);
-      
       if (avg > highestAvg) {
         highestAvg = avg;
+        topSection = sectionName;
       }
       if (avg < lowestAvg) {
         lowestAvg = avg;
+        lowestSection = sectionName;
       }
     });
-    
-    // Second pass: collect all sections with highest/lowest averages
-    Object.entries(sectionRatings).forEach(([sectionName, ratings]) => {
-      const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-      const count = ratings.length;
-      const variance = calculateVariance(ratings);
-      
-      if (Math.abs(avg - highestAvg) < 0.001) { // Handle floating point precision
-        topSections.push({name: sectionName, avg, count, variance});
-      }
-      if (Math.abs(avg - lowestAvg) < 0.001) { // Handle floating point precision
-        lowestSections.push({name: sectionName, avg, count, variance});
-      }
-    });
-    
-    // Apply tie-breaker logic for top rated: most responses → lowest variance
-    const getWinnerWithTieBreaker = (sections: Array<{name: string, avg: number, count: number, variance: number}>): string => {
-      if (sections.length === 0) return "";
-      if (sections.length === 1) return sections[0].name;
-      
-      // Sort by: 1) Most responses (descending), 2) Lowest variance (ascending)
-      sections.sort((a, b) => {
-        if (b.count !== a.count) return b.count - a.count; // Most responses first
-        return a.variance - b.variance; // Lowest variance first
-      });
-      
-      // If still tied, return all winners as comma-separated string
-      const winners = sections.filter(s => 
-        s.count === sections[0].count && 
-        Math.abs(s.variance - sections[0].variance) < 0.001
-      );
-      
-      return winners.length > 1 
-        ? winners.map(w => w.name).join(", ")
-        : sections[0].name;
-    };
-    
-    const topSection = getWinnerWithTieBreaker(topSections);
-    const lowestSection = getWinnerWithTieBreaker(lowestSections);
 
     setDepartmentStats(Object.values(deptStats));
     setOverallStats({
@@ -993,23 +943,11 @@ const SurveyResults = () => {
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Top Rated Section{overallStats.topRatedSection.includes(',') ? 's (Tied)' : ''}
-                        </p>
-                        <p className="text-lg font-bold text-green-600 break-words" 
-                           title={overallStats.topRatedSection.includes(',') ? 
-                             `Multiple sections tied for highest rating: ${overallStats.topRatedSection}` : 
-                             overallStats.topRatedSection}>
-                          {overallStats.topRatedSection}
-                        </p>
-                        {overallStats.topRatedSection.includes(',') && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Tie-breaker: Most responses → Lowest variance
-                          </p>
-                        )}
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Top Rated Section</p>
+                        <p className="text-lg font-bold text-green-600">{overallStats.topRatedSection}</p>
                       </div>
-                      <Award className="h-8 w-8 text-primary flex-shrink-0" />
+                      <Award className="h-8 w-8 text-primary" />
                     </div>
                   </CardContent>
                 </Card>
@@ -1017,23 +955,11 @@ const SurveyResults = () => {
                 <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Needs Attention{overallStats.lowestRatedSection.includes(',') ? ' (Tied)' : ''}
-                        </p>
-                        <p className="text-lg font-bold text-red-600 break-words" 
-                           title={overallStats.lowestRatedSection.includes(',') ? 
-                             `Multiple sections tied for lowest rating: ${overallStats.lowestRatedSection}` : 
-                             overallStats.lowestRatedSection}>
-                          {overallStats.lowestRatedSection}
-                        </p>
-                        {overallStats.lowestRatedSection.includes(',') && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Tie-breaker: Most responses → Lowest variance
-                          </p>
-                        )}
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Needs Attention</p>
+                        <p className="text-lg font-bold text-red-600">{overallStats.lowestRatedSection}</p>
                       </div>
-                      <AlertCircle className="h-8 w-8 text-primary flex-shrink-0" />
+                      <AlertCircle className="h-8 w-8 text-primary" />
                     </div>
                   </CardContent>
                 </Card>
