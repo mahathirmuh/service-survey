@@ -41,7 +41,7 @@ The Service Survey Application is a comprehensive web-based platform designed fo
 - ✅ Create, read, update, delete employee records
 - ✅ Bulk import/export via Excel files
 - ✅ Employee validation (ID badge format, department assignment)
-- ✅ Level-based categorization (Managerial/Non-Managerial)
+- ✅ Level-based categorization (Managerial/Non Managerial)
 
 #### Survey System
 - ✅ Dynamic survey forms based on department

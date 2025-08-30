@@ -67,6 +67,14 @@ interface SurveyResponse {
   id_badge_number: string;
   department: string;
   created_at: string;
+  level?: string;
+  employee_department?: string;
+  employee_name?: string;
+  employees?: {
+    level: string;
+    department: string;
+    name: string;
+  };
   [key: string]: any;
 }
 
@@ -208,7 +216,7 @@ const SurveyResults = () => {
       setActiveMenuItem('results-managerial');
       setResultsExpanded(true);
     } else if (path.includes('/non-managerial')) {
-      setLevelFilter('Non-Managerial');
+      setLevelFilter('Non Managerial');
       setActiveMenuItem('results-non-managerial');
       setResultsExpanded(true);
     } else if (path.includes('/results')) {
@@ -241,31 +249,27 @@ const SurveyResults = () => {
       console.log("🔄 Fetching survey data...");
       setLoading(true);
       
-      // First, get all survey responses
+      // Get all survey responses with employee level information using JOIN
       const { data: surveyData, error: surveyError } = await supabase
         .from("survey_responses")
-        .select("*")
+        .select(`
+          *,
+          employees!inner(
+            level,
+            department,
+            name
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (surveyError) throw surveyError;
 
-      // Get employee data to filter by level
-      const { data: employeeData, error: employeeError } = await supabase
-        .from("employees")
-        .select("id_badge_number, level");
-
-      if (employeeError) throw employeeError;
-
-      // Create a map of employee levels
-      const employeeLevels = new Map();
-      employeeData?.forEach(emp => {
-        employeeLevels.set(emp.id_badge_number, emp.level || 'Non-Managerial');
-      });
-
-      // Add level information to survey data
+      // Transform data to include level from employees table
       const enrichedData = (surveyData || []).map(response => ({
         ...response,
-        level: employeeLevels.get(response.id_badge_number) || 'Non-Managerial'
+        level: response.employees?.level || 'Non Managerial',
+        employee_department: response.employees?.department || response.department,
+        employee_name: response.employees?.name || response.name
       }));
 
       // Filter data based on current level filter
@@ -275,13 +279,19 @@ const SurveyResults = () => {
       }
 
       console.log("📊 Fetched survey responses:", filteredData?.length || 0, "(Level filter:", levelFilter, ")");
+      console.log("📋 Sample response with level:", filteredData[0] ? {
+        name: filteredData[0].name,
+        level: filteredData[0].level,
+        department: filteredData[0].department
+      } : 'No responses');
+      
       setSurveyData(filteredData);
       processStatistics(filteredData);
     } catch (error: any) {
       console.error("Error fetching survey data:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch survey results",
+        description: "Failed to fetch survey results. " + (error.message || 'Please try again.'),
         variant: "destructive",
       });
     } finally {
@@ -787,7 +797,7 @@ const SurveyResults = () => {
                     }`}
                   >
                     <Shield className="mr-3 h-4 w-4" />
-                    Non-Managerial
+                    Non Managerial
                   </button>
                 </div>
               )}
@@ -873,12 +883,12 @@ const SurveyResults = () => {
               <div>
                 <h1 className="text-3xl font-bold text-primary mb-2">
                   {levelFilter === 'Managerial' ? 'Managerial Results Dashboard' :
-                   levelFilter === 'Non-Managerial' ? 'Non-Managerial Results Dashboard' :
+                   levelFilter === 'Non-Managerial' ? 'Non Managerial Results Dashboard' :
                    'Survey Results Dashboard'}
                 </h1>
                 <p className="text-muted-foreground">
                   {levelFilter === 'Managerial' ? 'Analysis of managerial employee satisfaction survey responses' :
-                   levelFilter === 'Non-Managerial' ? 'Analysis of non-managerial employee satisfaction survey responses' :
+                   levelFilter === 'Non Managerial' ? 'Analysis of non-managerial employee satisfaction survey responses' :
                    'Comprehensive analysis of employee satisfaction survey responses'}
                 </p>
                 {levelFilter !== 'all' && (

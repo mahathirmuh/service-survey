@@ -440,6 +440,7 @@ const SurveyForm = () => {
                 name: formData.name,
                 id_badge_number: formData.idBadgeNumber,
                 department: formData.department,
+                level: employee.level || 'Non Managerial', // Store level at time of submission
                 
                 // Default values for all required HR columns
                 hr_documentcontrol_question1: 0,
@@ -554,13 +555,24 @@ const SurveyForm = () => {
             const { error } = await supabase.from("survey_responses").insert(insertData);
             if (error) throw error;
             
+            // Update employee status to 'Submitted'
+            const { error: updateError } = await supabase
+                .from('employees')
+                .update({ status: 'Submitted' })
+                .eq('id_badge_number', employee.id_badge_number);
+            
+            if (updateError) {
+                console.error('Error updating employee status:', updateError);
+                // Don't throw error here as survey was already submitted successfully
+            }
+            
             // Auto-route based on employee level
             const employeeLevel = employee.level;
             let redirectUrl = '/admin/results'; // Default for admin
             
             if (employeeLevel === 'Managerial') {
                 redirectUrl = '/admin/results/managerial';
-            } else if (employeeLevel === 'Non-Managerial') {
+            } else if (employeeLevel === 'Non Managerial') {
                 redirectUrl = '/admin/results/non-managerial';
             }
             

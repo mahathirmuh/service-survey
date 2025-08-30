@@ -178,7 +178,7 @@ const AdminDashboard = () => {
     const fetchEmployees = async () => {
         setIsLoading(true);
         try {
-            // First get all employees
+            // Get all employees with their status from the database
             const { data: employeesData, error: employeesError } = await supabase
                 .from("employees")
                 .select("*")
@@ -186,21 +186,37 @@ const AdminDashboard = () => {
 
             if (employeesError) throw employeesError;
 
-            // Get all survey responses to check submission status
+            // Get all survey responses to double-check and sync status
             const { data: responsesData, error: responsesError } = await supabase
                 .from("survey_responses")
                 .select("id_badge_number");
 
             if (responsesError) throw responsesError;
 
-            // Create a set of submitted ID badge numbers for quick lookup
+            // Create a set of submitted ID badge numbers for verification
             const submittedIds = new Set(responsesData?.map(r => r.id_badge_number) || []);
 
-            // Add submission status to employees
-            const employeesWithStatus = (employeesData || []).map(employee => ({
-                ...employee,
-                status: submittedIds.has(employee.id_badge_number) ? 'Submitted' : 'Not Submitted'
-            }));
+            // Sync database status with actual survey responses
+            const employeesWithStatus = (employeesData || []).map(employee => {
+                const actualStatus = submittedIds.has(employee.id_badge_number) ? 'Submitted' : 'Not Submitted';
+                
+                // If database status doesn't match actual status, update it
+                if (employee.status !== actualStatus) {
+                    // Update in background without blocking UI
+                    supabase
+                        .from('employees')
+                        .update({ status: actualStatus })
+                        .eq('id', employee.id)
+                        .then(({ error }) => {
+                            if (error) console.error('Error syncing employee status:', error);
+                        });
+                }
+                
+                return {
+                    ...employee,
+                    status: actualStatus
+                };
+            });
 
             setEmployees(employeesWithStatus);
             setFilteredEmployees(employeesWithStatus);
@@ -365,6 +381,24 @@ const AdminDashboard = () => {
 
             if (error) throw error;
 
+            // If level is being updated, sync survey responses for affected employees
+            if (updateData.level) {
+                const affectedEmployees = employees.filter(emp => selectedEmployees.has(emp.id));
+                const badgeNumbers = affectedEmployees.map(emp => emp.id_badge_number);
+                
+                if (badgeNumbers.length > 0) {
+                    const { error: syncError } = await supabase
+                        .from('survey_responses')
+                        .update({ level: updateData.level })
+                        .in('id_badge_number', badgeNumbers);
+                    
+                    if (syncError) {
+                        console.error('Error syncing survey response levels in bulk:', syncError);
+                        // Don't throw error here, just log it as it's not critical
+                    }
+                }
+            }
+
             // Update local state
             setEmployees(prev => prev.map(emp => 
                 selectedEmployees.has(emp.id) 
@@ -441,6 +475,19 @@ const AdminDashboard = () => {
                     .eq("id", editingEmployee.id);
 
                 if (error) throw error;
+
+                // If level changed, sync existing survey responses
+                if (editingEmployee.level !== formData.level) {
+                    const { error: syncError } = await supabase
+                        .from("survey_responses")
+                        .update({ level: formData.level })
+                        .eq("id_badge_number", formData.id_badge_number.toUpperCase());
+                    
+                    if (syncError) {
+                        console.error('Error syncing survey response levels:', syncError);
+                        // Don't throw error here, just log it as it's not critical
+                    }
+                }
 
                 toast({
                     title: "Success",
@@ -1128,7 +1175,7 @@ const AdminDashboard = () => {
                                         }`}
                                     >
                                         <Shield className="mr-3 h-4 w-4" />
-                                        Non-Managerial
+                                        Non Managerial
                                     </button>
                                 </div>
                             )}
