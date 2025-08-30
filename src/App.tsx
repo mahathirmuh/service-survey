@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import SurveyResults from "./pages/SurveyResults";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+3import AdminSubmission from "./pages/AdminSubmission";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/submission" element={<AdminSubmission />} />
             <Route path="/admin/results" element={<SurveyResults />} />
             <Route path="/admin/results/managerial" element={<SurveyResults />} />
             <Route path="/admin/results/non-managerial" element={<SurveyResults />} />

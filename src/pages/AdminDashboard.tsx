@@ -1113,7 +1113,10 @@ const AdminDashboard = () => {
                             Dashboard
                         </button>
                         <button
-                            onClick={() => setActiveMenuItem("submission")}
+                            onClick={() => {
+                                setActiveMenuItem("submission");
+                                navigate("/admin/submission");
+                            }}
                             className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                 activeMenuItem === "submission"
                                     ? "text-purple-600 bg-purple-50"
@@ -1726,153 +1729,7 @@ const AdminDashboard = () => {
                     </Card>
                 )}
 
-                {/* Submission View */}
-                {activeMenuItem === "submission" && (
-                    <Card>
-                        <CardHeader>
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <CardTitle className="text-xl font-semibold">Survey Submission Status</CardTitle>
-                                <div className="flex flex-wrap gap-2">
-                                    {/* Export Submission Report Button */}
-                                    <Button
-                                        onClick={handleExportToExcel}
-                                        variant="outline"
-                                        className="flex items-center gap-2"
-                                        disabled={employees.length === 0}
-                                    >
-                                        <Download className="h-4 w-4" />
-                                        Export Report
-                                    </Button>
-                                </div>
-                            </div>
 
-                            {/* Submission Filters */}
-                            <div className="flex flex-col sm:flex-row gap-4 mt-4">
-                                <div className="flex-1">
-                                    <Input
-                                        placeholder="Search by name or ID badge number..."
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="max-w-sm"
-                                    />
-                                </div>
-                                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                                    <SelectTrigger className="w-full sm:w-[200px]">
-                                        <SelectValue placeholder="Filter by department" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Departments</SelectItem>
-                                        {departments.map((dept) => (
-                                            <SelectItem key={dept} value={dept}>
-                                                {dept}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Select value={submissionFilter} onValueChange={setSubmissionFilter}>
-                                    <SelectTrigger className="w-full sm:w-[200px]">
-                                        <SelectValue placeholder="Filter by status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="Submitted">Submitted</SelectItem>
-                                        <SelectItem value="Not Submitted">Not Submitted</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {isLoading ? (
-                                <div className="text-center py-8">Loading submission status...</div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                         <TableHeader>
-                                             <TableRow>
-                                                 <TableHead>ID Badge</TableHead>
-                                                 <TableHead>Name</TableHead>
-                                                 <TableHead>Department</TableHead>
-                                                 <TableHead>Level</TableHead>
-                                                 <TableHead>Submission Date</TableHead>
-                                                 <TableHead>Status</TableHead>
-                                             </TableRow>
-                                         </TableHeader>
-                                         <TableBody>
-                                             {currentPageSubmissions.length === 0 ? (
-                                                 <TableRow>
-                                                     <TableCell colSpan={6} className="text-center py-8 text-gray-500">
-                                                         {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
-                                                     </TableCell>
-                                                 </TableRow>
-                                             ) : (
-                                                 currentPageSubmissions.map((employee) => (
-                                                     <TableRow key={employee.id}>
-                                                         <TableCell className="font-medium">
-                                                             {employee.id_badge_number}
-                                                         </TableCell>
-                                                         <TableCell>{employee.name}</TableCell>
-                                                         <TableCell>{employee.department}</TableCell>
-                                                         <TableCell>
-                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                                 employee.level === 'Managerial' 
-                                                                     ? 'bg-blue-100 text-blue-800' 
-                                                                     : 'bg-gray-100 text-gray-800'
-                                                             }`}>
-                                                                 {employee.level || 'Non Managerial'}
-                                                             </span>
-                                                         </TableCell>
-                                                         <TableCell>
-                                                             {employee.status === 'Submitted' 
-                                                                 ? new Date(employee.created_at).toLocaleDateString()
-                                                                 : '-'
-                                                             }
-                                                         </TableCell>
-                                                         <TableCell>
-                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                                 employee.status === 'Submitted' 
-                                                                     ? 'bg-green-100 text-green-800' 
-                                                                     : 'bg-red-100 text-red-800'
-                                                             }`}>
-                                                                 {employee.status || 'Not Submitted'}
-                                                             </span>
-                                                         </TableCell>
-                                                     </TableRow>
-                                                 ))
-                                             )}
-                                         </TableBody>
-                                     </Table>
-                                </div>
-                            )}
-                            
-                            {/* Pagination Controls for Submission Status */}
-                            {filteredEmployees.length > 0 && (
-                                <div className="mt-6 border-t pt-4">
-                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-                                        <div className="text-sm text-gray-600">
-                                            Showing {submissionPagination.state.startIndex + 1}-{Math.min(submissionPagination.state.endIndex + 1, filteredEmployees.length)} of {filteredEmployees.length} employees
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                            Page {submissionPagination.state.currentPage} of {submissionPagination.state.totalPages}
-                                        </div>
-                                    </div>
-                                    <Pagination
-                                        currentPage={submissionPagination.state.currentPage}
-                                        totalPages={submissionPagination.state.totalPages}
-                                        onPageChange={submissionPagination.actions.setPage}
-                                        pageSize={submissionPagination.state.pageSize}
-                                        totalItems={filteredEmployees.length}
-                                        onPageSizeChange={submissionPagination.actions.setPageSize}
-                                        showFirstLast={true}
-                                        showPageSizeSelector={true}
-                                        pageSizeOptions={[5, 10, 20, 50]}
-                                        maxVisiblePages={5}
-                                        className="justify-center"
-                                    />
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                )}
             </div>
         </div>
 
