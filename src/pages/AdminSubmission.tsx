@@ -237,7 +237,7 @@ const AdminSubmission = () => {
                     <button
                         onClick={() => {
                             setActiveMenuItem("submission");
-                            navigate("/admin/submission");
+                            navigate("/submission");
                         }}
                         className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                             activeMenuItem === "submission"
