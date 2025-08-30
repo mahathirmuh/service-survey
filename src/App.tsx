@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import SurveyResults from "./pages/SurveyResults";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-3import AdminSubmission from "./pages/AdminSubmission";
+import AdminSubmission from "./pages/AdminSubmission";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

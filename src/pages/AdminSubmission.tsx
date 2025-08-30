@@ -20,7 +20,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Download, Menu, LayoutDashboard, FileText, BarChart3, Users, Shield, ChevronDown, ChevronRight } from "lucide-react";
+import { LogOut, Download, Menu, LayoutDashboard, FileText, BarChart3, Users, Shield, ChevronDown, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import {
     AlertDialog,
@@ -73,23 +73,56 @@ const AdminSubmission = () => {
     const [activeMenuItem, setActiveMenuItem] = useState("submission");
     const [resultsExpanded, setResultsExpanded] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+    const [sortField, setSortField] = useState<keyof Employee | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const { toast } = useToast();
     const navigate = useNavigate();
 
-    // Filter employees based on search term, department, and submission status
-    const filteredEmployees = employees.filter((employee) => {
-        const matchesSearch = 
-            employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            employee.id_badge_number.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesDepartment = 
-            selectedDepartment === "all" || employee.department === selectedDepartment;
-        
-        const matchesSubmissionStatus = 
-            submissionFilter === "all" || employee.status === submissionFilter;
-        
-        return matchesSearch && matchesDepartment && matchesSubmissionStatus;
-    });
+    // Filter and sort employees based on search term, department, submission status, and sorting
+    const filteredEmployees = employees
+        .filter((employee) => {
+            const matchesSearch = 
+                employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee.id_badge_number.toLowerCase().includes(searchTerm.toLowerCase());
+            
+            const matchesDepartment = 
+                selectedDepartment === "all" || employee.department === selectedDepartment;
+            
+            const matchesSubmissionStatus = 
+                submissionFilter === "all" || employee.status === submissionFilter;
+            
+            return matchesSearch && matchesDepartment && matchesSubmissionStatus;
+        })
+        .sort((a, b) => {
+            if (!sortField) return 0;
+            
+            let aValue = a[sortField];
+            let bValue = b[sortField];
+            
+            // Handle null/undefined values
+            if (aValue == null) aValue = '';
+            if (bValue == null) bValue = '';
+            
+            // Special handling for dates
+            if (sortField === 'created_at') {
+                aValue = new Date(aValue as string).getTime();
+                bValue = new Date(bValue as string).getTime();
+            }
+            
+            // Convert to string for comparison if not already
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                aValue = aValue.toLowerCase();
+                bValue = bValue.toLowerCase();
+            }
+            
+            if (aValue < bValue) {
+                return sortDirection === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return sortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
 
     // Pagination for submissions
     const submissionPagination = usePagination({
@@ -163,6 +196,24 @@ const AdminSubmission = () => {
     const confirmLogout = () => {
         setLogoutDialogOpen(false);
         handleLogout();
+    };
+
+    const handleSort = (field: keyof Employee) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    const getSortIcon = (field: keyof Employee) => {
+        if (sortField !== field) {
+            return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
+        }
+        return sortDirection === 'asc' 
+            ? <ArrowUp className="h-4 w-4 text-purple-600" />
+            : <ArrowDown className="h-4 w-4 text-purple-600" />;
     };
 
     const handleExportToExcel = () => {
@@ -511,24 +562,78 @@ const AdminSubmission = () => {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>ID Badge</TableHead>
-                                            <TableHead>Name</TableHead>
-                                            <TableHead>Department</TableHead>
-                                            <TableHead>Level</TableHead>
-                                            <TableHead>Submission Date</TableHead>
-                                            <TableHead>Status</TableHead>
+                                            <TableHead className="w-16 text-center">
+                                                No.
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('id_badge_number')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    ID Badge
+                                                    {getSortIcon('id_badge_number')}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('name')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Name
+                                                    {getSortIcon('name')}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('department')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Department
+                                                    {getSortIcon('department')}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('level')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Level
+                                                    {getSortIcon('level')}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('created_at')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Submission Date
+                                                    {getSortIcon('created_at')}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-50 select-none"
+                                                onClick={() => handleSort('status')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Status
+                                                    {getSortIcon('status')}
+                                                </div>
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {currentPageSubmissions.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                                                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                                                     {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            currentPageSubmissions.map((employee) => (
+                                            currentPageSubmissions.map((employee, index) => (
                                                 <TableRow key={employee.id}>
+                                                    <TableCell className="text-center text-sm text-gray-600">
+                                                        {submissionPagination.state.startIndex + index + 1}
+                                                    </TableCell>
                                                     <TableCell className="font-medium">
                                                         {employee.id_badge_number}
                                                     </TableCell>

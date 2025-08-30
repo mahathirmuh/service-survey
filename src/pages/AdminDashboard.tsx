@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3 } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -113,6 +113,10 @@ const AdminDashboard = () => {
         department: "",
         level: "",
     });
+    
+    // Sorting state
+    const [sortField, setSortField] = useState<keyof Employee | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     
     const { toast } = useToast();
     const navigate = useNavigate();
@@ -236,7 +240,7 @@ const AdminDashboard = () => {
         fetchEmployees();
     }, []);
 
-    // Filter employees
+    // Filter and sort employees
     useEffect(() => {
         let filtered = employees;
 
@@ -256,8 +260,36 @@ const AdminDashboard = () => {
             filtered = filtered.filter((emp) => emp.status === submissionFilter);
         }
 
+        // Apply sorting
+        if (sortField) {
+            filtered.sort((a, b) => {
+                let aValue = a[sortField];
+                let bValue = b[sortField];
+
+                // Handle date fields
+                if (sortField === 'created_at') {
+                    aValue = new Date(aValue as string).getTime();
+                    bValue = new Date(bValue as string).getTime();
+                }
+
+                // Handle string fields (case-insensitive)
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
+
+                if (aValue < bValue) {
+                    return sortDirection === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
         setFilteredEmployees(filtered);
-    }, [employees, searchTerm, selectedDepartment, submissionFilter]);
+    }, [employees, searchTerm, selectedDepartment, submissionFilter, sortField, sortDirection]);
 
     const handleLogout = () => {
         sessionStorage.removeItem("adminAuthenticated");
@@ -272,6 +304,25 @@ const AdminDashboard = () => {
     const confirmLogout = () => {
         setLogoutDialogOpen(false);
         handleLogout();
+    };
+
+    // Sorting functions
+    const handleSort = (field: keyof Employee) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    const getSortIcon = (field: keyof Employee) => {
+        if (sortField !== field) {
+            return <ArrowUpDown className="ml-2 h-4 w-4" />;
+        }
+        return sortDirection === 'asc' ? 
+            <ArrowUp className="ml-2 h-4 w-4" /> : 
+            <ArrowDown className="ml-2 h-4 w-4" />;
     };
 
     const resetForm = () => {
@@ -1578,23 +1629,66 @@ const AdminDashboard = () => {
                                                         aria-label="Select all employees"
                                                     />
                                                 </TableHead>
-                                                <TableHead>ID Badge</TableHead>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead>Department</TableHead>
-                                                <TableHead>Level</TableHead>
-                                                <TableHead>Created</TableHead>
+                                                <TableHead className="w-16 text-center">
+                                                    No.
+                                                </TableHead>
+                                                <TableHead 
+                                                    className="cursor-pointer hover:bg-gray-50 select-none"
+                                                    onClick={() => handleSort('id_badge_number')}
+                                                >
+                                                    <div className="flex items-center">
+                                                        ID Badge
+                                                        {getSortIcon('id_badge_number')}
+                                                    </div>
+                                                </TableHead>
+                                                <TableHead 
+                                                    className="cursor-pointer hover:bg-gray-50 select-none"
+                                                    onClick={() => handleSort('name')}
+                                                >
+                                                    <div className="flex items-center">
+                                                        Name
+                                                        {getSortIcon('name')}
+                                                    </div>
+                                                </TableHead>
+                                                <TableHead 
+                                                    className="cursor-pointer hover:bg-gray-50 select-none"
+                                                    onClick={() => handleSort('department')}
+                                                >
+                                                    <div className="flex items-center">
+                                                        Department
+                                                        {getSortIcon('department')}
+                                                    </div>
+                                                </TableHead>
+                                                <TableHead 
+                                                    className="cursor-pointer hover:bg-gray-50 select-none"
+                                                    onClick={() => handleSort('level')}
+                                                >
+                                                    <div className="flex items-center">
+                                                        Level
+                                                        {getSortIcon('level')}
+                                                    </div>
+                                                </TableHead>
+                                                <TableHead 
+                                                    className="cursor-pointer hover:bg-gray-50 select-none"
+                                                    onClick={() => handleSort('created_at')}
+                                                >
+                                                    <div className="flex items-center">
+                                                        Created
+                                                        {getSortIcon('created_at')}
+                                                    </div>
+                                                </TableHead>
                                                 <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {currentPageEmployees.length === 0 ? (
                                                 <TableRow>
-                                                    <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                                                    <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                                                         {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
-                                                currentPageEmployees.map((employee) => (
+                                                currentPageEmployees.map((employee, index) => (
                                                     <TableRow key={employee.id}>
                                                         <TableCell>
                                                             <Checkbox
@@ -1602,6 +1696,9 @@ const AdminDashboard = () => {
                                                                 onCheckedChange={() => handleSelectEmployee(employee.id)}
                                                                 aria-label={`Select ${employee.name}`}
                                                             />
+                                                        </TableCell>
+                                                        <TableCell className="text-center text-sm text-gray-600">
+                                                            {pagination.state.startIndex + index + 1}
                                                         </TableCell>
                                                         <TableCell className="font-medium">
                                                             {employee.id_badge_number}
