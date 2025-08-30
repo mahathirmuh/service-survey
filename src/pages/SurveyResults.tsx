@@ -451,22 +451,98 @@ const SurveyResults = () => {
     const overallAverage = totalRatingCount > 0 ? totalRatings / totalRatingCount : 0;
     console.log("Overall average calculated:", overallAverage);
     
-    let topSection = "";
-    let lowestSection = "";
+    // Helper function to calculate variance
+    const calculateVariance = (ratings: number[]) => {
+      const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      const variance = ratings.reduce((sum, rating) => sum + Math.pow(rating - avg, 2), 0) / ratings.length;
+      return variance;
+    };
+
+    // Find top rated sections with tie handling
+    let topSections: string[] = [];
+    let lowestSections: string[] = [];
     let highestAvg = 0;
     let lowestAvg = 5;
     
+    // First pass: find highest and lowest averages
     Object.entries(sectionRatings).forEach(([sectionName, ratings]) => {
       const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
       if (avg > highestAvg) {
         highestAvg = avg;
-        topSection = sectionName;
       }
       if (avg < lowestAvg) {
         lowestAvg = avg;
-        lowestSection = sectionName;
       }
     });
+
+    // Second pass: collect all sections with highest/lowest averages
+    Object.entries(sectionRatings).forEach(([sectionName, ratings]) => {
+      const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+      if (Math.abs(avg - highestAvg) < 0.001) { // Use small epsilon for floating point comparison
+        topSections.push(sectionName);
+      }
+      if (Math.abs(avg - lowestAvg) < 0.001) {
+        lowestSections.push(sectionName);
+      }
+    });
+
+    // Handle ties for top rated section
+    let topSection = "";
+    if (topSections.length === 1) {
+      topSection = topSections[0];
+    } else if (topSections.length > 1) {
+      // Tie-breaker 1: Most responses
+      const topSectionsByResponses = topSections.map(section => ({
+        section,
+        responseCount: sectionRatings[section].length
+      })).sort((a, b) => b.responseCount - a.responseCount);
+      
+      const maxResponses = topSectionsByResponses[0].responseCount;
+      const topWithMaxResponses = topSectionsByResponses.filter(s => s.responseCount === maxResponses);
+      
+      if (topWithMaxResponses.length === 1) {
+        topSection = topWithMaxResponses[0].section;
+      } else {
+        // Tie-breaker 2: Lowest variance (most consistent ratings)
+        const topWithVariance = topWithMaxResponses.map(s => ({
+          section: s.section,
+          variance: calculateVariance(sectionRatings[s.section])
+        })).sort((a, b) => a.variance - b.variance);
+        
+        topSection = topWithVariance.length > 1 
+          ? topWithVariance.map(s => s.section).join(", ") // Multiple winners after all tie-breakers
+          : topWithVariance[0].section;
+      }
+    }
+
+    // Handle ties for lowest rated section (needs attention)
+    let lowestSection = "";
+    if (lowestSections.length === 1) {
+      lowestSection = lowestSections[0];
+    } else if (lowestSections.length > 1) {
+      // Tie-breaker 1: Most responses
+      const lowestSectionsByResponses = lowestSections.map(section => ({
+        section,
+        responseCount: sectionRatings[section].length
+      })).sort((a, b) => b.responseCount - a.responseCount);
+      
+      const maxResponses = lowestSectionsByResponses[0].responseCount;
+      const lowestWithMaxResponses = lowestSectionsByResponses.filter(s => s.responseCount === maxResponses);
+      
+      if (lowestWithMaxResponses.length === 1) {
+        lowestSection = lowestWithMaxResponses[0].section;
+      } else {
+        // Tie-breaker 2: Lowest variance (most consistent ratings)
+        const lowestWithVariance = lowestWithMaxResponses.map(s => ({
+          section: s.section,
+          variance: calculateVariance(sectionRatings[s.section])
+        })).sort((a, b) => a.variance - b.variance);
+        
+        lowestSection = lowestWithVariance.length > 1 
+          ? lowestWithVariance.map(s => s.section).join(", ") // Multiple winners after all tie-breakers
+          : lowestWithVariance[0].section;
+      }
+    }
 
     setDepartmentStats(Object.values(deptStats));
     setOverallStats({
