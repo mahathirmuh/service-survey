@@ -102,7 +102,7 @@ const AdminDashboard = () => {
         id_badge_number: "",
         name: "",
         department: "",
-        level: "Non-Managerial",
+        level: "Non Managerial",
     });
     
     // Bulk selection state
@@ -275,7 +275,7 @@ const AdminDashboard = () => {
                 id_badge_number: employee.id_badge_number,
                 name: employee.name,
                 department: employee.department,
-                level: employee.level || "Non-Managerial",
+                level: employee.level || "Non Managerial",
             });
         } else {
             resetForm();
@@ -543,7 +543,7 @@ const AdminDashboard = () => {
                 'ID Badge Number': emp.id_badge_number,
                 'Employee Name': emp.name,
                 'Department': emp.department,
-                'Level': emp.level || 'Non-Managerial',
+                'Level': emp.level || 'Non Managerial',
                 'Created Date': new Date(emp.created_at).toLocaleDateString(),
                 'Updated Date': new Date(emp.updated_at).toLocaleDateString()
             }));
@@ -642,7 +642,7 @@ const AdminDashboard = () => {
                 { 'Instructions': '    • OHS Department' },
                 { 'Instructions': '' },
                 { 'Instructions': 'Level:' },
-                { 'Instructions': '  - Must be either "Managerial" or "Non-Managerial"' },
+                { 'Instructions': '  - Must be either "Managerial" or "Non Managerial"' },
                 { 'Instructions': '  - Case sensitive - use exact spelling' },
                 { 'Instructions': '' },
                 { 'Instructions': 'IMPORTANT NOTES:' },
