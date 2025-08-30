@@ -43,10 +43,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3 } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import Pagination from "@/components/ui/pagination";
+import usePagination from "@/hooks/use-pagination";
 
 interface Employee {
     id: string;
@@ -114,6 +116,24 @@ const AdminDashboard = () => {
     
     const { toast } = useToast();
     const navigate = useNavigate();
+
+    // Initialize pagination for employee management
+    const pagination = usePagination({
+        totalItems: filteredEmployees.length,
+        initialPageSize: 10,
+    });
+
+    // Get current page data for employee management
+    const currentPageEmployees = pagination.paginateData(filteredEmployees);
+    
+    // Initialize pagination for submission status view
+    const submissionPagination = usePagination({
+        totalItems: filteredEmployees.length,
+        initialPageSize: 10,
+    });
+    
+    // Get current page data for submission view
+    const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
 
     // Check authentication and session timeout
     useEffect(() => {
@@ -243,7 +263,7 @@ const AdminDashboard = () => {
             id_badge_number: "",
             name: "",
             department: "",
-            level: "Non-Managerial",
+            level: "Non Managerial",
         });
         setEditingEmployee(null);
     };
@@ -576,7 +596,7 @@ const AdminDashboard = () => {
                     'ID Badge Number': 'MTI001',
                     'Employee Name': 'John Doe',
                     'Department': 'Human Resources',
-                    'Level': 'Non-Managerial'
+                    'Level': 'Non Managerial'
                 },
                 {
                     'ID Badge Number': 'MTI002',
@@ -588,7 +608,7 @@ const AdminDashboard = () => {
                     'ID Badge Number': 'MTI003',
                     'Employee Name': 'Bob Johnson',
                     'Department': 'Environmental Department',
-                    'Level': 'Non-Managerial'
+                    'Level': 'Non Managerial'
                 }
             ];
 
@@ -762,7 +782,7 @@ const AdminDashboard = () => {
 
                     // Default level if not provided
                     if (!level) {
-                        level = 'Non-Managerial';
+                        level = 'Non Managerial';
                     }
 
                     console.log(`Row ${rowNum} extracted:`, { idBadge, name, department, level });
@@ -788,8 +808,8 @@ const AdminDashboard = () => {
                     }
 
                     // Validate level
-                    if (level && !['Managerial', 'Non-Managerial'].includes(level)) {
-                        errors.push(`Row ${rowNum}: Level must be either 'Managerial' or 'Non-Managerial', got '${level}'`);
+                    if (level && !['Managerial', 'Non Managerial'].includes(level)) {
+                        errors.push(`Row ${rowNum}: Level must be either 'Managerial' or 'Non Managerial', got '${level}'`);
                         return;
                     }
 
@@ -1445,7 +1465,7 @@ const AdminDashboard = () => {
                                                         <SelectValue placeholder="Select level" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Non-Managerial">Non-Managerial</SelectItem>
+                                                        <SelectItem value="Non Managerial">Non Managerial</SelectItem>
                                                         <SelectItem value="Managerial">Managerial</SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -1517,14 +1537,14 @@ const AdminDashboard = () => {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {filteredEmployees.length === 0 ? (
+                                            {currentPageEmployees.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                                                        No employees found
+                                                        {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
-                                                filteredEmployees.map((employee) => (
+                                                currentPageEmployees.map((employee) => (
                                                     <TableRow key={employee.id}>
                                                         <TableCell>
                                                             <Checkbox
@@ -1544,7 +1564,7 @@ const AdminDashboard = () => {
                                                                     ? 'bg-blue-100 text-blue-800' 
                                                                     : 'bg-gray-100 text-gray-800'
                                                             }`}>
-                                                                {employee.level || 'Non-Managerial'}
+                                                                {employee.level || 'Non Managerial'}
                                                             </span>
                                                         </TableCell>
                                                         <TableCell>
@@ -1628,6 +1648,33 @@ const AdminDashboard = () => {
                                     </Table>
                                 </div>
                             )}
+                            
+                            {/* Pagination Controls */}
+                            {filteredEmployees.length > 0 && (
+                                <div className="mt-6 border-t pt-4">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+                                        <div className="text-sm text-gray-600">
+                                            Showing {pagination.state.startIndex + 1}-{Math.min(pagination.state.endIndex + 1, filteredEmployees.length)} of {filteredEmployees.length} employees
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Page {pagination.state.currentPage} of {pagination.state.totalPages}
+                                        </div>
+                                    </div>
+                                    <Pagination
+                                        currentPage={pagination.state.currentPage}
+                                        totalPages={pagination.state.totalPages}
+                                        onPageChange={pagination.actions.setPage}
+                                        pageSize={pagination.state.pageSize}
+                                        totalItems={filteredEmployees.length}
+                                        onPageSizeChange={pagination.actions.setPageSize}
+                                        showFirstLast={true}
+                                        showPageSizeSelector={true}
+                                        pageSizeOptions={[5, 10, 20, 50]}
+                                        maxVisiblePages={5}
+                                        className="justify-center"
+                                    />
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 )}
@@ -1703,14 +1750,14 @@ const AdminDashboard = () => {
                                              </TableRow>
                                          </TableHeader>
                                          <TableBody>
-                                             {filteredEmployees.length === 0 ? (
+                                             {currentPageSubmissions.length === 0 ? (
                                                  <TableRow>
                                                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                                         No employees found
+                                                         {filteredEmployees.length === 0 ? "No employees found" : "No employees on this page"}
                                                      </TableCell>
                                                  </TableRow>
                                              ) : (
-                                                 filteredEmployees.map((employee) => (
+                                                 currentPageSubmissions.map((employee) => (
                                                      <TableRow key={employee.id}>
                                                          <TableCell className="font-medium">
                                                              {employee.id_badge_number}
@@ -1737,6 +1784,33 @@ const AdminDashboard = () => {
                                              )}
                                          </TableBody>
                                      </Table>
+                                </div>
+                            )}
+                            
+                            {/* Pagination Controls for Submission Status */}
+                            {filteredEmployees.length > 0 && (
+                                <div className="mt-6 border-t pt-4">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+                                        <div className="text-sm text-gray-600">
+                                            Showing {submissionPagination.state.startIndex + 1}-{Math.min(submissionPagination.state.endIndex + 1, filteredEmployees.length)} of {filteredEmployees.length} employees
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            Page {submissionPagination.state.currentPage} of {submissionPagination.state.totalPages}
+                                        </div>
+                                    </div>
+                                    <Pagination
+                                        currentPage={submissionPagination.state.currentPage}
+                                        totalPages={submissionPagination.state.totalPages}
+                                        onPageChange={submissionPagination.actions.setPage}
+                                        pageSize={submissionPagination.state.pageSize}
+                                        totalItems={filteredEmployees.length}
+                                        onPageSizeChange={submissionPagination.actions.setPageSize}
+                                        showFirstLast={true}
+                                        showPageSizeSelector={true}
+                                        pageSizeOptions={[5, 10, 20, 50]}
+                                        maxVisiblePages={5}
+                                        className="justify-center"
+                                    />
                                 </div>
                             )}
                         </CardContent>
@@ -1801,7 +1875,7 @@ const AdminDashboard = () => {
                                 <SelectValue placeholder="Select level" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="Non-Managerial">Non-Managerial</SelectItem>
+                                <SelectItem value="Non Managerial">Non Managerial</SelectItem>
                                 <SelectItem value="Managerial">Managerial</SelectItem>
                             </SelectContent>
                         </Select>
