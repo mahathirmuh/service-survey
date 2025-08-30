@@ -82,13 +82,33 @@ const AdminSubmission = () => {
     const fetchEmployees = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
+            // Fetch employees with their submission status
+            const { data: employeesData, error: employeesError } = await supabase
                 .from('employees')
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setEmployees(data || []);
+            if (employeesError) throw employeesError;
+
+            // Fetch all survey responses to determine submission status
+            const { data: responsesData, error: responsesError } = await supabase
+                .from('survey_responses')
+                .select('id_badge_number');
+
+            if (responsesError) throw responsesError;
+
+            // Create a set of badge numbers that have submitted surveys
+            const submittedBadgeNumbers = new Set(
+                responsesData?.map(response => response.id_badge_number) || []
+            );
+
+            // Add status field to employees based on survey submission
+            const employeesWithStatus = (employeesData || []).map(employee => ({
+                ...employee,
+                status: submittedBadgeNumbers.has(employee.id_badge_number) ? 'submitted' : 'not_submitted'
+            }));
+
+            setEmployees(employeesWithStatus);
         } catch (error) {
             console.error('Error fetching employees:', error);
             toast({
@@ -179,7 +199,7 @@ const AdminSubmission = () => {
             'Name': employee.name,
             'Department': employee.department,
             'Level': employee.level || 'N/A',
-            'Status': employee.status || 'N/A',
+            'Status': employee.status === 'submitted' ? 'Submitted' : 'Not Submitted',
             'Created At': new Date(employee.created_at).toLocaleDateString(),
         }));
 
@@ -193,7 +213,6 @@ const AdminSubmission = () => {
 
     const departments = [...new Set(employees.map(emp => emp.department))].filter(Boolean);
     const levels = [...new Set(employees.map(emp => emp.level))].filter(Boolean);
-    const statuses = [...new Set(employees.map(emp => emp.status))].filter(Boolean);
 
     const totalEmployees = employees.length;
     const submittedCount = employees.filter(emp => emp.status === 'submitted').length;
@@ -399,9 +418,8 @@ const AdminSubmission = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All Status</SelectItem>
-                                        {statuses.map(status => (
-                                            <SelectItem key={status} value={status}>{status}</SelectItem>
-                                        ))}
+                                        <SelectItem value="submitted">Submitted</SelectItem>
+                                        <SelectItem value="not_submitted">Not Submitted</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -504,7 +522,7 @@ const AdminSubmission = () => {
                                                                     ? 'bg-green-100 text-green-800' 
                                                                     : 'bg-red-100 text-red-800'
                                                             }`}>
-                                                                {employee.status || 'Not Submitted'}
+                                                                {employee.status === 'submitted' ? 'Submitted' : 'Not Submitted'}
                                                             </span>
                                                         </TableCell>
                                                         <TableCell>
