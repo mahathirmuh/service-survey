@@ -1166,7 +1166,7 @@ const AdminDashboard = () => {
                         <button
                             onClick={() => {
                                 setActiveMenuItem("submission");
-                                navigate("/admin/submission");
+                                navigate("/submission");
                             }}
                             className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                 activeMenuItem === "submission"
@@ -1206,7 +1206,7 @@ const AdminDashboard = () => {
                                     <button
                                         onClick={() => {
                                             setActiveMenuItem("results-managerial");
-                                            navigate("/admin/results/managerial");
+                                            navigate("/results/managerial");
                                         }}
                                         className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                             activeMenuItem === "results-managerial"
@@ -1220,7 +1220,7 @@ const AdminDashboard = () => {
                                     <button
                                         onClick={() => {
                                             setActiveMenuItem("results-non-managerial");
-                                            navigate("/admin/results/non-managerial");
+                                            navigate("/results/non-managerial");
                                         }}
                                         className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                             activeMenuItem === "results-non-managerial"

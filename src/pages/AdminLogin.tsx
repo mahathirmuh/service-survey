@@ -34,7 +34,7 @@ const AdminLogin = () => {
                 variant: "default",
             });
             
-            navigate("/admin/dashboard");
+            navigate("/dashboard");
         } else {
             toast({
                 title: "Login Failed",

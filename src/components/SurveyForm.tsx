@@ -568,12 +568,12 @@ const SurveyForm = () => {
             
             // Auto-route based on employee level
             const employeeLevel = employee.level;
-            let redirectUrl = '/admin/results'; // Default for admin
+            let redirectUrl = '/results'; // Default for admin
             
             if (employeeLevel === 'Managerial') {
-                redirectUrl = '/admin/results/managerial';
+                redirectUrl = '/results/managerial';
             } else if (employeeLevel === 'Non Managerial') {
-                redirectUrl = '/admin/results/non-managerial';
+                redirectUrl = '/results/non-managerial';
             }
             
             setIsSubmitted(true);
