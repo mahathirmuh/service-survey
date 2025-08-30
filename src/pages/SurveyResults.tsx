@@ -123,7 +123,7 @@ const SurveyResults = () => {
       const loginTime = sessionStorage.getItem("adminLoginTime");
       
       if (!isAuthenticated) {
-        navigate("/admin/login");
+        navigate("/login");
         return;
       }
       
@@ -141,7 +141,7 @@ const SurveyResults = () => {
             description: "Your session has expired. Please login again.",
             variant: "destructive",
           });
-          navigate("/admin/login");
+          navigate("/login");
         }
       }
     };
@@ -162,7 +162,7 @@ const SurveyResults = () => {
       title: "Logged Out",
       description: "You have been successfully logged out",
     });
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   const confirmLogout = () => {

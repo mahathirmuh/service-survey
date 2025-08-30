@@ -182,7 +182,7 @@ const AdminSubmission = () => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            navigate("/admin/login");
+            navigate("/login");
         } catch (error) {
             console.error("Error logging out:", error);
             toast({

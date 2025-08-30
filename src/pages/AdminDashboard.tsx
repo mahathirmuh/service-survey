@@ -146,7 +146,7 @@ const AdminDashboard = () => {
             const loginTime = sessionStorage.getItem("adminLoginTime");
             
             if (!isAuthenticated) {
-                navigate("/admin/login");
+                navigate("/login");
                 return;
             }
             
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
                         description: "Your session has expired. Please login again.",
                         variant: "destructive",
                     });
-                    navigate("/admin/login");
+                    navigate("/login");
                 }
             }
         };
@@ -298,7 +298,7 @@ const AdminDashboard = () => {
             title: "Logged Out",
             description: "You have been successfully logged out",
         });
-        navigate("/admin/login");
+        navigate("/login");
     };
 
     const confirmLogout = () => {
