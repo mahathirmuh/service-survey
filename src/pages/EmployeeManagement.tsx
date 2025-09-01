@@ -80,6 +80,7 @@ const EmployeeManagement = () => {
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
+    const [selectedLevel, setSelectedLevel] = useState<string>("all");
     const [submissionFilter, setSubmissionFilter] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -230,6 +231,10 @@ const EmployeeManagement = () => {
             filtered = filtered.filter((emp) => emp.department === selectedDepartment);
         }
 
+        if (selectedLevel !== "all") {
+            filtered = filtered.filter((emp) => emp.level === selectedLevel);
+        }
+
         if (submissionFilter !== "all") {
             filtered = filtered.filter((emp) => emp.status === submissionFilter);
         }
@@ -263,7 +268,7 @@ const EmployeeManagement = () => {
         }
 
         setFilteredEmployees(filtered);
-    }, [employees, searchTerm, selectedDepartment, submissionFilter, sortField, sortDirection]);
+    }, [employees, searchTerm, selectedDepartment, selectedLevel, submissionFilter, sortField, sortDirection]);
 
     const handleLogout = () => {
         sessionStorage.removeItem("adminAuthenticated");
@@ -1609,6 +1614,16 @@ const EmployeeManagement = () => {
                                                 {dept}
                                             </SelectItem>
                                         ))}
+                                    </SelectContent>
+                                </Select>
+                                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                                    <SelectTrigger className="w-full sm:w-[200px]">
+                                        <SelectValue placeholder="Filter by level" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Levels</SelectItem>
+                                        <SelectItem value="Managerial">Managerial</SelectItem>
+                                        <SelectItem value="Non Managerial">Non Managerial</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
