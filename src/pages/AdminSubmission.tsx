@@ -55,6 +55,7 @@ const AdminSubmission = () => {
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState("submission");
+    const [resultsExpanded, setResultsExpanded] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [departmentFilter, setDepartmentFilter] = useState("all");
     const [levelFilter, setLevelFilter] = useState("all");
@@ -268,21 +269,62 @@ const AdminSubmission = () => {
                         Submission
                     </button>
 
-                    <div className="space-y-1">
+                    {/* Results Menu with Sub-items */}
+                    <div>
                         <button
                             onClick={() => {
-                                setActiveMenuItem("results");
-                                navigate("/results");
+                                setResultsExpanded(!resultsExpanded);
                             }}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                activeMenuItem === "results"
+                            className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem.includes("results")
                                     ? "text-purple-600 bg-purple-50"
                                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                             }`}
                         >
-                            <BarChart3 className="mr-3 h-4 w-4" />
-                            Results
+                            <div className="flex items-center">
+                                <BarChart3 className="mr-3 h-4 w-4" />
+                                Results
+                            </div>
+                            {resultsExpanded ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            )}
                         </button>
+                        
+                        {/* Sub-menu items */}
+                        {resultsExpanded && (
+                            <div className="ml-6 mt-1 space-y-1">
+                                <button
+                                    onClick={() => {
+                                        setActiveMenuItem("results-managerial");
+                                        navigate("/results/managerial");
+                                    }}
+                                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                        activeMenuItem === "results-managerial"
+                                            ? "text-purple-600 bg-purple-50"
+                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    <Users className="mr-3 h-4 w-4" />
+                                    Managerial
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setActiveMenuItem("results-non-managerial");
+                                        navigate("/results/non-managerial");
+                                    }}
+                                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                        activeMenuItem === "results-non-managerial"
+                                            ? "text-purple-600 bg-purple-50"
+                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                    }`}
+                                >
+                                    <Shield className="mr-3 h-4 w-4" />
+                                    Non Managerial
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </nav>
 
