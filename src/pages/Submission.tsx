@@ -238,129 +238,136 @@ const Submission = () => {
                     </div>
                 </div>
 
-                <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                    <button
-                            onClick={() => {
-                            setActiveMenuItem("dashboard");
-                            navigate("/employee");
-                        }}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                            }`}
-                        >
-                            <LayoutDashboard className="mr-3 h-4 w-4" />
-                            Employee
-                        </button>
-
-                    <button
-                        onClick={() => {
-                            setActiveMenuItem("submission");
-                            navigate("/submission");
-                        }}
-                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                            activeMenuItem === "submission"
-                                ? "text-purple-600 bg-purple-50"
-                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                        }`}
-                    >
-                        <FileText className="mr-3 h-4 w-4" />
-                        Submission
-                    </button>
-
-                    <button
-                        onClick={() => {
-                            setActiveMenuItem("user-management");
-                            navigate("/employee");
-                        }}
-                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                            activeMenuItem === "user-management"
-                                ? "text-purple-600 bg-purple-50"
-                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                        }`}
-                    >
-                        <Users className="mr-3 h-4 w-4" />
-                        User Management
-                    </button>
-
-                    {/* Results Menu with Sub-items */}
-                    <div>
+                <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+                        {/* 1. Employee */}
                         <button
                             onClick={() => {
-                                setResultsExpanded(!resultsExpanded);
+                                setActiveMenuItem("dashboard");
+                                navigate("/employee");
                             }}
-                            className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                activeMenuItem.includes("results")
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                activeMenuItem === "dashboard"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                             }`}
                         >
-                            <div className="flex items-center">
-                                <BarChart3 className="mr-3 h-4 w-4" />
-                                Results
-                            </div>
-                            {resultsExpanded ? (
-                                <ChevronDown className="h-4 w-4" />
-                            ) : (
-                                <ChevronRight className="h-4 w-4" />
-                            )}
+                            <LayoutDashboard className="mr-3 h-5 w-5" />
+                            Employee
                         </button>
                         
-                        {/* Sub-menu items */}
-                        {resultsExpanded && (
-                            <div className="ml-6 mt-1 space-y-1">
-                                <button
-                                    onClick={() => {
-                                        setActiveMenuItem("results-managerial");
-                                        navigate("/results/managerial");
-                                    }}
-                                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                        activeMenuItem === "results-managerial"
-                                            ? "text-purple-600 bg-purple-50"
-                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                    }`}
-                                >
-                                    <Users className="mr-3 h-4 w-4" />
-                                    Managerial
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setActiveMenuItem("results-non-managerial");
-                                        navigate("/results/non-managerial");
-                                    }}
-                                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                                        activeMenuItem === "results-non-managerial"
-                                            ? "text-purple-600 bg-purple-50"
-                                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                    }`}
-                                >
-                                    <Shield className="mr-3 h-4 w-4" />
-                                    Non Managerial
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                        {/* 2. Submission */}
+                        <button
+                            onClick={() => {
+                                setActiveMenuItem("submission");
+                                navigate("/submission");
+                            }}
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                activeMenuItem === "submission"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                            }`}
+                        >
+                            <FileText className="mr-3 h-5 w-5" />
+                            Submission
+                        </button>
+                        
+                        {/* 3. User Management */}
+                        <button
+                            onClick={() => {
+                                setActiveMenuItem("user-management");
+                                navigate("/user-management");
+                            }}
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                activeMenuItem === "user-management"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                            }`}
+                        >
+                            <Users className="mr-3 h-5 w-5" />
+                            User Management
+                        </button>
+                        
+                        {/* 4. Results Menu with Sub-items */}
+                        <div className="space-y-1">
+                            <button
+                                onClick={() => {
+                                    setResultsExpanded(!resultsExpanded);
+                                }}
+                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                    activeMenuItem.includes("results")
+                                        ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                }`}
+                            >
+                                <div className="flex items-center">
+                                    <BarChart3 className="mr-3 h-5 w-5" />
+                                    Results
+                                </div>
+                                {resultsExpanded ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                )}
+                            </button>
+                            
+                            {/* Sub-menu items */}
+                            {resultsExpanded && (
+                                <div className="ml-4 mt-2 space-y-1 border-l-2 border-purple-100 pl-4">
+                                    <button
+                                        onClick={() => {
+                                            setActiveMenuItem("results-managerial");
+                                            navigate("/results/managerial");
+                                        }}
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                                            activeMenuItem === "results-managerial"
+                                                ? "text-purple-600 bg-purple-50 shadow-sm"
+                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        }`}
+                                    >
+                                        <Shield className="mr-3 h-4 w-4" />
+                                        Managerial
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setActiveMenuItem("results-non-managerial");
+                                            navigate("/results/non-managerial");
+                                        }}
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                                            activeMenuItem === "results-non-managerial"
+                                                ? "text-purple-600 bg-purple-50 shadow-sm"
+                                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        }`}
+                                    >
+                                        <Users className="mr-3 h-4 w-4" />
+                                        Non Managerial
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                 </nav>
 
-                <div className="p-4 border-t">
+                {/* Logout Button at Bottom */}
+                <div className="p-3 border-t flex-shrink-0">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50">
-                                <LogOut className="mr-2 h-4 w-4" />
+                            <Button
+                                variant="outline"
+                                className="w-full flex items-center justify-center gap-2"
+                            >
+                                <LogOut className="h-4 w-4" />
                                 Logout
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                                <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    You will be redirected to the login page.
+                                    Are you sure you want to logout? You will need to login again to access the admin dashboard.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleLogout} className="bg-red-600 hover:bg-red-700">
+                                <AlertDialogAction onClick={handleLogout}>
                                     Logout
                                 </AlertDialogAction>
                             </AlertDialogFooter>

@@ -759,20 +759,20 @@ const SurveyResults = () => {
           </Button>
         </div>
         
-        <nav className="flex-1 mt-6 px-3 overflow-y-auto">
-          <div className="space-y-1">
+        <nav className="flex-1 mt-6 px-4 overflow-y-auto">
+          <div className="space-y-3">
             <button
                             onClick={() => {
                                 setActiveMenuItem("dashboard");
                                 navigate("/employee");
                             }}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
-                            <LayoutDashboard className="mr-3 h-4 w-4" />
+                            <LayoutDashboard className="mr-3 h-5 w-5" />
                             Employee
                         </button>
             <button
@@ -780,13 +780,13 @@ const SurveyResults = () => {
                 setActiveMenuItem("submission");
                 navigate("/submission");
               }}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                 activeMenuItem === "submission"
-                  ? "text-purple-600 bg-purple-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
               }`}
             >
-              <FileText className="mr-3 h-4 w-4" />
+              <FileText className="mr-3 h-5 w-5" />
               Submission
             </button>
             <button
@@ -794,13 +794,13 @@ const SurveyResults = () => {
                 setActiveMenuItem("user-management");
                 navigate("/employee");
               }}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                 activeMenuItem === "user-management"
-                  ? "text-purple-600 bg-purple-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
               }`}
             >
-              <Users className="mr-3 h-4 w-4" />
+              <Users className="mr-3 h-5 w-5" />
               User Management
             </button>
             {/* Results Menu with Sub-items */}
@@ -809,14 +809,14 @@ const SurveyResults = () => {
                 onClick={() => {
                   setResultsExpanded(!resultsExpanded);
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                   activeMenuItem.includes("results")
-                    ? "text-purple-600 bg-purple-50"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                 }`}
               >
                 <div className="flex items-center">
-                  <BarChart3 className="mr-3 h-4 w-4" />
+                  <BarChart3 className="mr-3 h-5 w-5" />
                   Results
                 </div>
                 {resultsExpanded ? (
@@ -828,16 +828,16 @@ const SurveyResults = () => {
               
               {/* Sub-menu items */}
               {resultsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
+                <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-4">
                   <button
                     onClick={() => {
                       setActiveMenuItem("results-managerial");
                       navigate("/results/managerial");
                     }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                       activeMenuItem === "results-managerial"
-                        ? "text-purple-600 bg-purple-50"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "text-purple-600 bg-purple-50 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                     }`}
                   >
                     <Users className="mr-3 h-4 w-4" />
@@ -848,10 +848,10 @@ const SurveyResults = () => {
                       setActiveMenuItem("results-non-managerial");
                       navigate("/results/non-managerial");
                     }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                       activeMenuItem === "results-non-managerial"
-                        ? "text-purple-600 bg-purple-50"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "text-purple-600 bg-purple-50 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                     }`}
                   >
                     <Shield className="mr-3 h-4 w-4" />
@@ -863,13 +863,13 @@ const SurveyResults = () => {
           </div>
         </nav>
         
-        {/* Logout Button at Bottom */}
-        <div className="p-3 border-t flex-shrink-0">
+        {/* Logout section */}
+        <div className="border-t flex-shrink-0 p-4">
           <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full flex items-center justify-center gap-2"
+                className="w-full flex items-center gap-2"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -879,7 +879,7 @@ const SurveyResults = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to logout? You will need to login again to access the admin employee panel.
+                  Are you sure you want to logout? You will need to login again to access the admin panel.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
