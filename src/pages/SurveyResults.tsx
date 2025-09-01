@@ -764,7 +764,7 @@ const SurveyResults = () => {
             <button
                             onClick={() => {
                                 setActiveMenuItem("dashboard");
-                                navigate("/dashboard");
+                                navigate("/employee");
                             }}
                             className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                 activeMenuItem === "dashboard"
@@ -792,7 +792,7 @@ const SurveyResults = () => {
             <button
               onClick={() => {
                 setActiveMenuItem("user-management");
-                navigate("/dashboard");
+                navigate("/employee");
               }}
               className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                 activeMenuItem === "user-management"

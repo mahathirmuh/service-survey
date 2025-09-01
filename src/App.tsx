@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import SurveyResults from "./pages/SurveyResults";
 import AdminLogin from "./pages/AdminLogin";
 import EmployeeManagement from "./pages/EmployeeManagement";
-import AdminSubmission from "./pages/AdminSubmission";
+import Submission from "./pages/Submission";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,8 +23,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<AdminLogin />} />
-            <Route path="/dashboard" element={<EmployeeManagement />} />
-            <Route path="/submission" element={<AdminSubmission />} />
+            <Route path="/employee" element={<EmployeeManagement />} />
+            <Route path="/submission" element={<Submission />} />
             <Route path="/results" element={<SurveyResults />} />
             <Route path="/results/managerial" element={<SurveyResults />} />
             <Route path="/results/non-managerial" element={<SurveyResults />} />

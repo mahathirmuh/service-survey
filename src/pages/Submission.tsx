@@ -49,7 +49,7 @@ interface Employee {
     updated_at: string;
 }
 
-const AdminSubmission = () => {
+const Submission = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
@@ -241,9 +241,9 @@ const AdminSubmission = () => {
                 <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                     <button
                             onClick={() => {
-                                setActiveMenuItem("dashboard");
-                                navigate("/dashboard");
-                            }}
+                            setActiveMenuItem("dashboard");
+                            navigate("/employee");
+                        }}
                             className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                                 activeMenuItem === "dashboard"
                                     ? "text-purple-600 bg-purple-50"
@@ -272,7 +272,7 @@ const AdminSubmission = () => {
                     <button
                         onClick={() => {
                             setActiveMenuItem("user-management");
-                            navigate("/dashboard");
+                            navigate("/employee");
                         }}
                         className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                             activeMenuItem === "user-management"
@@ -614,4 +614,4 @@ const AdminSubmission = () => {
     );
 };
 
-export default AdminSubmission;
+export default Submission;
