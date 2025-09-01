@@ -245,10 +245,10 @@ const Submission = () => {
                                 setActiveMenuItem("dashboard");
                                 navigate("/employee");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <LayoutDashboard className="mr-3 h-5 w-5" />
@@ -261,10 +261,10 @@ const Submission = () => {
                                 setActiveMenuItem("submission");
                                 navigate("/submission");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "submission"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <FileText className="mr-3 h-5 w-5" />
@@ -277,10 +277,10 @@ const Submission = () => {
                                 setActiveMenuItem("user-management");
                                 navigate("/user-management");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "user-management"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <Users className="mr-3 h-5 w-5" />
@@ -293,10 +293,10 @@ const Submission = () => {
                                 onClick={() => {
                                     setResultsExpanded(!resultsExpanded);
                                 }}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                     activeMenuItem.includes("results")
-                                        ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                        ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                                 }`}
                             >
                                 <div className="flex items-center">
