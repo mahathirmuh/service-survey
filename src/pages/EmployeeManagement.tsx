@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -75,7 +75,7 @@ const departments = [
     "Supply Chain Management"
 ];
 
-const AdminDashboard = () => {
+const EmployeeManagement = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -88,6 +88,7 @@ const AdminDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const [resultsExpanded, setResultsExpanded] = useState(false);
+    const [menuManagementExpanded, setMenuManagementExpanded] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState(() => {
         // Check if we're coming from the results page with submission intent
         const urlParams = new URLSearchParams(window.location.search);
@@ -95,6 +96,10 @@ const AdminDashboard = () => {
         // If we're on a results sub-page, expand the results menu
         if (menu.includes('results')) {
             setResultsExpanded(true);
+        }
+        // If we're on a user-management page, set the active menu item
+        if (menu.includes('user-management')) {
+            // User management is now a single page, no expansion needed
         }
         return menu;
     });
@@ -139,44 +144,13 @@ const AdminDashboard = () => {
     // Get current page data for submission view
     const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
 
-    // Check authentication and session timeout
+    // Check authentication
     useEffect(() => {
-        const checkSession = () => {
-            const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
-            const loginTime = sessionStorage.getItem("adminLoginTime");
-            
-            if (!isAuthenticated) {
-                navigate("/login");
-                return;
-            }
-            
-            if (loginTime) {
-                const loginTimestamp = new Date(loginTime).getTime();
-                const currentTime = new Date().getTime();
-                const sessionDuration = currentTime - loginTimestamp;
-                const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
-                
-                if (sessionDuration > fifteenMinutes) {
-                    sessionStorage.removeItem("adminAuthenticated");
-                    sessionStorage.removeItem("adminLoginTime");
-                    toast({
-                        title: "Session Expired",
-                        description: "Your session has expired. Please login again.",
-                        variant: "destructive",
-                    });
-                    navigate("/login");
-                }
-            }
-        };
-        
-        // Check session immediately
-        checkSession();
-        
-        // Set up interval to check session every minute
-        const sessionCheckInterval = setInterval(checkSession, 60000);
-        
-        return () => clearInterval(sessionCheckInterval);
-    }, [navigate, toast]);
+        const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
+        if (!isAuthenticated) {
+            navigate("/login");
+        }
+    }, [navigate]);
 
     // Fetch employees with submission status
     const fetchEmployees = async () => {
@@ -293,7 +267,6 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         sessionStorage.removeItem("adminAuthenticated");
-        sessionStorage.removeItem("adminLoginTime");
         toast({
             title: "Logged Out",
             description: "You have been successfully logged out",
@@ -1129,7 +1102,7 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 flex flex-col`}>
+            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 flex flex-col`}>
                 <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
           <div className="flex items-center space-x-3">
             <div className="bg-white p-2 rounded-lg shadow-sm">
@@ -1150,47 +1123,66 @@ const AdminDashboard = () => {
                     </Button>
                 </div>
                 
-                <nav className="flex-1 mt-6 px-3 overflow-y-auto">
-                    <div className="space-y-1">
+                <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
+                        {/* 1. Employee */}
                         <button
                             onClick={() => setActiveMenuItem("dashboard")}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                                 activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                             }`}
                         >
-                            <LayoutDashboard className="mr-3 h-4 w-4" />
-                            Dashboard
+                            <LayoutDashboard className="mr-3 h-5 w-5" />
+                            Employee
                         </button>
+                        
+                        {/* 2. Submission */}
                         <button
                             onClick={() => {
                                 setActiveMenuItem("submission");
                                 navigate("/submission");
                             }}
-                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                                 activeMenuItem === "submission"
-                                    ? "text-purple-600 bg-purple-50"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                             }`}
                         >
-                            <FileText className="mr-3 h-4 w-4" />
+                            <FileText className="mr-3 h-5 w-5" />
                             Submission
                         </button>
-                        {/* Results Menu with Sub-items */}
-                        <div>
+                        
+                        {/* 3. User Management */}
+                        <button
+                            onClick={() => {
+                                setActiveMenuItem("user-management");
+                                navigate("/user-management");
+                            }}
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                activeMenuItem === "user-management"
+                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                            }`}
+                        >
+                            <Users className="mr-3 h-5 w-5" />
+                            User Management
+                        </button>
+                        
+                        {/* 4. Results Menu with Sub-items */}
+                        <div className="space-y-1">
                             <button
                                 onClick={() => {
                                     setResultsExpanded(!resultsExpanded);
                                 }}
-                                className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                                     activeMenuItem.includes("results")
-                                        ? "text-purple-600 bg-purple-50"
-                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
                                 }`}
                             >
                                 <div className="flex items-center">
-                                    <BarChart3 className="mr-3 h-4 w-4" />
+                                    <BarChart3 className="mr-3 h-5 w-5" />
                                     Results
                                 </div>
                                 {resultsExpanded ? (
@@ -1202,19 +1194,19 @@ const AdminDashboard = () => {
                             
                             {/* Sub-menu items */}
                             {resultsExpanded && (
-                                <div className="ml-6 mt-1 space-y-1">
+                                <div className="ml-4 mt-2 space-y-1 border-l-2 border-purple-100 pl-4">
                                     <button
                                         onClick={() => {
                                             setActiveMenuItem("results-managerial");
                                             navigate("/results/managerial");
                                         }}
-                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                                             activeMenuItem === "results-managerial"
-                                                ? "text-purple-600 bg-purple-50"
+                                                ? "text-purple-600 bg-purple-50 shadow-sm"
                                                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                                         }`}
                                     >
-                                        <Users className="mr-3 h-4 w-4" />
+                                        <Shield className="mr-3 h-4 w-4" />
                                         Managerial
                                     </button>
                                     <button
@@ -1222,19 +1214,18 @@ const AdminDashboard = () => {
                                             setActiveMenuItem("results-non-managerial");
                                             navigate("/results/non-managerial");
                                         }}
-                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                                             activeMenuItem === "results-non-managerial"
-                                                ? "text-purple-600 bg-purple-50"
+                                                ? "text-purple-600 bg-purple-50 shadow-sm"
                                                 : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                                         }`}
                                     >
-                                        <Shield className="mr-3 h-4 w-4" />
+                                        <Users className="mr-3 h-4 w-4" />
                                         Non Managerial
                                     </button>
                                 </div>
                             )}
                         </div>
-                    </div>
                 </nav>
                 
                 {/* Logout Button at Bottom */}
@@ -1291,7 +1282,6 @@ const AdminDashboard = () => {
                                     <Menu className="h-5 w-5" />
                                 </Button>
                                 <div className="lg:flex items-center space-x-4 hidden">
-                                    <img src={mtiLogo} alt="MTI Logo" className="h-10 w-auto" />
                                     <div>
                                         <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                                             {activeMenuItem === "dashboard" && (
@@ -1306,17 +1296,25 @@ const AdminDashboard = () => {
                                                     Survey Submission Status
                                                 </>
                                             )}
+                                            {activeMenuItem === "user-management" && (
+                                <>
+                                    <Users className="h-6 w-6 text-purple-600" />
+                                    User Management
+                                </>
+                            )}
                                         </h1>
                                         <p className="text-gray-600">
                                             {activeMenuItem === "dashboard" && "Employee Management System"}
-                                            {activeMenuItem === "submission" && "Survey Completion Tracking"}
+                            {activeMenuItem === "submission" && "Survey Completion Tracking"}
+                            {activeMenuItem === "user-management" && "Manage user accounts and permissions"}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="lg:hidden">
                                     <h1 className="text-xl font-bold text-gray-900">
-                                        {activeMenuItem === "dashboard" && "Employee Dashboard"}
-                                        {activeMenuItem === "submission" && "Survey Status"}
+                                        {activeMenuItem === "dashboard" && "Employee"}
+                        {activeMenuItem === "submission" && "Survey Status"}
+                        {activeMenuItem === "user-management" && "User Management"}
                                     </h1>
                                 </div>
                             </div>
@@ -1363,50 +1361,51 @@ const AdminDashboard = () => {
                 {/* Submission Stats Cards */}
                 {activeMenuItem === "submission" && (
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{employees.length}</div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Submitted</CardTitle>
-                                <FileText className="h-4 w-4 text-green-600" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-green-600">
-                                    {employees.filter(emp => emp.status === 'Submitted').length}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-blue-600">Total Employees</p>
+                                    <p className="text-2xl font-bold text-blue-900">{employees.length}</p>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Not Submitted</CardTitle>
-                                <FileText className="h-4 w-4 text-red-600" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-red-600">
-                                    {employees.filter(emp => emp.status === 'Not Submitted').length}
+                                <Users className="h-8 w-8 text-blue-500" />
+                            </div>
+                        </div>
+                        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-green-600">Submitted</p>
+                                    <p className="text-2xl font-bold text-green-900">
+                                        {employees.filter(emp => emp.status === 'Submitted').length}
+                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-                                <BarChart3 className="h-4 w-4 text-blue-600" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-blue-600">
-                                    {employees.length > 0 
-                                        ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100)
-                                        : 0}%
+                                <Shield className="h-8 w-8 text-green-500" />
+                            </div>
+                        </div>
+                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-red-600">Not Submitted</p>
+                                    <p className="text-2xl font-bold text-red-900">
+                                        {employees.filter(emp => emp.status === 'Not Submitted').length}
+                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <Users className="h-8 w-8 text-red-500" />
+                            </div>
+                        </div>
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-purple-600">Completion Rate</p>
+                                    <p className="text-2xl font-bold text-purple-900">
+                                        {employees.length > 0 
+                                            ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100)
+                                            : 0
+                                        }%
+                                    </p>
+                                </div>
+                                <BarChart3 className="h-8 w-8 text-purple-500" />
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -1826,6 +1825,30 @@ const AdminDashboard = () => {
                     </Card>
                 )}
 
+                {/* User Management */}
+                {activeMenuItem === "user-management" && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                                <Users className="h-5 w-5 text-purple-600" />
+                                User Management
+                            </CardTitle>
+                            <p className="text-gray-600">Manage user accounts, roles, and permissions for the system.</p>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-center py-12">
+                                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">User Account Management</h3>
+                                <p className="text-gray-500 mb-6">Create, edit, and manage user accounts, roles, and access permissions.</p>
+                                <Button className="bg-purple-600 hover:bg-purple-700">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add New User
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
 
             </div>
         </div>
@@ -1906,4 +1929,4 @@ const AdminDashboard = () => {
 );
 };
 
-export default AdminDashboard;
+export default EmployeeManagement;

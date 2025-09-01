@@ -7,7 +7,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import SurveyResults from "./pages/SurveyResults";
 import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeManagement from "./pages/EmployeeManagement";
 import AdminSubmission from "./pages/AdminSubmission";
 import NotFound from "./pages/NotFound";
 
@@ -23,7 +23,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<AdminLogin />} />
-            <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/dashboard" element={<EmployeeManagement />} />
             <Route path="/submission" element={<AdminSubmission />} />
             <Route path="/results" element={<SurveyResults />} />
             <Route path="/results/managerial" element={<SurveyResults />} />

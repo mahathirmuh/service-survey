@@ -26,11 +26,10 @@ const AdminLogin = () => {
         if (username === "admin" && password === "T$1ngsh4n@24") {
             // Store admin session
             sessionStorage.setItem("adminAuthenticated", "true");
-            sessionStorage.setItem("adminLoginTime", new Date().toISOString());
             
             toast({
                 title: "Login Successful",
-                description: "Welcome to the Admin Dashboard",
+                description: "Welcome to the Admin Employee Panel",
                 variant: "default",
             });
             

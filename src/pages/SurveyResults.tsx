@@ -116,48 +116,16 @@ const SurveyResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check authentication and session timeout
+  // Check authentication
   useEffect(() => {
-    const checkSession = () => {
-      const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
-      const loginTime = sessionStorage.getItem("adminLoginTime");
-      
-      if (!isAuthenticated) {
-        navigate("/login");
-        return;
-      }
-      
-      if (loginTime) {
-        const loginTimestamp = new Date(loginTime).getTime();
-        const currentTime = new Date().getTime();
-        const sessionDuration = currentTime - loginTimestamp;
-        const fifteenMinutes = 15 * 60 * 1000; // 15 minutes in milliseconds
-        
-        if (sessionDuration > fifteenMinutes) {
-          sessionStorage.removeItem("adminAuthenticated");
-          sessionStorage.removeItem("adminLoginTime");
-          toast({
-            title: "Session Expired",
-            description: "Your session has expired. Please login again.",
-            variant: "destructive",
-          });
-          navigate("/login");
-        }
-      }
-    };
-    
-    // Check session immediately
-    checkSession();
-    
-    // Set up interval to check session every minute
-    const sessionCheckInterval = setInterval(checkSession, 60000);
-    
-    return () => clearInterval(sessionCheckInterval);
-  }, [navigate, toast]);
+    const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const handleLogout = () => {
     sessionStorage.removeItem("adminAuthenticated");
-    sessionStorage.removeItem("adminLoginTime");
     toast({
       title: "Logged Out",
       description: "You have been successfully logged out",
@@ -768,7 +736,7 @@ const SurveyResults = () => {
   return (
     <div className="h-screen bg-gray-100 overflow-hidden">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col`}>
         <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
@@ -794,19 +762,19 @@ const SurveyResults = () => {
         <nav className="flex-1 mt-6 px-3 overflow-y-auto">
           <div className="space-y-1">
             <button
-              onClick={() => {
-                setActiveMenuItem("dashboard");
-                navigate("/dashboard");
-              }}
-              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeMenuItem === "dashboard"
-                  ? "text-purple-600 bg-purple-50"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              <LayoutDashboard className="mr-3 h-4 w-4" />
-              Dashboard
-            </button>
+                            onClick={() => {
+                                setActiveMenuItem("dashboard");
+                                navigate("/dashboard");
+                            }}
+                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem === "dashboard"
+                                    ? "text-purple-600 bg-purple-50"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            }`}
+                        >
+                            <LayoutDashboard className="mr-3 h-4 w-4" />
+                            Employee
+                        </button>
             <button
               onClick={() => {
                 setActiveMenuItem("submission");
@@ -820,6 +788,20 @@ const SurveyResults = () => {
             >
               <FileText className="mr-3 h-4 w-4" />
               Submission
+            </button>
+            <button
+              onClick={() => {
+                setActiveMenuItem("user-management");
+                navigate("/dashboard");
+              }}
+              className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeMenuItem === "user-management"
+                  ? "text-purple-600 bg-purple-50"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
+            >
+              <Users className="mr-3 h-4 w-4" />
+              User Management
             </button>
             {/* Results Menu with Sub-items */}
             <div>
@@ -897,7 +879,7 @@ const SurveyResults = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to logout? You will need to login again to access the admin dashboard.
+                  Are you sure you want to logout? You will need to login again to access the admin employee panel.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -920,7 +902,7 @@ const SurveyResults = () => {
       )}
 
       {/* Main Content */}
-      <div className="lg:ml-64 h-full overflow-y-auto">
+      <div className="flex-1 lg:ml-64">
         {/* Header */}
         <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white shadow-sm border-b z-30">
           <div className="w-full px-6 py-4">
@@ -939,7 +921,7 @@ const SurveyResults = () => {
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       <BarChart3 className="h-6 w-6 text-purple-600" />
-                      Survey Analytics Dashboard
+                      Survey Analytics Employee
                     </h1>
                     <p className="text-gray-600">Employee Satisfaction Analysis & Insights</p>
                   </div>
@@ -958,9 +940,9 @@ const SurveyResults = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-primary mb-2">
-                  {levelFilter === 'Managerial' ? 'Managerial Results Dashboard' :
-                   levelFilter === 'Non-Managerial' ? 'Non Managerial Results Dashboard' :
-                   'Survey Results Dashboard'}
+                  {levelFilter === 'Managerial' ? 'Managerial Results Employee' :
+                        levelFilter === 'Non-Managerial' ? 'Non Managerial Results Employee' :
+                        'Survey Results Employee'}
                 </h1>
                 <p className="text-muted-foreground">
                   {levelFilter === 'Managerial' ? 'Analysis of managerial employee satisfaction survey responses' :
@@ -1056,7 +1038,7 @@ const SurveyResults = () => {
                           ? 'There are currently no survey responses from managerial level employees. Once managerial employees submit their surveys, the analytics will appear here.'
                           : levelFilter === 'Non Managerial'
                           ? 'There are currently no survey responses from non-managerial level employees. Once non-managerial employees submit their surveys, the analytics will appear here.'
-                          : 'There are currently no survey responses available. Once employees start submitting their surveys, the analytics dashboard will display comprehensive insights and statistics here.'}
+                          : 'There are currently no survey responses available. Once employees start submitting their surveys, the analytics employee panel will display comprehensive insights and statistics here.'}
                       </p>
                     </div>
                     <Button onClick={fetchSurveyData} variant="outline" className="mt-4">

@@ -223,7 +223,7 @@ const AdminSubmission = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${
+            <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${
                 sidebarOpen ? 'translate-x-0' : '-translate-x-full'
             } transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 flex flex-col`}>
                 <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
@@ -240,19 +240,19 @@ const AdminSubmission = () => {
 
                 <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                     <button
-                        onClick={() => {
-                            setActiveMenuItem("dashboard");
-                            navigate("/dashboard");
-                        }}
-                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                            activeMenuItem === "dashboard"
-                                ? "text-purple-600 bg-purple-50"
-                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                        }`}
-                    >
-                        <LayoutDashboard className="mr-3 h-4 w-4" />
-                        Dashboard
-                    </button>
+                            onClick={() => {
+                                setActiveMenuItem("dashboard");
+                                navigate("/dashboard");
+                            }}
+                            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                activeMenuItem === "dashboard"
+                                    ? "text-purple-600 bg-purple-50"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                            }`}
+                        >
+                            <LayoutDashboard className="mr-3 h-4 w-4" />
+                            Employee
+                        </button>
 
                     <button
                         onClick={() => {
@@ -267,6 +267,21 @@ const AdminSubmission = () => {
                     >
                         <FileText className="mr-3 h-4 w-4" />
                         Submission
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setActiveMenuItem("user-management");
+                            navigate("/dashboard");
+                        }}
+                        className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                            activeMenuItem === "user-management"
+                                ? "text-purple-600 bg-purple-50"
+                                : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        }`}
+                    >
+                        <Users className="mr-3 h-4 w-4" />
+                        User Management
                     </button>
 
                     {/* Results Menu with Sub-items */}
@@ -357,7 +372,8 @@ const AdminSubmission = () => {
             {/* Main Content */}
             <div className="flex-1 lg:ml-64">
                 {/* Header */}
-                <div className="bg-white shadow-sm border-b px-6 py-4">
+                <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white shadow-sm border-b z-30">
+                    <div className="w-full px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Button
@@ -378,10 +394,11 @@ const AdminSubmission = () => {
                             Export Excel
                         </Button>
                     </div>
+                    </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
+                <div className="w-full p-6 pt-24">
                     <Card className="mb-6">
                         <CardContent className="p-6">
                             {/* Stats Cards */}
