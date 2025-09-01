@@ -1944,7 +1944,7 @@ const EmployeeManagement = () => {
                     <Button variant="outline" onClick={() => setIsBulkEditOpen(false)}>
                         Cancel
                     </Button>
-                    <Button onClick={handleBulkEdit}>
+                    <Button variant="secondary" onClick={handleBulkEdit}>
                         Update {selectedEmployees.size} Employee{selectedEmployees.size > 1 ? 's' : ''}
                     </Button>
                 </DialogFooter>
