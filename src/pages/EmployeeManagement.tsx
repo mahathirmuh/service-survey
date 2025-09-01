@@ -1132,10 +1132,10 @@ const EmployeeManagement = () => {
                         {/* 1. Employee */}
                         <button
                             onClick={() => setActiveMenuItem("dashboard")}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <LayoutDashboard className="mr-3 h-5 w-5" />
@@ -1148,10 +1148,10 @@ const EmployeeManagement = () => {
                                 setActiveMenuItem("submission");
                                 navigate("/submission");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "submission"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <FileText className="mr-3 h-5 w-5" />
@@ -1164,10 +1164,10 @@ const EmployeeManagement = () => {
                                 setActiveMenuItem("user-management");
                                 navigate("/user-management");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "user-management"
-                                    ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                             }`}
                         >
                             <Users className="mr-3 h-5 w-5" />
@@ -1180,10 +1180,10 @@ const EmployeeManagement = () => {
                                 onClick={() => {
                                     setResultsExpanded(!resultsExpanded);
                                 }}
-                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                     activeMenuItem.includes("results")
-                                        ? "text-purple-600 bg-purple-50 shadow-sm border border-purple-200"
-                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                                        ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
                                 }`}
                             >
                                 <div className="flex items-center">
@@ -1330,37 +1330,41 @@ const EmployeeManagement = () => {
                 <div className="w-full p-6 pt-24">
                 {/* Stats Cards */}
                 {activeMenuItem === "dashboard" && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{employees.length}</div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Departments</CardTitle>
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">
-                                    {new Set(employees.map(emp => emp.department)).size}
+                    <Card className="mb-6">
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-blue-600">Total Employees</p>
+                                            <p className="text-2xl font-bold text-blue-900">{employees.length}</p>
+                                        </div>
+                                        <Users className="h-8 w-8 text-blue-500" />
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Filtered Results</CardTitle>
-                                <Search className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{filteredEmployees.length}</div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-green-600">Departments</p>
+                                            <p className="text-2xl font-bold text-green-900">
+                                                {new Set(employees.map(emp => emp.department)).size}
+                                            </p>
+                                        </div>
+                                        <Shield className="h-8 w-8 text-green-500" />
+                                    </div>
+                                </div>
+                                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-purple-600">Filtered Results</p>
+                                            <p className="text-2xl font-bold text-purple-900">{filteredEmployees.length}</p>
+                                        </div>
+                                        <Search className="h-8 w-8 text-purple-500" />
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
 
                 {/* Submission Stats Cards */}
@@ -1404,8 +1408,7 @@ const EmployeeManagement = () => {
                                     <p className="text-2xl font-bold text-purple-900">
                                         {employees.length > 0 
                                             ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100)
-                                            : 0
-                                        }%
+                                            : 0}%
                                     </p>
                                 </div>
                                 <BarChart3 className="h-8 w-8 text-purple-500" />
@@ -1632,8 +1635,9 @@ const EmployeeManagement = () => {
                             {isLoading ? (
                                 <div className="text-center py-8">Loading employees...</div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <Table>
+                                <div className="space-y-4">
+                                    <div className="rounded-md border">
+                                        <Table>
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="w-12">
@@ -1646,50 +1650,55 @@ const EmployeeManagement = () => {
                                                 <TableHead className="w-16 text-center">
                                                     No.
                                                 </TableHead>
-                                                <TableHead 
-                                                    className="cursor-pointer hover:bg-gray-50 select-none"
-                                                    onClick={() => handleSort('id_badge_number')}
-                                                >
-                                                    <div className="flex items-center">
+                                                <TableHead>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('id_badge_number')}
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    >
                                                         ID Badge
                                                         {getSortIcon('id_badge_number')}
-                                                    </div>
+                                                    </Button>
                                                 </TableHead>
-                                                <TableHead 
-                                                    className="cursor-pointer hover:bg-gray-50 select-none"
-                                                    onClick={() => handleSort('name')}
-                                                >
-                                                    <div className="flex items-center">
+                                                <TableHead>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('name')}
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    >
                                                         Name
                                                         {getSortIcon('name')}
-                                                    </div>
+                                                    </Button>
                                                 </TableHead>
-                                                <TableHead 
-                                                    className="cursor-pointer hover:bg-gray-50 select-none"
-                                                    onClick={() => handleSort('department')}
-                                                >
-                                                    <div className="flex items-center">
+                                                <TableHead>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('department')}
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    >
                                                         Department
                                                         {getSortIcon('department')}
-                                                    </div>
+                                                    </Button>
                                                 </TableHead>
-                                                <TableHead 
-                                                    className="cursor-pointer hover:bg-gray-50 select-none"
-                                                    onClick={() => handleSort('level')}
-                                                >
-                                                    <div className="flex items-center">
+                                                <TableHead>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('level')}
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    >
                                                         Level
                                                         {getSortIcon('level')}
-                                                    </div>
+                                                    </Button>
                                                 </TableHead>
-                                                <TableHead 
-                                                    className="cursor-pointer hover:bg-gray-50 select-none"
-                                                    onClick={() => handleSort('created_at')}
-                                                >
-                                                    <div className="flex items-center">
-                                                        Created
+                                                <TableHead>
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => handleSort('created_at')}
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    >
+                                                        Created At
                                                         {getSortIcon('created_at')}
-                                                    </div>
+                                                    </Button>
                                                 </TableHead>
                                                 <TableHead className="text-right">Actions</TableHead>
                                             </TableRow>
@@ -1806,7 +1815,8 @@ const EmployeeManagement = () => {
                                                 ))
                                             )}
                                         </TableBody>
-                                    </Table>
+                                        </Table>
+                                    </div>
                                 </div>
                             )}
                             
