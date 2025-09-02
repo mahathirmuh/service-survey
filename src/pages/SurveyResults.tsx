@@ -187,6 +187,9 @@ const SurveyResults = () => {
       setLevelFilter('Non Managerial');
       setActiveMenuItem('results-non-managerial');
       setResultsExpanded(true);
+    } else if (path.includes('/user-management')) {
+      setActiveMenuItem('user-management');
+      setResultsExpanded(false);
     } else if (path.includes('/results')) {
       setLevelFilter('all');
       setActiveMenuItem('results');
@@ -792,7 +795,7 @@ const SurveyResults = () => {
             <button
               onClick={() => {
                 setActiveMenuItem("user-management");
-                navigate("/employee");
+                navigate("/user-management");
               }}
               className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                 activeMenuItem === "user-management"

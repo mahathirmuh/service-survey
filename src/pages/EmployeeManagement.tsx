@@ -92,18 +92,25 @@ const EmployeeManagement = () => {
     const [resultsExpanded, setResultsExpanded] = useState(false);
     const [menuManagementExpanded, setMenuManagementExpanded] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState(() => {
-        // Check if we're coming from the results page with submission intent
+        // Check current path and URL parameters
+        const currentPath = window.location.pathname;
         const urlParams = new URLSearchParams(window.location.search);
-        const menu = urlParams.get('menu') || "dashboard";
+        const menu = urlParams.get('menu');
+        
+        // If we're on the user-management route, set active menu to user-management
+        if (currentPath === '/user-management') {
+            return 'user-management';
+        }
+        
+        // Otherwise use menu parameter or default to dashboard
+        const activeMenu = menu || "dashboard";
+        
         // If we're on a results sub-page, expand the results menu
-        if (menu.includes('results')) {
+        if (activeMenu.includes('results')) {
             setResultsExpanded(true);
         }
-        // If we're on a user-management page, set the active menu item
-        if (menu.includes('user-management')) {
-            // User management is now a single page, no expansion needed
-        }
-        return menu;
+        
+        return activeMenu;
     });
     const [formData, setFormData] = useState({
         id_badge_number: "",
@@ -155,6 +162,16 @@ const EmployeeManagement = () => {
             navigate("/login");
         }
     }, [navigate]);
+
+    // Handle route changes to update active menu item
+    useEffect(() => {
+        const currentPath = window.location.pathname;
+        if (currentPath === '/user-management') {
+            setActiveMenuItem('user-management');
+        } else if (currentPath === '/employee') {
+            setActiveMenuItem('dashboard');
+        }
+    }, [window.location.pathname]);
 
     // Fetch employees with submission status
     const fetchEmployees = async () => {
