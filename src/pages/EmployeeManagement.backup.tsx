@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock, Building2 } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -57,7 +57,6 @@ interface Employee {
     department: string;
     level?: string;
     status?: string;
-    email?: string;
     created_at: string;
     updated_at: string;
 }
@@ -110,7 +109,6 @@ const EmployeeManagement = () => {
         name: "",
         department: "",
         level: "Non Managerial",
-        email: "",
     });
     
     // Bulk selection state
@@ -120,7 +118,6 @@ const EmployeeManagement = () => {
     const [bulkFormData, setBulkFormData] = useState({
         department: "",
         level: "",
-        email: "",
     });
     
     // Sorting state
@@ -312,7 +309,6 @@ const EmployeeManagement = () => {
             name: "",
             department: "",
             level: "Non Managerial",
-            email: "",
         });
         setEditingEmployee(null);
     };
@@ -325,7 +321,6 @@ const EmployeeManagement = () => {
                 name: employee.name,
                 department: employee.department,
                 level: employee.level || "Non Managerial",
-                email: employee.email || "",
             });
         } else {
             resetForm();
@@ -398,9 +393,6 @@ const EmployeeManagement = () => {
             if (bulkFormData.level) {
                 updateData.level = bulkFormData.level;
             }
-            if (bulkFormData.email) {
-                updateData.email = bulkFormData.email;
-            }
 
             if (Object.keys(updateData).length === 0) {
                 toast({
@@ -445,7 +437,7 @@ const EmployeeManagement = () => {
             
             clearSelection();
             setIsBulkEditOpen(false);
-            setBulkFormData({ department: "", level: "", email: "" });
+            setBulkFormData({ department: "", level: "" });
 
             toast({
                 title: "Success",
@@ -508,7 +500,6 @@ const EmployeeManagement = () => {
                         name: formData.name,
                         department: formData.department,
                         level: formData.level,
-                        email: formData.email,
                     })
                     .eq("id", editingEmployee.id);
 
@@ -540,7 +531,6 @@ const EmployeeManagement = () => {
                         name: formData.name,
                         department: formData.department,
                         level: formData.level,
-                        email: formData.email,
                     });
 
                 if (error) {
@@ -628,7 +618,6 @@ const EmployeeManagement = () => {
             const exportData = employees.map(emp => ({
                 'ID Badge Number': emp.id_badge_number,
                 'Employee Name': emp.name,
-                'Email': emp.email || '',
                 'Department': emp.department,
                 'Level': emp.level || 'Non Managerial',
                 'Created Date': new Date(emp.created_at).toLocaleDateString(),
@@ -643,7 +632,6 @@ const EmployeeManagement = () => {
             const colWidths = [
                 { wch: 15 }, // ID Badge Number
                 { wch: 25 }, // Employee Name
-                { wch: 30 }, // Email
                 { wch: 25 }, // Department
                 { wch: 15 }, // Level
                 { wch: 12 }, // Created Date
@@ -683,21 +671,18 @@ const EmployeeManagement = () => {
                 {
                     'ID Badge Number': 'MTI001',
                     'Employee Name': 'John Doe',
-                    'Email': 'john.doe@company.com',
                     'Department': 'Human Resources',
                     'Level': 'Non Managerial'
                 },
                 {
                     'ID Badge Number': 'MTI002',
                     'Employee Name': 'Jane Smith',
-                    'Email': 'jane.smith@company.com',
                     'Department': 'ICT Department',
                     'Level': 'Managerial'
                 },
                 {
                     'ID Badge Number': 'MTI003',
                     'Employee Name': 'Bob Johnson',
-                    'Email': 'bob.johnson@company.com',
                     'Department': 'Environmental Department',
                     'Level': 'Non Managerial'
                 }
@@ -709,7 +694,7 @@ const EmployeeManagement = () => {
                 { 'Instructions': '' },
                 { 'Instructions': '1. Use the "Employee Template" sheet to add your data' },
                 { 'Instructions': '2. DELETE the sample rows before adding your data' },
-                { 'Instructions': '3. Fill in ALL five columns for each employee:' },
+                { 'Instructions': '3. Fill in ALL four columns for each employee:' },
                 { 'Instructions': '' },
                 { 'Instructions': 'COLUMN REQUIREMENTS:' },
                 { 'Instructions': '' },
@@ -756,7 +741,6 @@ const EmployeeManagement = () => {
             const colWidths = [
                 { wch: 20 }, // ID Badge Number
                 { wch: 25 }, // Employee Name
-                { wch: 30 }, // Email
                 { wch: 30 }, // Department
                 { wch: 15 }  // Level
             ];
@@ -831,14 +815,12 @@ const EmployeeManagement = () => {
                     // Get all possible column variations
                     const possibleIdColumns = ['ID Badge Number', 'Employee ID', 'ID', 'Badge', 'Employee', 'ID Badge', 'Badge Number'];
                     const possibleNameColumns = ['Employee Name', 'Name', 'Full Name', 'Employee', 'Full_Name', 'EmployeeName'];
-                    const possibleEmailColumns = ['Email', 'Email Address', 'E-mail', 'Employee Email', 'Work Email'];
                     const possibleDeptColumns = ['Department', 'Dept', 'Department Name', 'Dep'];
                     const possibleLevelColumns = ['Level', 'Employee Level', 'Position Level', 'Management Level'];
 
                     // Find the actual values
                     let idBadge = '';
                     let name = '';
-                    let email = '';
                     let department = '';
                     let level = '';
 
@@ -854,14 +836,6 @@ const EmployeeManagement = () => {
                     for (const col of possibleNameColumns) {
                         if (row[col] && String(row[col]).trim()) {
                             name = String(row[col]).trim();
-                            break;
-                        }
-                    }
-
-                    // Try to find Email
-                    for (const col of possibleEmailColumns) {
-                        if (row[col] && String(row[col]).trim()) {
-                            email = String(row[col]).trim();
                             break;
                         }
                     }
@@ -887,7 +861,7 @@ const EmployeeManagement = () => {
                         level = 'Non Managerial';
                     }
 
-                    console.log(`Row ${rowNum} extracted:`, { idBadge, name, email, department, level });
+                    console.log(`Row ${rowNum} extracted:`, { idBadge, name, department, level });
 
                     // Skip completely empty rows
                     if (!idBadge && !name && !department) {
@@ -1004,16 +978,14 @@ const EmployeeManagement = () => {
                         id_badge_number: formattedIdBadge,
                         name: String(name).trim(),
                         department: mappedDepartment,
-                        level: level,
-                        email: email
+                        level: level
                     });
 
                     console.log(`Row ${rowNum} validated successfully:`, {
                         id_badge_number: formattedIdBadge,
                         name: String(name).trim(),
                         department: mappedDepartment,
-                        level: level,
-                        email: email
+                        level: level
                     });
                 });
 
@@ -1127,25 +1099,24 @@ const EmployeeManagement = () => {
                 // Reset file input
                 event.target.value = '';
             }
-        };
+        }; // Close reader.onload function
 
         reader.readAsArrayBuffer(file);
-    };
+    }; // Close handleImportFromExcel function
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
-            {/* Sidebar */}
             <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:fixed lg:inset-y-0 flex flex-col`}>
                 <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
-          <div className="flex items-center space-x-3">
-            <div className="bg-white p-2 rounded-lg shadow-sm">
-              <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
-            </div>
-            <div className="text-white">
-              <div className="text-lg font-bold">Employee Satisfaction</div>
-              <div className="text-sm opacity-90">Survey System</div>
-            </div>
-          </div>
+                    <div className="flex items-center space-x-3">
+                        <div className="bg-white p-2 rounded-lg shadow-sm">
+                            <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
+                        </div>
+                        <div className="text-white">
+                            <div className="text-lg font-bold">Employee Satisfaction</div>
+                            <div className="text-sm opacity-90">Survey System</div>
+                        </div>
+                    </div>
                     <Button
                         variant="ghost"
                         size="sm"
@@ -1356,11 +1327,10 @@ const EmployeeManagement = () => {
                 </div>
 
                 <div className="w-full p-6 pt-24">
-                {/* Stats Cards */}
-                {activeMenuItem === "dashboard" && (
                     <Card className="mb-6">
                         <CardContent className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            {/* Unified Stats Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
                                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -1373,77 +1343,50 @@ const EmployeeManagement = () => {
                                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm font-medium text-green-600">Departments</p>
+                                            <p className="text-sm font-medium text-green-600">Submitted</p>
                                             <p className="text-2xl font-bold text-green-900">
-                                                {new Set(employees.map(emp => emp.department)).size}
+                                                {employees.filter(emp => emp.status === 'Submitted').length}
                                             </p>
                                         </div>
                                         <Shield className="h-8 w-8 text-green-500" />
                                     </div>
                                 </div>
+                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-red-600">Not Submitted</p>
+                                            <p className="text-2xl font-bold text-red-900">
+                                                {employees.filter(emp => emp.status === 'Not Submitted').length}
+                                            </p>
+                                        </div>
+                                        <Users className="h-8 w-8 text-red-500" />
+                                    </div>
+                                </div>
                                 <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="text-sm font-medium text-purple-600">Filtered Results</p>
-                                            <p className="text-2xl font-bold text-purple-900">{filteredEmployees.length}</p>
+                                            <p className="text-sm font-medium text-purple-600">Completion Rate</p>
+                                            <p className="text-2xl font-bold text-purple-900">
+                                                {employees.length > 0 ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100) : 0}%
+                                            </p>
                                         </div>
-                                        <Search className="h-8 w-8 text-purple-500" />
+                                        <BarChart3 className="h-8 w-8 text-purple-500" />
+                                    </div>
+                                </div>
+                                <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-sm font-medium text-indigo-600">Departments</p>
+                                            <p className="text-2xl font-bold text-indigo-900">
+                                                {new Set(employees.map(emp => emp.department)).size}
+                                            </p>
+                                        </div>
+                                        <Building2 className="h-8 w-8 text-indigo-500" />
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-                )}
-
-                {/* Submission Stats Cards */}
-                {activeMenuItem === "submission" && (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-blue-600">Total Employees</p>
-                                    <p className="text-2xl font-bold text-blue-900">{employees.length}</p>
-                                </div>
-                                <Users className="h-8 w-8 text-blue-500" />
-                            </div>
-                        </div>
-                        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-green-600">Submitted</p>
-                                    <p className="text-2xl font-bold text-green-900">
-                                        {employees.filter(emp => emp.status === 'Submitted').length}
-                                    </p>
-                                </div>
-                                <Shield className="h-8 w-8 text-green-500" />
-                            </div>
-                        </div>
-                        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-red-600">Not Submitted</p>
-                                    <p className="text-2xl font-bold text-red-900">
-                                        {employees.filter(emp => emp.status === 'Not Submitted').length}
-                                    </p>
-                                </div>
-                                <Users className="h-8 w-8 text-red-500" />
-                            </div>
-                        </div>
-                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-purple-600">Completion Rate</p>
-                                    <p className="text-2xl font-bold text-purple-900">
-                                        {employees.length > 0 
-                                            ? Math.round((employees.filter(emp => emp.status === 'Submitted').length / employees.length) * 100)
-                                            : 0}%
-                                    </p>
-                                </div>
-                                <BarChart3 className="h-8 w-8 text-purple-500" />
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Main Content */}
                 {activeMenuItem === "dashboard" && (
@@ -1567,18 +1510,6 @@ const EmployeeManagement = () => {
                                                         setFormData({ ...formData, name: e.target.value })
                                                     }
                                                     required
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="email">Email</Label>
-                                                <Input
-                                                    id="email"
-                                                    type="email"
-                                                    placeholder="john.doe@example.com"
-                                                    value={formData.email}
-                                                    onChange={(e) =>
-                                                        setFormData({ ...formData, email: e.target.value })
-                                                    }
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -1713,16 +1644,6 @@ const EmployeeManagement = () => {
                                                 <TableHead>
                                                     <Button
                                                         variant="ghost"
-                                                        onClick={() => handleSort('email')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
-                                                    >
-                                                        Email
-                                                        {getSortIcon('email')}
-                                                    </Button>
-                                                </TableHead>
-                                                <TableHead>
-                                                    <Button
-                                                        variant="ghost"
                                                         onClick={() => handleSort('department')}
                                                         className="h-auto p-0 font-semibold hover:bg-transparent"
                                                     >
@@ -1777,7 +1698,6 @@ const EmployeeManagement = () => {
                                                             {employee.id_badge_number}
                                                         </TableCell>
                                                         <TableCell>{employee.name}</TableCell>
-                                                        <TableCell>{employee.email || '-'}</TableCell>
                                                         <TableCell>{employee.department}</TableCell>
                                                         <TableCell>
                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -1925,9 +1845,7 @@ const EmployeeManagement = () => {
                     </Card>
                 )}
 
-
             </div>
-        </div>
 
         {/* Bulk Delete Confirmation Dialog */}
         <Dialog open={isBulkDeleteOpen} onOpenChange={setIsBulkDeleteOpen}>
@@ -1990,19 +1908,6 @@ const EmployeeManagement = () => {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="bulk-email" className="text-right">
-                            Email
-                        </Label>
-                        <Input
-                            id="bulk-email"
-                            type="email"
-                            placeholder="Enter email address"
-                            className="col-span-3"
-                            value={bulkFormData.email}
-                            onChange={(e) => setBulkFormData(prev => ({ ...prev, email: e.target.value }))}
-                        />
-                    </div>
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setIsBulkEditOpen(false)}>
@@ -2015,7 +1920,7 @@ const EmployeeManagement = () => {
             </DialogContent>
         </Dialog>
     </div>
-);
+    );
 };
 
 export default EmployeeManagement;

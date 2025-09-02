@@ -34,6 +34,7 @@ interface SectionQuestions {
 interface FormData {
     name: string;
     idBadgeNumber: string;
+    email: string;
     department: string;
     environmental_section: string;
     environmental_sections: { [sectionName: string]: SectionQuestions };
@@ -150,6 +151,7 @@ const SurveyForm = () => {
     const [formData, setFormData] = useState<FormData>({
         name: "",
         idBadgeNumber: "",
+        email: "",
         department: "",
         environmental_section: "",
         environmental_sections: {},
@@ -176,37 +178,78 @@ const SurveyForm = () => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const validateIdBadge = async (value: string) => {
+    const validateEmployeeData = async () => {
         setIdError("");
-        const cleanValue = value.replace(/\s/g, "").toUpperCase();
-        if (!cleanValue) return;
-        if (!/^MTI/.test(cleanValue)) {
+        const cleanIdBadge = formData.idBadgeNumber.replace(/\s/g, "").toUpperCase();
+        const cleanEmail = formData.email.trim();
+        
+        // Check if both fields are provided
+        if (!cleanIdBadge || !cleanEmail) return;
+        
+        // Validate ID Badge format
+        if (!/^MTI/.test(cleanIdBadge)) {
             setIdError("ID Badge Number must start with 'MTI'");
             return;
         }
-        if (cleanValue.length > 3) {
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(cleanEmail)) {
+            setIdError("Please enter a valid email address");
+            return;
+        }
+        
+        if (cleanIdBadge.length > 3) {
             try {
                 const { data: employee } = await supabase
                     .from("employees")
-                    .select("id, name, department, id_badge_number")
-                    .eq("id_badge_number", cleanValue)
+                    .select("id, name, department, id_badge_number, email")
+                    .eq("id_badge_number", cleanIdBadge)
                     .maybeSingle();
+                    
                 if (!employee) {
                     setIdError(
                         "ID Badge Number is not registered. Please double check and try again. If error persists, please contact HR Team."
                     );
-                } else {
-                    setFormData((prev) => ({
-                        ...prev,
-                        name: employee.name,
-                        department: employee.department,
-                        idBadgeNumber: cleanValue,
-                    }));
+                    return;
                 }
+                
+                // Check if email matches the employee record
+                if (employee.email && employee.email.toLowerCase() !== cleanEmail.toLowerCase()) {
+                    setIdError(
+                        "Email address does not match the registered email for this ID Badge Number. Please verify both fields."
+                    );
+                    return;
+                }
+                
+                // Auto-fill name and department if both ID and email are valid
+                setFormData((prev) => ({
+                    ...prev,
+                    name: employee.name,
+                    department: employee.department,
+                    idBadgeNumber: cleanIdBadge,
+                }));
             } catch (error) {
-                console.error("Error checking ID badge number:", error);
+                console.error("Error validating employee data:", error);
             }
         }
+    };
+    
+    const validateIdBadge = async (value: string) => {
+        // Update the ID badge value first
+        const cleanValue = value.replace(/\s/g, "").toUpperCase();
+        setFormData((prev) => ({ ...prev, idBadgeNumber: cleanValue }));
+        
+        // Then validate both ID and email together
+        setTimeout(() => validateEmployeeData(), 100);
+    };
+    
+    const validateEmail = async (value: string) => {
+        // Update the email value first
+        setFormData((prev) => ({ ...prev, email: value }));
+        
+        // Then validate both ID and email together
+        setTimeout(() => validateEmployeeData(), 100);
     };
 
     const updateDepartmentQuestions = useCallback(
@@ -331,10 +374,14 @@ const SurveyForm = () => {
 
     // Form validation
     const isFormValid = useCallback(() => {
-        const requiredFields = ["name", "idBadgeNumber", "department"];
+        const requiredFields = ["name", "idBadgeNumber", "email", "department"];
         const areRequiredFieldsFilled = requiredFields.every(
             (field) => formData[field as keyof FormData]?.toString().trim().length !== 0
         );
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isEmailValid = emailRegex.test(formData.email.trim());
         const departments = ["hr", "environmental", "external", "scm"] as const;
         const allDepartmentsComplete = departments.every((dept) => {
             const sections = formData[`${dept}_sections` as keyof FormData] as {
@@ -346,7 +393,7 @@ const SurveyForm = () => {
         });
         const isIdBadgeNumberValid =
             /^MTI/.test(formData.idBadgeNumber.trim()) && !idError;
-        return areRequiredFieldsFilled && allDepartmentsComplete && isIdBadgeNumberValid;
+        return areRequiredFieldsFilled && allDepartmentsComplete && isIdBadgeNumberValid && isEmailValid;
     }, [formData, idError]);
 
     // Get missing questions for better error display
@@ -439,6 +486,7 @@ const SurveyForm = () => {
             const insertData: any = {
                 name: formData.name,
                 id_badge_number: formData.idBadgeNumber,
+                email: formData.email,
                 department: formData.department,
                 level: employee.level || 'Non Managerial', // Store level at time of submission
                 
@@ -979,6 +1027,28 @@ const SurveyForm = () => {
                                         {idError && <p className="text-sm text-destructive animate-fade-in">{idError}</p>}
                                     </div>
                                     <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-sm font-medium">
+                                            Email Address <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            placeholder="Enter your email address (e.g., john.doe@mti.com.my)"
+                                            value={formData.email}
+                                            onChange={(e) => validateEmail(e.target.value)}
+                                            className={`h-11 transition-colors duration-200 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                                                formData.email.trim() === ""
+                                                    ? "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                                    : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+                                                        ? "border-green-400 bg-green-50 focus:border-green-500 focus-visible:border-green-500"
+                                                        : "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                            }`}
+                                        />
+                                        {formData.email.trim() !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()) && (
+                                            <p className="text-sm text-destructive animate-fade-in">Please enter a valid email address</p>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
                                         <Label htmlFor="name" className="text-sm font-medium">
                                             Full Name <span className="text-destructive">*</span>
                                         </Label>
@@ -1084,7 +1154,7 @@ const SurveyForm = () => {
                                 <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
                                     <p className="text-sm text-red-800 text-center flex items-center justify-center">
                                         <span className="mr-2">⚠️</span>
-                                        Please enter a valid ID Badge Number and complete all department evaluations.
+                                        Please enter a valid ID Badge Number, email address, and complete all department evaluations.
                                     </p>
                                 </div>
                             )}
