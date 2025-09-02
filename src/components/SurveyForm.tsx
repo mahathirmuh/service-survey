@@ -178,10 +178,10 @@ const SurveyForm = () => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const validateEmployeeData = async () => {
+    const validateEmployeeData = async (idBadge?: string, email?: string) => {
         setIdError("");
-        const cleanIdBadge = formData.idBadgeNumber.replace(/\s/g, "").toUpperCase();
-        const cleanEmail = formData.email.trim();
+        const cleanIdBadge = (idBadge || formData.idBadgeNumber).replace(/\s/g, "").toUpperCase();
+        const cleanEmail = (email || formData.email).trim();
         
         // Check if both fields are provided
         if (!cleanIdBadge || !cleanEmail) return;
@@ -240,16 +240,16 @@ const SurveyForm = () => {
         const cleanValue = value.replace(/\s/g, "").toUpperCase();
         setFormData((prev) => ({ ...prev, idBadgeNumber: cleanValue }));
         
-        // Then validate both ID and email together
-        setTimeout(() => validateEmployeeData(), 100);
+        // Then validate both ID and email together with current values
+        setTimeout(() => validateEmployeeData(cleanValue, formData.email), 100);
     };
     
     const validateEmail = async (value: string) => {
         // Update the email value first
         setFormData((prev) => ({ ...prev, email: value }));
         
-        // Then validate both ID and email together
-        setTimeout(() => validateEmployeeData(), 100);
+        // Then validate both ID and email together with current values
+        setTimeout(() => validateEmployeeData(formData.idBadgeNumber, value), 100);
     };
 
     const updateDepartmentQuestions = useCallback(
@@ -1014,7 +1014,7 @@ const SurveyForm = () => {
                                             id="idBadge"
                                             placeholder="Enter your ID badge number (e.g., MTI123456)"
                                             value={formData.idBadgeNumber}
-                                            onChange={(e) => updateFormData("idBadgeNumber", e.target.value)}
+                                            onChange={(e) => validateIdBadge(e.target.value)}
                                             onBlur={(e) => validateIdBadge(e.target.value)}
                                             className={`h-11 transition-colors duration-200 focus-visible:ring-0 focus-visible:ring-offset-0 ${
                                                 idError 
