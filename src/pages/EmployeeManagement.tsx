@@ -264,50 +264,7 @@ const EmployeeManagement = () => {
 
             if (error) {
                 console.error("Error fetching users:", error);
-                // If table doesn't exist, use sample data
-                const sampleUsers: User[] = [
-                    {
-                        id: "1",
-                        name: "John Doe",
-                        email: "john.doe@company.com",
-                        password: "••••••••",
-                        role: "Admin",
-                        status: "Active",
-                        last_login: "2 hours ago",
-                        created_at: "2025-01-15T10:30:00Z"
-                    },
-                    {
-                        id: "2",
-                        name: "Jane Smith",
-                        email: "jane.smith@company.com",
-                        password: "••••••••",
-                        role: "Admin",
-                        status: "Active",
-                        last_login: "1 day ago",
-                        created_at: "2025-01-14T09:15:00Z"
-                    },
-                    {
-                        id: "3",
-                        name: "Mike Johnson",
-                        email: "mike.johnson@company.com",
-                        password: "••••••••",
-                        role: "Manager",
-                        status: "Inactive",
-                        last_login: "1 week ago",
-                        created_at: "2025-01-10T14:20:00Z"
-                    },
-                    {
-                        id: "4",
-                        name: "Sarah Wilson",
-                        email: "sarah.wilson@company.com",
-                        password: "••••••••",
-                        role: "Viewer",
-                        status: "Active",
-                        last_login: "5 hours ago",
-                        created_at: "2025-01-12T11:45:00Z"
-                    }
-                ];
-                setUsers(sampleUsers);
+                setUsers([]);
                 return;
             }
 
@@ -965,28 +922,14 @@ const EmployeeManagement = () => {
     // Download Template Function
     const handleDownloadTemplate = () => {
         try {
-            // Create template data with sample rows
+            // Create empty template data with headers only
             const templateData = [
                 {
-                    'ID Badge Number': 'MTI001',
-                    'Employee Name': 'John Doe',
-                    'Email': 'john.doe@company.com',
-                    'Department': 'Human Resources',
-                    'Level': 'Non Managerial'
-                },
-                {
-                    'ID Badge Number': 'MTI002',
-                    'Employee Name': 'Jane Smith',
-                    'Email': 'jane.smith@company.com',
-                    'Department': 'ICT Department',
-                    'Level': 'Managerial'
-                },
-                {
-                    'ID Badge Number': 'MTI003',
-                    'Employee Name': 'Bob Johnson',
-                    'Email': 'bob.johnson@company.com',
-                    'Department': 'Environmental Department',
-                    'Level': 'Non Managerial'
+                    'ID Badge Number': '',
+                    'Employee Name': '',
+                    'Email': '',
+                    'Department': '',
+                    'Level': ''
                 }
             ];
 
@@ -995,7 +938,7 @@ const EmployeeManagement = () => {
                 { 'Instructions': 'HOW TO USE THIS TEMPLATE:' },
                 { 'Instructions': '' },
                 { 'Instructions': '1. Use the "Employee Template" sheet to add your data' },
-                { 'Instructions': '2. DELETE the sample rows before adding your data' },
+                { 'Instructions': '2. Fill in the empty template with your employee data' },
                 { 'Instructions': '3. Fill in ALL five columns for each employee:' },
                 { 'Instructions': '' },
                 { 'Instructions': 'COLUMN REQUIREMENTS:' },
@@ -1026,7 +969,7 @@ const EmployeeManagement = () => {
                 { 'Instructions': 'IMPORTANT NOTES:' },
                 { 'Instructions': '• Do not change column headers' },
                 { 'Instructions': '• Do not leave any cells empty' },
-                { 'Instructions': '• Remove sample data before importing' },
+                { 'Instructions': '• Fill in all required fields before importing' },
                 { 'Instructions': '• Save as Excel (.xlsx) format' }
             ];
 
@@ -1848,7 +1791,7 @@ const EmployeeManagement = () => {
                                                 <Label htmlFor="name">Full Name</Label>
                                                 <Input
                                                     id="name"
-                                                    placeholder="John Doe"
+                                                    placeholder="Enter full name"
                                                     value={formData.name}
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, name: e.target.value })
@@ -1861,7 +1804,7 @@ const EmployeeManagement = () => {
                                                 <Input
                                                     id="email"
                                                     type="email"
-                                                    placeholder="john.doe@example.com"
+                                                    placeholder="employee@company.com"
                                                     value={formData.email}
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, email: e.target.value })
@@ -2247,7 +2190,7 @@ const EmployeeManagement = () => {
                                                 <Label htmlFor="user-name">Full Name</Label>
                                                 <Input
                                                     id="user-name"
-                                                    placeholder="John Doe"
+                                                    placeholder="Enter full name"
                                                     value={userFormData.name}
                                                     onChange={(e) =>
                                                         setUserFormData({ ...userFormData, name: e.target.value })
@@ -2260,7 +2203,7 @@ const EmployeeManagement = () => {
                                                 <Input
                                                     id="user-email"
                                                     type="email"
-                                                    placeholder="john.doe@example.com"
+                                                    placeholder="user@company.com"
                                                     value={userFormData.email}
                                                     onChange={(e) =>
                                                         setUserFormData({ ...userFormData, email: e.target.value })
