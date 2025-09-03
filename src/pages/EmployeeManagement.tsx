@@ -62,6 +62,17 @@ interface Employee {
     updated_at: string;
 }
 
+interface User {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    status: string;
+    last_login?: string;
+    created_at: string;
+}
+
 const departments = [
     "AIM Construction",
     "AIM Operation",
@@ -118,6 +129,18 @@ const EmployeeManagement = () => {
         department: "",
         level: "Non Managerial",
         email: "",
+    });
+    
+    // User management state
+    const [users, setUsers] = useState<User[]>([]);
+    const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [userFormData, setUserFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "Admin",
+        status: "Active",
     });
     
     // Bulk selection state
@@ -231,8 +254,98 @@ const EmployeeManagement = () => {
         }
     };
 
+    // Fetch users from admin_users table
+    const fetchUsers = async () => {
+        try {
+            const { data: usersData, error } = await supabase
+                .from("admin_users")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error("Error fetching users:", error);
+                // If table doesn't exist, use sample data
+                const sampleUsers: User[] = [
+                    {
+                        id: "1",
+                        name: "John Doe",
+                        email: "john.doe@company.com",
+                        password: "••••••••",
+                        role: "Super Admin",
+                        status: "Active",
+                        last_login: "2 hours ago",
+                        created_at: "2025-01-15T10:30:00Z"
+                    },
+                    {
+                        id: "2",
+                        name: "Jane Smith",
+                        email: "jane.smith@company.com",
+                        password: "••••••••",
+                        role: "Admin",
+                        status: "Active",
+                        last_login: "1 day ago",
+                        created_at: "2025-01-14T09:15:00Z"
+                    },
+                    {
+                        id: "3",
+                        name: "Mike Johnson",
+                        email: "mike.johnson@company.com",
+                        password: "••••••••",
+                        role: "Manager",
+                        status: "Inactive",
+                        last_login: "1 week ago",
+                        created_at: "2025-01-10T14:20:00Z"
+                    },
+                    {
+                        id: "4",
+                        name: "Sarah Wilson",
+                        email: "sarah.wilson@company.com",
+                        password: "••••••••",
+                        role: "Viewer",
+                        status: "Active",
+                        last_login: "5 hours ago",
+                        created_at: "2025-01-12T11:45:00Z"
+                    }
+                ];
+                setUsers(sampleUsers);
+                return;
+            }
+
+            // Format users data with masked passwords
+            const formattedUsers = (usersData || []).map(user => ({
+                ...user,
+                password: "••••••••", // Mask password for display
+                last_login: user.last_login ? formatRelativeTime(user.last_login) : "Never"
+            }));
+
+            setUsers(formattedUsers);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            toast({
+                title: "Error",
+                description: "Failed to fetch users",
+                variant: "destructive",
+            });
+        }
+    };
+
+    // Helper function to format relative time
+    const formatRelativeTime = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = now.getTime() - date.getTime();
+        const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+        const diffInDays = Math.floor(diffInHours / 24);
+        
+        if (diffInHours < 1) return "Just now";
+        if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+        if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        return `${Math.floor(diffInDays / 7)} week${Math.floor(diffInDays / 7) > 1 ? 's' : ''} ago`;
+    };
+
     useEffect(() => {
         fetchEmployees();
+        fetchUsers();
     }, []);
 
     // Filter and sort employees
@@ -349,6 +462,163 @@ const EmployeeManagement = () => {
         }
         setIsDialogOpen(true);
     };
+
+    // User form functions
+    const resetUserForm = () => {
+        setUserFormData({
+            name: "",
+            email: "",
+            password: "",
+            role: "Admin",
+            status: "Active",
+        });
+        setEditingUser(null);
+    };
+
+    const openUserDialog = (user?: User) => {
+        if (user) {
+            setEditingUser(user);
+            setUserFormData({
+                name: user.name,
+                email: user.email,
+                password: "", // Don't populate password for security
+                role: user.role,
+                status: user.status,
+            });
+        } else {
+            resetUserForm();
+        }
+        setIsUserDialogOpen(true);
+    };
+
+    const closeUserDialog = () => {
+        setIsUserDialogOpen(false);
+        resetUserForm();
+    };
+
+    const handleUserSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        try {
+            if (editingUser) {
+                // Update existing user
+                const updateData: any = {
+                    name: userFormData.name,
+                    email: userFormData.email,
+                    role: userFormData.role,
+                    status: userFormData.status,
+                };
+                
+                // Only include password if it's provided
+                if (userFormData.password.trim()) {
+                    updateData.password = userFormData.password;
+                }
+                
+                const { error } = await supabase
+                    .from('admin_users')
+                    .update(updateData)
+                    .eq('id', editingUser.id);
+                
+                if (error) throw error;
+                
+                toast({
+                    title: "Success",
+                    description: "User updated successfully",
+                });
+            } else {
+                // Create new user
+                const { error } = await supabase
+                    .from('admin_users')
+                    .insert({
+                        name: userFormData.name,
+                        email: userFormData.email,
+                        password: userFormData.password,
+                        role: userFormData.role,
+                        status: userFormData.status,
+                        created_at: new Date().toISOString(),
+                        last_login: null
+                    });
+                
+                if (error) throw error;
+                
+                toast({
+                    title: "Success",
+                    description: "User created successfully",
+                });
+            }
+            
+            closeUserDialog();
+            fetchUsers(); // Refresh the users list
+        } catch (error) {
+            console.error('Error saving user:', error);
+            toast({
+                title: "Error",
+                description: editingUser ? "Failed to update user" : "Failed to create user",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleDeleteUser = async (userId: string) => {
+        try {
+            const { error } = await supabase
+                .from('admin_users')
+                .delete()
+                .eq('id', userId);
+            
+            if (error) throw error;
+            
+            toast({
+                title: "Success",
+                description: "User deleted successfully",
+            });
+            
+            fetchUsers(); // Refresh the users list
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            toast({
+                title: "Error",
+                description: "Failed to delete user",
+                variant: "destructive",
+            });
+        }
+    };
+
+    // Password strength validation
+    const validatePasswordStrength = (password: string) => {
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+        
+        const score = Object.values(requirements).filter(Boolean).length;
+        const strength = score < 3 ? 'weak' : score < 5 ? 'medium' : 'strong';
+        
+        return { requirements, score, strength };
+    };
+
+    const getPasswordStrengthColor = (strength: string) => {
+        switch (strength) {
+            case 'weak': return 'text-red-600';
+            case 'medium': return 'text-yellow-600';
+            case 'strong': return 'text-green-600';
+            default: return 'text-gray-400';
+        }
+    };
+
+    const getPasswordStrengthBg = (strength: string) => {
+        switch (strength) {
+            case 'weak': return 'bg-red-200';
+            case 'medium': return 'bg-yellow-200';
+            case 'strong': return 'bg-green-200';
+            default: return 'bg-gray-200';
+        }
+    };
+
+    const passwordValidation = validatePasswordStrength(userFormData.password);
 
     // Bulk selection functions
     const handleSelectEmployee = (employeeId: string) => {
@@ -1924,19 +2194,421 @@ const EmployeeManagement = () => {
                         <CardHeader>
                             <CardTitle className="text-xl font-semibold flex items-center gap-2">
                                 <Users className="h-5 w-5 text-purple-600" />
-                                User Management
+                                User Account Management
                             </CardTitle>
-                            <p className="text-gray-600">Manage user accounts, roles, and permissions for the system.</p>
+                            <p className="text-gray-600">Manage admin accounts, roles, and permissions for the system</p>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-center py-12">
-                                <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">User Account Management</h3>
-                                <p className="text-gray-500 mb-6">Create, edit, and manage user accounts, roles, and access permissions.</p>
-                                <Button className="bg-purple-600 hover:bg-purple-700">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add New User
-                                </Button>
+                            {/* Action Bar */}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                                        <Input
+                                            placeholder="Search users..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="pl-10 w-full sm:w-64"
+                                        />
+                                    </div>
+                                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                                        <SelectTrigger className="w-full sm:w-48">
+                                            <SelectValue placeholder="Filter by role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Roles</SelectItem>
+                                            <SelectItem value="Super Admin">Super Admin</SelectItem>
+                                            <SelectItem value="Admin">Admin</SelectItem>
+                                            <SelectItem value="Manager">Manager</SelectItem>
+                                            <SelectItem value="Viewer">Viewer</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button 
+                                            onClick={() => openUserDialog()}
+                                            className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                                        >
+                                            <Plus className="h-4 w-4 mr-2" />
+                                            Add New User
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                {editingUser ? "Edit User" : "Add New User"}
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                {editingUser ? "Update user account details" : "Create a new user account with password"}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <form onSubmit={handleUserSubmit} className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="user-name">Full Name</Label>
+                                                <Input
+                                                    id="user-name"
+                                                    placeholder="John Doe"
+                                                    value={userFormData.name}
+                                                    onChange={(e) =>
+                                                        setUserFormData({ ...userFormData, name: e.target.value })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="user-email">Email Address</Label>
+                                                <Input
+                                                    id="user-email"
+                                                    type="email"
+                                                    placeholder="john.doe@example.com"
+                                                    value={userFormData.email}
+                                                    onChange={(e) =>
+                                                        setUserFormData({ ...userFormData, email: e.target.value })
+                                                    }
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="user-password">Password</Label>
+                                                <Input
+                                                    id="user-password"
+                                                    type="password"
+                                                    placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"}
+                                                    value={userFormData.password}
+                                                    onChange={(e) =>
+                                                        setUserFormData({ ...userFormData, password: e.target.value })
+                                                    }
+                                                    required={!editingUser}
+                                                />
+                                                {userFormData.password && (
+                                                    <div className="space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                                <div 
+                                                                    className={`h-full transition-all duration-300 ${
+                                                                        passwordValidation.strength === 'weak' ? 'bg-red-500 w-1/3' :
+                                                                        passwordValidation.strength === 'medium' ? 'bg-yellow-500 w-2/3' :
+                                                                        'bg-green-500 w-full'
+                                                                    }`}
+                                                                />
+                                                            </div>
+                                                            <span className={`text-xs font-medium capitalize ${getPasswordStrengthColor(passwordValidation.strength)}`}>
+                                                                {passwordValidation.strength}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-xs space-y-1">
+                                                            <div className={passwordValidation.requirements.length ? 'text-green-600' : 'text-gray-400'}>
+                                                                ✓ At least 8 characters
+                                                            </div>
+                                                            <div className={passwordValidation.requirements.uppercase ? 'text-green-600' : 'text-gray-400'}>
+                                                                ✓ One uppercase letter
+                                                            </div>
+                                                            <div className={passwordValidation.requirements.lowercase ? 'text-green-600' : 'text-gray-400'}>
+                                                                ✓ One lowercase letter
+                                                            </div>
+                                                            <div className={passwordValidation.requirements.number ? 'text-green-600' : 'text-gray-400'}>
+                                                                ✓ One number
+                                                            </div>
+                                                            <div className={passwordValidation.requirements.special ? 'text-green-600' : 'text-gray-400'}>
+                                                                ✓ One special character
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="user-role">Role</Label>
+                                                <Select
+                                                    value={userFormData.role}
+                                                    onValueChange={(value) =>
+                                                        setUserFormData({ ...userFormData, role: value })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select role" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Super Admin">Super Admin</SelectItem>
+                                                        <SelectItem value="Admin">Admin</SelectItem>
+                                                        <SelectItem value="Manager">Manager</SelectItem>
+                                                        <SelectItem value="Viewer">Viewer</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="user-status">Status</Label>
+                                                <Select
+                                                    value={userFormData.status}
+                                                    onValueChange={(value) =>
+                                                        setUserFormData({ ...userFormData, status: value })
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select status" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Active">Active</SelectItem>
+                                                        <SelectItem value="Inactive">Inactive</SelectItem>
+                                                        <SelectItem value="Suspended">Suspended</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="flex justify-end space-x-2 pt-4">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={closeUserDialog}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button type="submit">
+                                                    {editingUser ? "Update" : "Create"}
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+
+                            {/* Users Table */}
+                            <div className="border rounded-lg overflow-hidden">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-gray-50">
+                                            <TableHead className="w-12">
+                                                <Checkbox
+                                                    checked={selectedEmployees.size === filteredEmployees.length && filteredEmployees.length > 0}
+                                                    onCheckedChange={handleSelectAll}
+                                                />
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleSort('name')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Username
+                                                    {sortField === 'name' && (
+                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead>Email</TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleSort('department')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Role
+                                                    {sortField === 'department' && (
+                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Last Login</TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleSort('created_at')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Created
+                                                    {sortField === 'created_at' && (
+                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {users.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
+                                                    No users found
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            users.map((user, index) => {
+                                                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                                                const roleColors = {
+                                                    'Super Admin': 'bg-red-100 text-red-800',
+                                                    'Admin': 'bg-blue-100 text-blue-800',
+                                                    'Manager': 'bg-purple-100 text-purple-800',
+                                                    'Viewer': 'bg-gray-100 text-gray-800'
+                                                };
+                                                const statusColors = {
+                                                    'Active': 'bg-green-100 text-green-800',
+                                                    'Inactive': 'bg-yellow-100 text-yellow-800',
+                                                    'Suspended': 'bg-red-100 text-red-800'
+                                                };
+                                                
+                                                return (
+                                                    <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
+                                                        <TableCell>
+                                                            <Checkbox
+                                                                checked={selectedEmployees.has(user.id)}
+                                                                onCheckedChange={(checked) => handleSelectEmployee(user.id, checked as boolean)}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                                    <span className="text-sm font-medium text-purple-600">{initials}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="font-medium text-gray-900">{user.name}</div>
+                                                                    <div className="text-sm text-gray-500">@{user.email.split('@')[0]}</div>
+                                                                </div>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="text-gray-900">{user.email}</div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleColors[user.role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800'}`}>
+                                                                {user.role}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[user.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
+                                                                {user.status === 'Active' && <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>}
+                                                                {user.status}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="text-gray-900">{user.last_login || 'Never'}</div>
+                                                            <div className="text-sm text-gray-500">{new Date(user.created_at).toLocaleDateString()}</div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="text-gray-500">{new Date(user.created_at).toLocaleDateString()}</div>
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <div className="flex justify-end space-x-2">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => openUserDialog(user)}
+                                                                    className="group relative text-blue-600 hover:text-white border-blue-200 hover:border-blue-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
+                                                                >
+                                                                    <Edit className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="group relative text-amber-600 hover:text-white border-amber-200 hover:border-amber-500 hover:bg-gradient-to-r hover:from-amber-500 hover:to-amber-600 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25 hover:scale-105"
+                                                                >
+                                                                    <Shield className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                </Button>
+                                                                <AlertDialog>
+                                                                    <AlertDialogTrigger asChild>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            size="sm"
+                                                                            className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                        </Button>
+                                                                    </AlertDialogTrigger>
+                                                                    <AlertDialogContent>
+                                                                        <div className="flex flex-col items-center text-center space-y-4">
+                                                                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                                                                                <Trash2 className="h-6 w-6 text-red-600" />
+                                                                            </div>
+                                                                            <AlertDialogHeader>
+                                                                                <AlertDialogTitle className="text-lg font-semibold text-gray-900">
+                                                                                    Delete User Account
+                                                                                </AlertDialogTitle>
+                                                                                <AlertDialogDescription className="text-sm text-gray-500 max-w-sm">
+                                                                                    Are you sure you want to delete <span className="font-medium text-gray-900">{user.name}</span>? This action cannot be undone and will permanently remove their account and all associated data.
+                                                                                </AlertDialogDescription>
+                                                                            </AlertDialogHeader>
+                                                                            <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 w-full">
+                                                                                <AlertDialogCancel className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 border-gray-300 order-2 sm:order-1">
+                                                                                    Cancel
+                                                                                </AlertDialogCancel>
+                                                                                <AlertDialogAction
+                                                                                    onClick={() => handleDeleteUser(user.id)}
+                                                                                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2"
+                                                                                >
+                                                                                    <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
+                                                                                    Delete User
+                                                                                </AlertDialogAction>
+                                                                            </AlertDialogFooter>
+                                                                        </div>
+                                                                    </AlertDialogContent>
+                                                                </AlertDialog>
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                );
+                                            })
+                                        )}
+
+
+
+
+
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Bulk Actions */}
+                            {selectedEmployees.size > 0 && (
+                                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium text-blue-900">
+                                                {selectedEmployees.size} user{selectedEmployees.size > 1 ? 's' : ''} selected
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setIsBulkEditOpen(true)}
+                                                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                            >
+                                                <Edit className="h-4 w-4 mr-2" />
+                                                Bulk Edit
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="text-amber-600 border-amber-200 hover:bg-amber-50"
+                                            >
+                                                <Shield className="h-4 w-4 mr-2" />
+                                                Manage Permissions
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setIsBulkDeleteOpen(true)}
+                                                className="text-red-600 border-red-200 hover:bg-red-50"
+                                            >
+                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                Delete Selected
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Pagination */}
+                            <div className="mt-6">
+                                <Pagination
+                                    currentPage={pagination.state.currentPage}
+                                    totalPages={pagination.state.totalPages}
+                                    onPageChange={pagination.actions.setPage}
+                                    pageSize={pagination.state.pageSize}
+                                    totalItems={4}
+                                    onPageSizeChange={pagination.actions.setPageSize}
+                                    showFirstLast={true}
+                                    showPageSizeSelector={true}
+                                    pageSizeOptions={[5, 10, 20, 50]}
+                                    maxVisiblePages={5}
+                                    className="justify-center"
+                                />
                             </div>
                         </CardContent>
                     </Card>
