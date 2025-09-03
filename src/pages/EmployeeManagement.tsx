@@ -444,6 +444,15 @@ const EmployeeManagement = () => {
             <ArrowDown className="ml-2 h-4 w-4" />;
     };
 
+    const getUserSortIcon = (field: keyof User) => {
+        if (userSortField !== field) {
+            return <ArrowUpDown className="ml-2 h-4 w-4" />;
+        }
+        return userSortDirection === 'asc' ? 
+            <ArrowUp className="ml-2 h-4 w-4" /> : 
+            <ArrowDown className="ml-2 h-4 w-4" />;
+    };
+
     // User sorting functions
     const handleUserSort = (field: keyof User) => {
         if (userSortField === field) {
@@ -2595,71 +2604,65 @@ const EmployeeManagement = () => {
                                             <TableHead className="w-16 text-center">
                                                 No.
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('username')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('username')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Username
-                                                    {userSortField === 'username' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('username')}
+                                                </Button>
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('email')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('email')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Email
-                                                    {userSortField === 'email' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('email')}
+                                                </Button>
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('role')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('role')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Role
-                                                    {userSortField === 'role' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('role')}
+                                                </Button>
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('status')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('status')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Status
-                                                    {userSortField === 'status' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('status')}
+                                                </Button>
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('last_login')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('last_login')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Last Login
-                                                    {userSortField === 'last_login' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('last_login')}
+                                                </Button>
                                             </TableHead>
-                                            <TableHead 
-                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleUserSort('created_at')}
-                                            >
-                                                <div className="flex items-center gap-2">
+                                            <TableHead>
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => handleUserSort('created_at')}
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                >
                                                     Created
-                                                    {userSortField === 'created_at' && (
-                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                                                    )}
-                                                </div>
+                                                    {getUserSortIcon('created_at')}
+                                                </Button>
                                             </TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
