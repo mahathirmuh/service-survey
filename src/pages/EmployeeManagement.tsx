@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, ChevronUp, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -158,6 +158,10 @@ const EmployeeManagement = () => {
     const [sortField, setSortField] = useState<keyof Employee | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     
+    // User sorting state
+    const [userSortField, setUserSortField] = useState<keyof User | null>(null);
+    const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc');
+    
     const { toast } = useToast();
     const navigate = useNavigate();
 
@@ -179,14 +183,48 @@ const EmployeeManagement = () => {
     // Get current page data for submission view
     const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
     
+    // Sort users based on current sort field and direction
+    const sortedUsers = useMemo(() => {
+        if (!userSortField) return users;
+        
+        return [...users].sort((a, b) => {
+            let aValue = a[userSortField];
+            let bValue = b[userSortField];
+            
+            // Handle null/undefined values
+            if (aValue === null || aValue === undefined) aValue = '';
+            if (bValue === null || bValue === undefined) bValue = '';
+            
+            // Handle date fields
+            if (userSortField === 'created_at' || userSortField === 'last_login') {
+                aValue = new Date(aValue as string).getTime();
+                bValue = new Date(bValue as string).getTime();
+            }
+            
+            // Convert to string for comparison if not already
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                aValue = aValue.toLowerCase();
+                bValue = bValue.toLowerCase();
+            }
+            
+            if (aValue < bValue) {
+                return userSortDirection === 'asc' ? -1 : 1;
+            }
+            if (aValue > bValue) {
+                return userSortDirection === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+    }, [users, userSortField, userSortDirection]);
+    
     // Initialize pagination for user management
     const userPagination = usePagination({
-        totalItems: users.length,
+        totalItems: sortedUsers.length,
         initialPageSize: 10,
     });
     
     // Get current page data for user management
-    const currentPageUsers = userPagination.paginateData(users);
+    const currentPageUsers = userPagination.paginateData(sortedUsers);
 
     // Check authentication
     useEffect(() => {
@@ -401,6 +439,16 @@ const EmployeeManagement = () => {
         return sortDirection === 'asc' ? 
             <ArrowUp className="ml-2 h-4 w-4" /> : 
             <ArrowDown className="ml-2 h-4 w-4" />;
+    };
+
+    // User sorting functions
+    const handleUserSort = (field: keyof User) => {
+        if (userSortField === field) {
+            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setUserSortField(field);
+            setUserSortDirection('asc');
+        }
     };
 
     const resetForm = () => {
@@ -2327,45 +2375,73 @@ const EmployeeManagement = () => {
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-gray-50">
-                                            <TableHead className="w-12">
-                                                <Checkbox
-                                                    checked={selectedEmployees.size === filteredEmployees.length && filteredEmployees.length > 0}
-                                                    onCheckedChange={handleSelectAll}
-                                                />
+
+                                            <TableHead className="w-16 text-center">
+                                                No.
                                             </TableHead>
                                             <TableHead 
                                                 className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleSort('name')}
+                                                onClick={() => handleUserSort('username')}
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Username
-                                                    {sortField === 'name' && (
-                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    {userSortField === 'username' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                                                     )}
                                                 </div>
                                             </TableHead>
-                                            <TableHead>Email</TableHead>
                                             <TableHead 
                                                 className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleSort('department')}
+                                                onClick={() => handleUserSort('email')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Email
+                                                    {userSortField === 'email' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleUserSort('role')}
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Role
-                                                    {sortField === 'department' && (
-                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    {userSortField === 'role' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                                                     )}
                                                 </div>
                                             </TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Last Login</TableHead>
                                             <TableHead 
                                                 className="cursor-pointer hover:bg-gray-100 transition-colors"
-                                                onClick={() => handleSort('created_at')}
+                                                onClick={() => handleUserSort('status')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Status
+                                                    {userSortField === 'status' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleUserSort('last_login')}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    Last Login
+                                                    {userSortField === 'last_login' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                            <TableHead 
+                                                className="cursor-pointer hover:bg-gray-100 transition-colors"
+                                                onClick={() => handleUserSort('created_at')}
                                             >
                                                 <div className="flex items-center gap-2">
                                                     Created
-                                                    {sortField === 'created_at' && (
-                                                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                                                    {userSortField === 'created_at' && (
+                                                        userSortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                                                     )}
                                                 </div>
                                             </TableHead>
@@ -2395,11 +2471,9 @@ const EmployeeManagement = () => {
                                 
                                 return (
                                     <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={selectedEmployees.has(user.id)}
-                                                onCheckedChange={(checked) => handleSelectEmployee(user.id, checked as boolean)}
-                                            />
+
+                                        <TableCell className="text-center text-sm text-gray-500">
+                                            {(userPagination.state.currentPage - 1) * userPagination.state.pageSize + index + 1}
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
