@@ -2380,7 +2380,7 @@ const EmployeeManagement = () => {
                                             </TableRow>
                                         ) : (
                                             currentPageUsers.map((user, index) => {
-                                                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                                                const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
                                                 const roleColors = {
                                                     'Admin': 'bg-blue-100 text-blue-800',
                                                     'Manager': 'bg-purple-100 text-purple-800',
@@ -2406,8 +2406,8 @@ const EmployeeManagement = () => {
                                                                     <span className="text-sm font-medium text-purple-600">{initials}</span>
                                                                 </div>
                                                                 <div>
-                                                                    <div className="font-medium text-gray-900">{user.name}</div>
-                                                                    <div className="text-sm text-gray-500">@{user.email.split('@')[0]}</div>
+                                                                    <div className="font-medium text-gray-900">{user.name || 'Unknown User'}</div>
+                                                                    <div className="text-sm text-gray-500">@{user.email ? user.email.split('@')[0] : 'no-email'}</div>
                                                                 </div>
                                                             </div>
                                                         </TableCell>
