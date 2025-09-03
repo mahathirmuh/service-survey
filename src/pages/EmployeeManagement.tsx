@@ -177,6 +177,15 @@ const EmployeeManagement = () => {
     
     // Get current page data for submission view
     const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
+    
+    // Initialize pagination for user management
+    const userPagination = usePagination({
+        totalItems: users.length,
+        initialPageSize: 10,
+    });
+    
+    // Get current page data for user management
+    const currentPageUsers = userPagination.paginateData(users);
 
     // Check authentication
     useEffect(() => {
@@ -2363,14 +2372,14 @@ const EmployeeManagement = () => {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {users.length === 0 ? (
+                                        {currentPageUsers.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                                                     No users found
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            users.map((user, index) => {
+                                            currentPageUsers.map((user, index) => {
                                                 const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
                                                 const roleColors = {
                                                     'Admin': 'bg-blue-100 text-blue-800',
@@ -2537,12 +2546,12 @@ const EmployeeManagement = () => {
                             {/* Pagination */}
                             <div className="mt-6">
                                 <Pagination
-                                    currentPage={pagination.state.currentPage}
-                                    totalPages={pagination.state.totalPages}
-                                    onPageChange={pagination.actions.setPage}
-                                    pageSize={pagination.state.pageSize}
-                                    totalItems={4}
-                                    onPageSizeChange={pagination.actions.setPageSize}
+                                    currentPage={userPagination.state.currentPage}
+                                    totalPages={userPagination.state.totalPages}
+                                    onPageChange={userPagination.actions.setPage}
+                                    pageSize={userPagination.state.pageSize}
+                                    totalItems={users.length}
+                                    onPageSizeChange={userPagination.actions.setPageSize}
                                     showFirstLast={true}
                                     showPageSizeSelector={true}
                                     pageSizeOptions={[5, 10, 20, 50]}
