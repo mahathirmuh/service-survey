@@ -2516,13 +2516,7 @@ const EmployeeManagement = () => {
                                                                 >
                                                                     <Edit className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                                                                 </Button>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="group relative text-amber-600 hover:text-white border-amber-200 hover:border-amber-500 hover:bg-gradient-to-r hover:from-amber-500 hover:to-amber-600 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25 hover:scale-105"
-                                                                >
-                                                                    <Shield className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                                                                </Button>
+
                                                                 <AlertDialog>
                                                                     <AlertDialogTrigger asChild>
                                                                         <Button
