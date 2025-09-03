@@ -64,7 +64,8 @@ interface Employee {
 
 interface User {
     id: string;
-    name: string;
+    username: string;
+    name?: string;
     email: string;
     password: string;
     role: string;
@@ -136,7 +137,7 @@ const EmployeeManagement = () => {
     const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [userFormData, setUserFormData] = useState({
-        name: "",
+        username: "",
         email: "",
         password: "",
         role: "Admin",
@@ -268,7 +269,7 @@ const EmployeeManagement = () => {
         try {
             const { data: usersData, error } = await supabase
                 .from("admin_users")
-                .select("*")
+                .select("id, username, email, password, role, status, last_login, created_at")
                 .order("created_at", { ascending: false });
 
             if (error) {
@@ -432,7 +433,7 @@ const EmployeeManagement = () => {
     // User form functions
     const resetUserForm = () => {
         setUserFormData({
-            name: "",
+            username: "",
             email: "",
             password: "",
             role: "Admin",
@@ -445,7 +446,7 @@ const EmployeeManagement = () => {
         if (user) {
             setEditingUser(user);
             setUserFormData({
-                name: user.name,
+                username: user.username || "",
                 email: user.email,
                 password: "", // Don't populate password for security
                 role: user.role,
@@ -469,7 +470,7 @@ const EmployeeManagement = () => {
             if (editingUser) {
                 // Update existing user
                 const updateData: any = {
-                    name: userFormData.name,
+                    username: userFormData.username,
                     email: userFormData.email,
                     role: userFormData.role,
                     status: userFormData.status,
@@ -496,7 +497,7 @@ const EmployeeManagement = () => {
                 const { error } = await supabase
                     .from('admin_users')
                     .insert({
-                        name: userFormData.name,
+                        username: userFormData.username,
                         email: userFormData.email,
                         password: userFormData.password,
                         role: userFormData.role,
@@ -2196,13 +2197,13 @@ const EmployeeManagement = () => {
                                         </DialogHeader>
                                         <form onSubmit={handleUserSubmit} className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="user-name">Full Name</Label>
+                                                <Label htmlFor="user-username">Username</Label>
                                                 <Input
-                                                    id="user-name"
-                                                    placeholder="Enter full name"
-                                                    value={userFormData.name}
+                                                    id="user-username"
+                                                    placeholder="Enter username"
+                                                    value={userFormData.username}
                                                     onChange={(e) =>
-                                                        setUserFormData({ ...userFormData, name: e.target.value })
+                                                        setUserFormData({ ...userFormData, username: e.target.value })
                                                     }
                                                     required
                                                 />
@@ -2380,37 +2381,37 @@ const EmployeeManagement = () => {
                                             </TableRow>
                                         ) : (
                                             currentPageUsers.map((user, index) => {
-                                                const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
-                                                const roleColors = {
-                                                    'Admin': 'bg-blue-100 text-blue-800',
-                                                    'Manager': 'bg-purple-100 text-purple-800',
-                                                    'Viewer': 'bg-gray-100 text-gray-800'
-                                                };
-                                                const statusColors = {
-                                                    'Active': 'bg-green-100 text-green-800',
-                                                    'Inactive': 'bg-yellow-100 text-yellow-800',
-                                                    'Suspended': 'bg-red-100 text-red-800'
-                                                };
-                                                
-                                                return (
-                                                    <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={selectedEmployees.has(user.id)}
-                                                                onCheckedChange={(checked) => handleSelectEmployee(user.id, checked as boolean)}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                                                                    <span className="text-sm font-medium text-purple-600">{initials}</span>
-                                                                </div>
-                                                                <div>
-                                                                    <div className="font-medium text-gray-900">{user.name || 'Unknown User'}</div>
-                                                                    <div className="text-sm text-gray-500">@{user.email ? user.email.split('@')[0] : 'no-email'}</div>
-                                                                </div>
-                                                            </div>
-                                                        </TableCell>
+                                const initials = user.username ? user.username.split('_').map(n => n[0]).join('').toUpperCase() : 'U';
+                                const roleColors = {
+                                    'Admin': 'bg-blue-100 text-blue-800',
+                                    'Manager': 'bg-purple-100 text-purple-800',
+                                    'Viewer': 'bg-gray-100 text-gray-800'
+                                };
+                                const statusColors = {
+                                    'Active': 'bg-green-100 text-green-800',
+                                    'Inactive': 'bg-yellow-100 text-yellow-800',
+                                    'Suspended': 'bg-red-100 text-red-800'
+                                };
+                                
+                                return (
+                                    <TableRow key={user.id} className="hover:bg-gray-50 transition-colors">
+                                        <TableCell>
+                                            <Checkbox
+                                                checked={selectedEmployees.has(user.id)}
+                                                onCheckedChange={(checked) => handleSelectEmployee(user.id, checked as boolean)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                                                    <span className="text-sm font-medium text-purple-600">{initials}</span>
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{user.username || 'Unknown User'}</div>
+                                                    <div className="text-sm text-gray-500">@{user.username || (user.email ? user.email.split('@')[0] : 'no-username')}</div>
+                                                </div>
+                                            </div>
+                                        </TableCell>
                                                         <TableCell>
                                                             <div className="text-gray-900">{user.email}</div>
                                                         </TableCell>

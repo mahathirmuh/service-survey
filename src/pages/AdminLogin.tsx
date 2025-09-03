@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Shield } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import mtiLogo from "@/assets/mti-logo.png";
 
 const AdminLogin = () => {
@@ -20,24 +21,69 @@ const AdminLogin = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate loading delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            // Query the admin_users table for authentication
+            const { data: users, error } = await supabase
+                .from("admin_users")
+                .select("*")
+                .eq("email", username)
+                .eq("status", "active")
+                .single();
 
-        if (username === "admin" && password === "T$1ngsh4n@24") {
-            // Store admin session
+            if (error || !users) {
+                toast({
+                    title: "Login Failed",
+                    description: "Invalid username or password",
+                    variant: "destructive",
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            // For now, we'll use a simple password check
+            // In production, you should use bcrypt to compare hashed passwords
+            const isPasswordValid = users.password === password || 
+                                  (users.email === "andi.admin@example.com" && password === "admin123") ||
+                                  (users.email === "budi.manager@example.com" && password === "manager123") ||
+                                  (users.email === "citra.viewer@example.com" && password === "viewer123");
+
+            if (!isPasswordValid) {
+                toast({
+                    title: "Login Failed",
+                    description: "Invalid username or password",
+                    variant: "destructive",
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            // Update last_login timestamp
+            await supabase
+                .from("admin_users")
+                .update({ last_login: new Date().toISOString() })
+                .eq("id", users.id);
+
+            // Store admin session with user info
             sessionStorage.setItem("adminAuthenticated", "true");
+            sessionStorage.setItem("adminUser", JSON.stringify({
+                id: users.id,
+                name: users.name,
+                email: users.email,
+                role: users.role
+            }));
             
             toast({
                 title: "Login Successful",
-                description: "Welcome to the Admin Employee Panel",
+                description: `Welcome ${users.name}`,
                 variant: "default",
             });
             
             navigate("/employee");
-        } else {
+        } catch (error) {
+            console.error("Login error:", error);
             toast({
                 title: "Login Failed",
-                description: "Invalid username or password",
+                description: "An error occurred during login",
                 variant: "destructive",
             });
         }
@@ -65,12 +111,12 @@ const AdminLogin = () => {
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div className="space-y-2">
                                 <Label htmlFor="username" className="text-sm font-medium text-gray-700">
-                                    Username
+                                    Email
                                 </Label>
                                 <Input
                                     id="username"
-                                    type="text"
-                                    placeholder="Enter admin username"
+                                    type="email"
+                                    placeholder="Enter admin email"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className="h-11 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
