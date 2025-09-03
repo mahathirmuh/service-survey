@@ -65,7 +65,6 @@ interface Employee {
 interface User {
     id: string;
     username: string;
-    name?: string;
     email: string;
     password: string;
     role: string;
@@ -304,11 +303,14 @@ const EmployeeManagement = () => {
 
     // Fetch users from admin_users table
     const fetchUsers = async () => {
+        console.log("Starting fetchUsers...");
         try {
             const { data: usersData, error } = await supabase
-                .from("admin_users")
-                .select("id, username, email, password, role, status, last_login, created_at")
-                .order("created_at", { ascending: false });
+            .from("admin_users")
+            .select("id, username, email, password, role, status, last_login, created_at")
+            .order("created_at", { ascending: false });
+
+            console.log("Supabase response:", { usersData, error });
 
             if (error) {
                 console.error("Error fetching users:", error);
@@ -323,6 +325,7 @@ const EmployeeManagement = () => {
                 last_login: user.last_login ? formatRelativeTime(user.last_login) : "Never"
             }));
 
+            console.log("Formatted users:", formattedUsers);
             setUsers(formattedUsers);
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -514,14 +517,135 @@ const EmployeeManagement = () => {
     const handleUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
+        // Validate required fields
+        if (!userFormData.username.trim()) {
+            toast({
+                title: "Validation Error",
+                description: "Username is required",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        if (!userFormData.email.trim()) {
+            toast({
+                title: "Validation Error",
+                description: "Email is required",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(userFormData.email)) {
+            toast({
+                title: "Validation Error",
+                description: "Please enter a valid email address",
+                variant: "destructive",
+            });
+            return;
+        }
+        
+        // For new users, validate password requirements
+        if (!editingUser) {
+            if (!userFormData.password.trim()) {
+                toast({
+                    title: "Validation Error",
+                    description: "Password is required for new users",
+                    variant: "destructive",
+                });
+                return;
+            }
+            
+            const passwordValidation = validatePasswordStrength(userFormData.password);
+            if (passwordValidation.strength === 'weak') {
+                toast({
+                    title: "Weak Password",
+                    description: "Password must be at least 8 characters with uppercase, lowercase, number, and special character",
+                    variant: "destructive",
+                });
+                return;
+            }
+        }
+        
+        // For existing users, validate password if provided
+        if (editingUser && userFormData.password.trim()) {
+            const passwordValidation = validatePasswordStrength(userFormData.password);
+            if (passwordValidation.strength === 'weak') {
+                toast({
+                    title: "Weak Password",
+                    description: "Password must be at least 8 characters with uppercase, lowercase, number, and special character",
+                    variant: "destructive",
+                });
+                return;
+            }
+        }
+        
         try {
             if (editingUser) {
+                // Check for duplicate username/email (excluding current user)
+                const { data: existingUsers } = await supabase
+                    .from('admin_users')
+                    .select('id, username, email')
+                    .neq('id', editingUser.id)
+                    .or(`username.eq.${userFormData.username},email.eq.${userFormData.email}`);
+                
+                if (existingUsers && existingUsers.length > 0) {
+                    const duplicateUsername = existingUsers.find(u => u.username === userFormData.username);
+                    const duplicateEmail = existingUsers.find(u => u.email === userFormData.email);
+                    
+                    if (duplicateUsername) {
+                        toast({
+                            title: "Validation Error",
+                            description: "Username already exists",
+                            variant: "destructive",
+                        });
+                        return;
+                    }
+                    
+                    if (duplicateEmail) {
+                        toast({
+                            title: "Validation Error",
+                            description: "Email already exists",
+                            variant: "destructive",
+                        });
+                        return;
+                    }
+                }
+                
                 // Update existing user
+                // Normalize role and status values to lowercase to prevent check constraint violations
+                const normalizedRole = userFormData.role.toLowerCase();
+                const normalizedStatus = userFormData.status.toLowerCase();
+                
+                // Validate normalized values
+                const allowedRoles = ['admin', 'manager', 'viewer'];
+                const allowedStatuses = ['active', 'inactive'];
+                
+                if (!allowedRoles.includes(normalizedRole)) {
+                    toast({
+                        title: "Validation Error",
+                        description: `Invalid role. Allowed values: ${allowedRoles.join(', ')}`,
+                        variant: "destructive",
+                    });
+                    return;
+                }
+                
+                if (!allowedStatuses.includes(normalizedStatus)) {
+                    toast({
+                        title: "Validation Error",
+                        description: `Invalid status. Allowed values: ${allowedStatuses.join(', ')}`,
+                        variant: "destructive",
+                    });
+                    return;
+                }
+                
                 const updateData: any = {
                     username: userFormData.username,
                     email: userFormData.email,
-                    role: userFormData.role,
-                    status: userFormData.status,
+                    role: normalizedRole,
+                    status: normalizedStatus,
                 };
                 
                 // Only include password if it's provided
@@ -541,20 +665,113 @@ const EmployeeManagement = () => {
                     description: "User updated successfully",
                 });
             } else {
+                // Check for duplicate username/email for new users
+                const { data: existingUsers } = await supabase
+                    .from('admin_users')
+                    .select('username, email')
+                    .or(`username.eq.${userFormData.username},email.eq.${userFormData.email}`);
+                
+                if (existingUsers && existingUsers.length > 0) {
+                    const duplicateUsername = existingUsers.find(u => u.username === userFormData.username);
+                    const duplicateEmail = existingUsers.find(u => u.email === userFormData.email);
+                    
+                    if (duplicateUsername) {
+                        toast({
+                            title: "Validation Error",
+                            description: "Username already exists",
+                            variant: "destructive",
+                        });
+                        return;
+                    }
+                    
+                    if (duplicateEmail) {
+                        toast({
+                            title: "Validation Error",
+                            description: "Email already exists",
+                            variant: "destructive",
+                        });
+                        return;
+                    }
+                }
+                
                 // Create new user
-                const { error } = await supabase
+                // Normalize role and status values to lowercase to prevent check constraint violations
+                const normalizedRole = userFormData.role.toLowerCase();
+                const normalizedStatus = userFormData.status.toLowerCase();
+                
+                // Validate normalized values
+                const allowedRoles = ['admin', 'manager', 'viewer'];
+                const allowedStatuses = ['active', 'inactive'];
+                
+                if (!allowedRoles.includes(normalizedRole)) {
+                    toast({
+                        title: "Validation Error",
+                        description: `Invalid role. Allowed values: ${allowedRoles.join(', ')}`,
+                        variant: "destructive",
+                    });
+                    return;
+                }
+                
+                if (!allowedStatuses.includes(normalizedStatus)) {
+                    toast({
+                        title: "Validation Error",
+                        description: `Invalid status. Allowed values: ${allowedStatuses.join(', ')}`,
+                        variant: "destructive",
+                    });
+                    return;
+                }
+                
+                console.log('Creating user with data:', {
+                    username: userFormData.username,
+                    email: userFormData.email,
+                    role: normalizedRole,
+                    status: normalizedStatus
+                });
+                
+                const { data, error } = await supabase
                     .from('admin_users')
                     .insert({
                         username: userFormData.username,
                         email: userFormData.email,
                         password: userFormData.password,
-                        role: userFormData.role,
-                        status: userFormData.status,
+                        role: normalizedRole,
+                        status: normalizedStatus,
                         created_at: new Date().toISOString(),
                         last_login: null
-                    });
+                    })
+                    .select();
                 
-                if (error) throw error;
+                console.log('Insert result:', { data, error });
+                
+                if (error) {
+                    console.error('Supabase error:', error);
+                    
+                    // Handle specific database errors
+                    if (error.code === '23505') { // Unique constraint violation
+                        if (error.message.includes('username')) {
+                            toast({
+                                title: "Error",
+                                description: "Username already exists",
+                                variant: "destructive",
+                            });
+                        } else if (error.message.includes('email')) {
+                            toast({
+                                title: "Error",
+                                description: "Email already exists",
+                                variant: "destructive",
+                            });
+                        } else {
+                            toast({
+                                title: "Error",
+                                description: "User with this information already exists",
+                                variant: "destructive",
+                            });
+                        }
+                        return;
+                    }
+                    
+                    throw error;
+                }
                 
                 toast({
                     title: "Success",
@@ -2349,7 +2566,6 @@ const EmployeeManagement = () => {
                                                     <SelectContent>
                                                         <SelectItem value="Active">Active</SelectItem>
                                                         <SelectItem value="Inactive">Inactive</SelectItem>
-                                                        <SelectItem value="Suspended">Suspended</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -2457,7 +2673,7 @@ const EmployeeManagement = () => {
                                             </TableRow>
                                         ) : (
                                             currentPageUsers.map((user, index) => {
-                                const initials = user.username ? user.username.split('_').map(n => n[0]).join('').toUpperCase() : 'U';
+                                const initials = user.username ? user.username.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
                                 const roleColors = {
                                     'Admin': 'bg-blue-100 text-blue-800',
                                     'Manager': 'bg-purple-100 text-purple-800',
