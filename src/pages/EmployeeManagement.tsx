@@ -271,7 +271,7 @@ const EmployeeManagement = () => {
                         name: "John Doe",
                         email: "john.doe@company.com",
                         password: "••••••••",
-                        role: "Super Admin",
+                        role: "Admin",
                         status: "Active",
                         last_login: "2 hours ago",
                         created_at: "2025-01-15T10:30:00Z"
@@ -2217,7 +2217,6 @@ const EmployeeManagement = () => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All Roles</SelectItem>
-                                            <SelectItem value="Super Admin">Super Admin</SelectItem>
                                             <SelectItem value="Admin">Admin</SelectItem>
                                             <SelectItem value="Manager">Manager</SelectItem>
                                             <SelectItem value="Viewer">Viewer</SelectItem>
@@ -2329,7 +2328,6 @@ const EmployeeManagement = () => {
                                                         <SelectValue placeholder="Select role" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Super Admin">Super Admin</SelectItem>
                                                         <SelectItem value="Admin">Admin</SelectItem>
                                                         <SelectItem value="Manager">Manager</SelectItem>
                                                         <SelectItem value="Viewer">Viewer</SelectItem>
@@ -2432,7 +2430,6 @@ const EmployeeManagement = () => {
                                             users.map((user, index) => {
                                                 const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
                                                 const roleColors = {
-                                                    'Super Admin': 'bg-red-100 text-red-800',
                                                     'Admin': 'bg-blue-100 text-blue-800',
                                                     'Manager': 'bg-purple-100 text-purple-800',
                                                     'Viewer': 'bg-gray-100 text-gray-800'
