@@ -2482,7 +2482,6 @@ const EmployeeManagement = () => {
                                                 </div>
                                                 <div>
                                                     <div className="font-medium text-gray-900">{user.username || 'Unknown User'}</div>
-                                                    <div className="text-sm text-gray-500">@{user.username || (user.email ? user.email.split('@')[0] : 'no-username')}</div>
                                                 </div>
                                             </div>
                                         </TableCell>
