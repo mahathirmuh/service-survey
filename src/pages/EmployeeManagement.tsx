@@ -2471,7 +2471,7 @@ const EmployeeManagement = () => {
                                         </DialogHeader>
                                         <form onSubmit={handleUserSubmit} className="space-y-4">
                                             <div className="space-y-2">
-                                                <Label htmlFor="user-username">Username</Label>
+                                                <Label htmlFor="user-username">Name</Label>
                                                 <Input
                                                     id="user-username"
                                                     placeholder="Enter username"
@@ -2695,14 +2695,7 @@ const EmployeeManagement = () => {
                                             {(userPagination.state.currentPage - 1) * userPagination.state.pageSize + index + 1}
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                                                    <span className="text-sm font-medium text-purple-600">{initials}</span>
-                                                </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{user.username || 'Unknown User'}</div>
-                                                </div>
-                                            </div>
+                                            <div className="font-medium text-gray-900">{user.username || 'Unknown User'}</div>
                                         </TableCell>
                                                         <TableCell>
                                                             <div className="text-gray-900">{user.email}</div>
