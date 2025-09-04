@@ -9,7 +9,7 @@ import { Eye, EyeOff, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import mtiLogo from "@/assets/mti-logo.png";
 
-const AdminLogin = () => {
+const UserLogin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -179,4 +179,4 @@ const AdminLogin = () => {
     );
 };
 
-export default AdminLogin;
+export default UserLogin;

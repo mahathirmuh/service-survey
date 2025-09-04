@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Index from "./pages/Index";
 import SurveyResults from "./pages/SurveyResults";
-import AdminLogin from "./pages/AdminLogin";
+import UserLogin from "./pages/UserLogin";
 import EmployeeManagement from "./pages/EmployeeManagement";
 import Submission from "./pages/Submission";
 import NotFound from "./pages/NotFound";
@@ -22,7 +22,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/login" element={<AdminLogin />} />
+            <Route path="/login" element={<UserLogin />} />
             <Route path="/employee" element={<EmployeeManagement />} />
             <Route path="/user-management" element={<EmployeeManagement />} />
             <Route path="/submission" element={<Submission />} />
