@@ -506,7 +506,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('id_badge_number')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Badge Number
                                                             {getSortIcon('id_badge_number')}
@@ -516,7 +516,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('name')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Name
                                                             {getSortIcon('name')}
@@ -526,7 +526,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('department')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Department
                                                             {getSortIcon('department')}
@@ -536,7 +536,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('level')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Level
                                                             {getSortIcon('level')}
@@ -546,7 +546,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('status')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Status
                                                             {getSortIcon('status')}
@@ -556,7 +556,7 @@ const Submission = () => {
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => handleSort('created_at')}
-                                                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                            className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                         >
                                                             Created At
                                                             {getSortIcon('created_at')}

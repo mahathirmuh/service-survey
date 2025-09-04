@@ -2210,7 +2210,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('id_badge_number')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         ID Badge
                                                         {getSortIcon('id_badge_number')}
@@ -2220,7 +2220,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('name')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         Name
                                                         {getSortIcon('name')}
@@ -2230,7 +2230,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('email')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         Email
                                                         {getSortIcon('email')}
@@ -2240,7 +2240,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('department')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         Department
                                                         {getSortIcon('department')}
@@ -2250,7 +2250,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('level')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         Level
                                                         {getSortIcon('level')}
@@ -2260,7 +2260,7 @@ const EmployeeManagement = () => {
                                                     <Button
                                                         variant="ghost"
                                                         onClick={() => handleSort('created_at')}
-                                                        className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                        className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                     >
                                                         Created At
                                                         {getSortIcon('created_at')}
@@ -2626,7 +2626,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('username')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Name
                                                     {getUserSortIcon('username')}
@@ -2636,7 +2636,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('email')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Email
                                                     {getUserSortIcon('email')}
@@ -2646,7 +2646,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('role')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Role
                                                     {getUserSortIcon('role')}
@@ -2656,7 +2656,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('status')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Status
                                                     {getUserSortIcon('status')}
@@ -2666,7 +2666,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('last_login')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Last Login
                                                     {getUserSortIcon('last_login')}
@@ -2676,7 +2676,7 @@ const EmployeeManagement = () => {
                                                 <Button
                                                     variant="ghost"
                                                     onClick={() => handleUserSort('created_at')}
-                                                    className="h-auto p-0 font-semibold hover:bg-transparent"
+                                                    className="h-auto p-0 font-semibold hover:bg-transparent text-gray-700 hover:text-gray-900"
                                                 >
                                                     Created
                                                     {getUserSortIcon('created_at')}
