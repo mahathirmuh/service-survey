@@ -94,6 +94,7 @@ const EmployeeManagement = () => {
     const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
     const [selectedLevel, setSelectedLevel] = useState<string>("all");
     const [submissionFilter, setSubmissionFilter] = useState<string>("all");
+    const [selectedRole, setSelectedRole] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -140,8 +141,8 @@ const EmployeeManagement = () => {
         username: "",
         email: "",
         password: "",
-        role: "Admin",
-        status: "Active",
+        role: "admin",
+        status: "active",
     });
     
     // Bulk selection state
@@ -183,11 +184,31 @@ const EmployeeManagement = () => {
     // Get current page data for submission view
     const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
     
+    // Filter users based on search term and selected role
+    const filteredUsers = useMemo(() => {
+        let filtered = users;
+        
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter((user) =>
+                user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        
+        // Filter by role
+        if (selectedRole !== "all") {
+            filtered = filtered.filter((user) => user.role === selectedRole);
+        }
+        
+        return filtered;
+    }, [users, searchTerm, selectedRole]);
+    
     // Sort users based on current sort field and direction
     const sortedUsers = useMemo(() => {
-        if (!userSortField) return users;
+        if (!userSortField) return filteredUsers;
         
-        return [...users].sort((a, b) => {
+        return [...filteredUsers].sort((a, b) => {
             let aValue = a[userSortField];
             let bValue = b[userSortField];
             
@@ -215,7 +236,7 @@ const EmployeeManagement = () => {
             }
             return 0;
         });
-    }, [users, userSortField, userSortDirection]);
+    }, [filteredUsers, userSortField, userSortDirection]);
     
     // Initialize pagination for user management
     const userPagination = usePagination({
@@ -497,8 +518,8 @@ const EmployeeManagement = () => {
             username: "",
             email: "",
             password: "",
-            role: "Admin",
-            status: "Active",
+            role: "admin",
+            status: "active",
         });
         setEditingUser(null);
         setShowUserPassword(false);
@@ -2440,15 +2461,15 @@ const EmployeeManagement = () => {
                                             className="pl-10 w-full sm:w-64"
                                         />
                                     </div>
-                                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                                    <Select value={selectedRole} onValueChange={setSelectedRole}>
                                         <SelectTrigger className="w-full sm:w-48">
                                             <SelectValue placeholder="Filter by role" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="all">All Roles</SelectItem>
-                                            <SelectItem value="Admin">Admin</SelectItem>
-                                            <SelectItem value="Manager">Manager</SelectItem>
-                                            <SelectItem value="Viewer">Viewer</SelectItem>
+                                            <SelectItem value="admin">Admin</SelectItem>
+                                            <SelectItem value="manager">Manager</SelectItem>
+                                            <SelectItem value="viewer">Viewer</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -2573,9 +2594,9 @@ const EmployeeManagement = () => {
                                                         <SelectValue placeholder="Select role" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Admin">Admin</SelectItem>
-                                                        <SelectItem value="Manager">Manager</SelectItem>
-                                                        <SelectItem value="Viewer">Viewer</SelectItem>
+                                                        <SelectItem value="admin">Admin</SelectItem>
+                                                        <SelectItem value="manager">Manager</SelectItem>
+                                                        <SelectItem value="viewer">Viewer</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -2591,8 +2612,8 @@ const EmployeeManagement = () => {
                                                         <SelectValue placeholder="Select status" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="Active">Active</SelectItem>
-                                                        <SelectItem value="Inactive">Inactive</SelectItem>
+                                                        <SelectItem value="active">Active</SelectItem>
+                                                        <SelectItem value="inactive">Inactive</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </div>
@@ -2696,14 +2717,14 @@ const EmployeeManagement = () => {
                                             currentPageUsers.map((user, index) => {
                                 const initials = user.username ? user.username.split(' ').map(n => n[0]).join('').toUpperCase() : 'U';
                                 const roleColors = {
-                                    'Admin': 'bg-blue-100 text-blue-800',
-                                    'Manager': 'bg-purple-100 text-purple-800',
-                                    'Viewer': 'bg-gray-100 text-gray-800'
+                                    'admin': 'bg-blue-100 text-blue-800',
+                                    'manager': 'bg-purple-100 text-purple-800',
+                                    'viewer': 'bg-gray-100 text-gray-800'
                                 };
                                 const statusColors = {
-                                    'Active': 'bg-green-100 text-green-800',
-                                    'Inactive': 'bg-yellow-100 text-yellow-800',
-                                    'Suspended': 'bg-red-100 text-red-800'
+                                    'active': 'bg-green-100 text-green-800',
+                                    'inactive': 'bg-yellow-100 text-yellow-800',
+                                    'suspended': 'bg-red-100 text-red-800'
                                 };
                                 
                                 return (
@@ -2725,7 +2746,7 @@ const EmployeeManagement = () => {
                                                         </TableCell>
                                                         <TableCell>
                                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[user.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'}`}>
-                                                                {user.status === 'Active' && <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>}
+                                                                {user.status === 'active' && <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>}
                                                                 {user.status}
                                                             </span>
                                                         </TableCell>
