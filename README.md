@@ -12,6 +12,9 @@ This application enables employees to evaluate different departments within thei
 - **Section-Based Evaluation**: Each department contains multiple specialized sections for targeted feedback
 - **Visual Performance Charts**: Interactive charts displaying department performance metrics
 - **Employee Validation**: ID badge number validation against employee database
+- **Role-Based Access Control**: Admin, Manager, and Viewer roles with different permission levels
+- **User Management System**: Complete user administration with status filtering and role management
+- **Survey Results Dashboard**: Comprehensive analytics and data export capabilities
 - **Responsive Design**: Mobile-friendly interface with modern UI components
 - **Real-time Data**: Live survey submission and data storage
 - **Professional Layout**: Clean, intuitive design with proper spacing and typography
@@ -30,8 +33,9 @@ This application enables employees to evaluate different departments within thei
 
 ### Prerequisites
 
-- **Node.js** (v16 or higher) - [Install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Node.js** (v18 or higher) - [Install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 - **npm** or **bun** package manager
+- **Supabase Account** - For database and authentication
 - **Docker** (optional, for containerized deployment)
 
 ### Installation & Setup
@@ -56,7 +60,7 @@ npm run dev
 bun run dev
 ```
 
-The application will be available at `http://localhost:5173`
+The application will be available at `http://localhost:5173` (or `http://localhost:8082` if using alternative port)
 
 #### Option 2: Docker Development
 
@@ -100,20 +104,31 @@ The application will be available at `http://localhost:3000`
 src/
 ├── components/          # React components
 │   ├── SurveyForm.tsx  # Main survey form component
-│   └── ui/             # Reusable UI components
+│   ├── EmployeeManagement/ # User management components
+│   └── ui/             # Reusable UI components (shadcn/ui)
 ├── data/
 │   └── images.ts       # Department and section configurations
 ├── assets/             # Images and static files
 ├── hooks/              # Custom React hooks
 ├── lib/                # Utility functions
 ├── pages/              # Page components
+│   ├── Index.tsx       # Main survey page
+│   ├── EmployeeManagement.tsx # User management dashboard
+│   ├── SurveyResults.tsx # Results and analytics
+│   ├── Submission.tsx  # Survey submission page
+│   └── UserLogin.tsx   # Authentication page
+├── types/              # TypeScript type definitions
+├── utils/              # Utility functions
 └── integrations/       # External service integrations
+    └── supabase/       # Supabase configuration
 ```
 
 ### Key Files to Modify
 
 - **`src/data/images.ts`**: Department configurations, sections, and content
 - **`src/components/SurveyForm.tsx`**: Main survey form logic and UI
+- **`src/pages/EmployeeManagement.tsx`**: User management and administration
+- **`src/pages/SurveyResults.tsx`**: Results dashboard and analytics
 - **`src/assets/`**: Department images and charts
 - **`supabase/migrations/`**: Database schema changes
 - **`mssql-schema.sql`**: MSSQL database alternative
@@ -135,11 +150,13 @@ src/
 - **Frontend Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
+- **UI Components**: shadcn/ui (Radix UI primitives)
 - **Database**: Supabase (PostgreSQL) / MSSQL Server
+- **Authentication**: Supabase Auth with role-based access control
 - **Containerization**: Docker & Docker Compose
-- **State Management**: React Hooks
-- **Form Handling**: Custom form validation
+- **State Management**: React Hooks with Context API
+- **Form Handling**: Custom form validation with TypeScript
+- **Charts**: Custom chart components for data visualization
 
 ## 📱 Features in Detail
 
@@ -151,6 +168,18 @@ src/
 5. **Visual Charts**: View department performance metrics
 6. **Submission**: Save responses to database
 
+### Administrative Features
+- **User Management**: Add, edit, and manage system users with role assignments
+- **Status Filtering**: Filter users by active/inactive status
+- **Role-Based Access**: Different permission levels for Admin, Manager, and Viewer roles
+- **Survey Analytics**: Comprehensive results dashboard with export capabilities
+- **Data Export**: CSV export functionality for survey results (role-restricted)
+
+### Role Permissions
+- **Admin**: Full access to all features including user management
+- **Manager**: Access to survey results and data export, no user management
+- **Viewer**: Read-only access to survey results, no export capabilities
+
 ### UI/UX Features
 - Responsive design for all screen sizes
 - Professional color scheme and typography
@@ -158,6 +187,7 @@ src/
 - Visual performance charts
 - Form validation and error handling
 - Loading states and user feedback
+- Modern shadcn/ui component library
 
 ## 🚢 Deployment
 
