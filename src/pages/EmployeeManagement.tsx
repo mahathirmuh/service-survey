@@ -2513,7 +2513,7 @@ const EmployeeManagement = () => {
                                                     placeholder="user@company.com"
                                                     value={userFormData.email}
                                                     onChange={(e) =>
-                                                        setUserFormData({ ...userFormData, email: e.target.value })
+                                                        setUserFormData({ ...userFormData, email: e.target.value.toLowerCase() })
                                                     }
                                                     required
                                                 />
