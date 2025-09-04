@@ -330,7 +330,7 @@ const EmployeeManagement = () => {
             const { data: usersData, error } = await supabase
             .from("admin_users")
             .select("id, username, email, password, role, status, last_login, created_at")
-            .order("created_at", { ascending: false });
+            .order("created_at", { ascending: true });
 
             console.log("Supabase response:", { usersData, error });
 
