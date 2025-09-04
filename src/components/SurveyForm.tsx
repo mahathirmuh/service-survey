@@ -166,6 +166,7 @@ const SurveyForm = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [idError, setIdError] = useState("");
+    const [emailError, setEmailError] = useState("");
     const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
     const { toast } = useToast();
 
@@ -180,6 +181,7 @@ const SurveyForm = () => {
 
     const validateEmployeeData = async (idBadge?: string, email?: string) => {
         setIdError("");
+        setEmailError("");
         const cleanIdBadge = (idBadge || formData.idBadgeNumber).replace(/\s/g, "").toUpperCase();
         const cleanEmail = (email || formData.email).trim();
         
@@ -195,7 +197,7 @@ const SurveyForm = () => {
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(cleanEmail)) {
-            setIdError("Please enter a valid email address");
+            setEmailError("Please enter a valid email address");
             return;
         }
         
@@ -216,7 +218,7 @@ const SurveyForm = () => {
                 
                 // Check if email matches the employee record
                 if (employee.email && employee.email.toLowerCase() !== cleanEmail.toLowerCase()) {
-                    setIdError(
+                    setEmailError(
                         "Email address does not match the registered email for this ID Badge Number. Please verify both fields."
                     );
                     return;
@@ -1037,16 +1039,16 @@ const SurveyForm = () => {
                                             value={formData.email}
                                             onChange={(e) => validateEmail(e.target.value)}
                                             className={`h-11 transition-colors duration-200 focus-visible:ring-0 focus-visible:ring-offset-0 ${
-                                                formData.email.trim() === ""
-                                                    ? "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
-                                                    : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
-                                                        ? "border-green-400 bg-green-50 focus:border-green-500 focus-visible:border-green-500"
-                                                        : "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                                emailError
+                                                    ? "border-destructive focus:border-destructive focus-visible:border-destructive"
+                                                    : formData.email.trim() === ""
+                                                        ? "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
+                                                        : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
+                                                            ? "border-green-400 bg-green-50 focus:border-green-500 focus-visible:border-green-500"
+                                                            : "border-red-400 bg-red-50 focus:border-red-500 focus-visible:border-red-500"
                                             }`}
                                         />
-                                        {formData.email.trim() !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim()) && (
-                                            <p className="text-sm text-destructive animate-fade-in">Please enter a valid email address</p>
-                                        )}
+                                        {emailError && <p className="text-sm text-destructive animate-fade-in">{emailError}</p>}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="name" className="text-sm font-medium">
