@@ -43,7 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, ChevronUp, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock } from "lucide-react";
+import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, ChevronUp, Grid3X3, ArrowUpDown, ArrowUp, ArrowDown, Settings, FolderOpen, List, Lock, Eye, EyeOff } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -135,6 +135,7 @@ const EmployeeManagement = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [showUserPassword, setShowUserPassword] = useState(false);
     const [userFormData, setUserFormData] = useState({
         username: "",
         email: "",
@@ -500,6 +501,7 @@ const EmployeeManagement = () => {
             status: "Active",
         });
         setEditingUser(null);
+        setShowUserPassword(false);
     };
 
     const openUserDialog = (user?: User) => {
@@ -2497,16 +2499,32 @@ const EmployeeManagement = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <Label htmlFor="user-password">Password</Label>
-                                                <Input
-                                                    id="user-password"
-                                                    type="password"
-                                                    placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"}
-                                                    value={userFormData.password}
-                                                    onChange={(e) =>
-                                                        setUserFormData({ ...userFormData, password: e.target.value })
-                                                    }
-                                                    required={!editingUser}
-                                                />
+                                                <div className="relative">
+                                                    <Input
+                                                        id="user-password"
+                                                        type={showUserPassword ? "text" : "password"}
+                                                        placeholder={editingUser ? "Leave blank to keep current password" : "Enter password"}
+                                                        value={userFormData.password}
+                                                        onChange={(e) =>
+                                                            setUserFormData({ ...userFormData, password: e.target.value })
+                                                        }
+                                                        className="pr-10"
+                                                        required={!editingUser}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="absolute right-0 top-0 h-10 px-3 py-2 hover:bg-transparent"
+                                                        onClick={() => setShowUserPassword(!showUserPassword)}
+                                                    >
+                                                        {showUserPassword ? (
+                                                            <EyeOff className="h-4 w-4 text-gray-400" />
+                                                        ) : (
+                                                            <Eye className="h-4 w-4 text-gray-400" />
+                                                        )}
+                                                    </Button>
+                                                </div>
                                                 {userFormData.password && (
                                                     <div className="space-y-2">
                                                         <div className="flex items-center gap-2">
