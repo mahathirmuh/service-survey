@@ -95,6 +95,7 @@ const EmployeeManagement = () => {
     const [selectedLevel, setSelectedLevel] = useState<string>("all");
     const [submissionFilter, setSubmissionFilter] = useState<string>("all");
     const [selectedRole, setSelectedRole] = useState<string>("all");
+    const [selectedStatus, setSelectedStatus] = useState<string>("all");
     const [isLoading, setIsLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -200,7 +201,7 @@ const EmployeeManagement = () => {
     // Get current page data for submission view
     const currentPageSubmissions = submissionPagination.paginateData(filteredEmployees);
     
-    // Filter users based on search term and selected role
+    // Filter users based on search term, selected role, and selected status
     const filteredUsers = useMemo(() => {
         let filtered = users;
         
@@ -217,8 +218,13 @@ const EmployeeManagement = () => {
             filtered = filtered.filter((user) => user.role === selectedRole);
         }
         
+        // Filter by status
+        if (selectedStatus !== "all") {
+            filtered = filtered.filter((user) => user.status === selectedStatus);
+        }
+        
         return filtered;
-    }, [users, searchTerm, selectedRole]);
+    }, [users, searchTerm, selectedRole, selectedStatus]);
     
     // Sort users based on current sort field and direction
     const sortedUsers = useMemo(() => {
@@ -2488,6 +2494,16 @@ const EmployeeManagement = () => {
                                             <SelectItem value="admin">Admin</SelectItem>
                                             <SelectItem value="manager">Manager</SelectItem>
                                             <SelectItem value="viewer">Viewer</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                        <SelectTrigger className="w-full sm:w-48">
+                                            <SelectValue placeholder="Filter by status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All Status</SelectItem>
+                                            <SelectItem value="active">Active</SelectItem>
+                                            <SelectItem value="inactive">Inactive</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
