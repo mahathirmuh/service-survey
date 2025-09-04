@@ -2610,7 +2610,7 @@ const EmployeeManagement = () => {
                                                     onClick={() => handleUserSort('username')}
                                                     className="h-auto p-0 font-semibold hover:bg-transparent"
                                                 >
-                                                    Username
+                                                    Name
                                                     {getUserSortIcon('username')}
                                                 </Button>
                                             </TableHead>
