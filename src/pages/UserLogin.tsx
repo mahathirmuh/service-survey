@@ -65,16 +65,17 @@ const UserLogin = () => {
 
             // Store admin session with user info
             sessionStorage.setItem("adminAuthenticated", "true");
+            const displayName = user.name || user.username || user.email.split('@')[0];
             sessionStorage.setItem("adminUser", JSON.stringify({
                 id: user.id,
-                name: user.name,
+                name: displayName,
                 email: user.email,
                 role: user.role
             }));
             
             toast({
                 title: "Login Successful",
-                description: `Welcome ${user.name}`,
+                description: `Welcome ${displayName}`,
                 variant: "default",
             });
             
