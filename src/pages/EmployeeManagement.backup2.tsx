@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import {
     Dialog,
     DialogContent,
@@ -88,6 +89,7 @@ const departments = [
 ];
 
 const EmployeeManagement = () => {
+    const { user } = useAuth();
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -103,22 +105,6 @@ const EmployeeManagement = () => {
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const [resultsExpanded, setResultsExpanded] = useState(false);
     const [menuManagementExpanded, setMenuManagementExpanded] = useState(false);
-    
-    // Get current user role from session storage
-    const getCurrentUserRole = () => {
-        try {
-            const adminUser = sessionStorage.getItem("adminUser");
-            if (adminUser) {
-                const user = JSON.parse(adminUser);
-                return user.role?.toLowerCase() || 'viewer';
-            }
-        } catch (error) {
-            console.error('Error parsing admin user from session storage:', error);
-        }
-        return 'viewer';
-    };
-    
-    const currentUserRole = getCurrentUserRole();
     const [activeMenuItem, setActiveMenuItem] = useState(() => {
         // Check current path and URL parameters
         const currentPath = window.location.pathname;
@@ -565,6 +551,16 @@ const EmployeeManagement = () => {
     const handleUserSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
+        // Check permissions - only admin can create/edit users
+        if (user?.role !== 'admin') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to manage users",
+                variant: "destructive",
+            });
+            return;
+        }
+        
         // Validate required fields
         if (!userFormData.username.trim()) {
             toast({
@@ -840,6 +836,16 @@ const EmployeeManagement = () => {
     };
 
     const handleDeleteUser = async (userId: string) => {
+        // Check permissions - only admin can delete users
+        if (user?.role !== 'admin') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to delete users",
+                variant: "destructive",
+            });
+            return;
+        }
+
         try {
             const { error } = await supabase
                 .from('admin_users')
@@ -924,6 +930,16 @@ const EmployeeManagement = () => {
     };
 
     const handleBulkDelete = async () => {
+        // Check permissions - only admin and manager can delete employees
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to delete employees",
+                variant: "destructive",
+            });
+            return;
+        }
+
         try {
             const selectedIds = Array.from(selectedEmployees);
             
@@ -954,6 +970,16 @@ const EmployeeManagement = () => {
     };
 
     const handleBulkEdit = async () => {
+        // Check permissions - only admin and manager can edit employees
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to edit employees",
+                variant: "destructive",
+            });
+            return;
+        }
+
         try {
             const selectedIds = Array.from(selectedEmployees);
             const updateData: any = {};
@@ -1035,6 +1061,16 @@ const EmployeeManagement = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Check permissions - only admin and manager can create/edit employees
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to modify employee data",
+                variant: "destructive",
+            });
+            return;
+        }
 
         // Validate required fields
         if (!formData.name.trim()) {
@@ -1141,6 +1177,16 @@ const EmployeeManagement = () => {
     };
 
     const handleDelete = async (employee: Employee) => {
+        // Check permissions - only admin and manager can delete employees
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to delete employees",
+                variant: "destructive",
+            });
+            return;
+        }
+
         try {
             console.log("🗑️ Starting deletion for employee:", employee.id_badge_number);
             
@@ -1190,6 +1236,16 @@ const EmployeeManagement = () => {
 
     // Excel Export Function
     const handleExportToExcel = () => {
+        // Check permissions - only admin and manager can export employee data
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to export employee data",
+                variant: "destructive",
+            });
+            return;
+        }
+
         try {
             // Prepare data for export
             const exportData = employees.map(emp => ({
@@ -1338,6 +1394,16 @@ const EmployeeManagement = () => {
 
     // Excel Import Function
     const handleImportFromExcel = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // Check permissions - only admin and manager can import employees
+        if (user?.role === 'viewer') {
+            toast({
+                title: "Access Denied",
+                description: "You don't have permission to import employee data",
+                variant: "destructive",
+            });
+            return;
+        }
+
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -1739,8 +1805,8 @@ const EmployeeManagement = () => {
                             Submission
                         </button>
                         
-                        {/* 3. User Management - Hidden for Manager role */}
-                        {currentUserRole !== 'manager' && (
+                        {/* 3. User Management - Only visible to Admin and Manager */}
+                        {user?.role !== 'viewer' && (
                             <button
                                 onClick={() => {
                                     setActiveMenuItem("user-management");
@@ -2028,27 +2094,29 @@ const EmployeeManagement = () => {
                                         Export Excel
                                     </Button>
                                     
-                                    {/* Import Button */}
-                                    <div className="relative inline-block">
-                                        <input
-                                            type="file"
-                                            accept=".xlsx,.xls"
-                                            onChange={handleImportFromExcel}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                            disabled={isImporting}
-                                        />
-                                        <Button
-                                            variant="outline"
-                                            className="flex items-center gap-2 pointer-events-none"
-                                            disabled={isImporting}
-                                        >
-                                            <Upload className="h-4 w-4" />
-                                            {isImporting ? "Importing..." : "Import Excel"}
-                                        </Button>
-                                    </div>
+                                    {/* Import Button - Only for Admin and Manager */}
+                                    {user?.role !== 'viewer' && (
+                                        <div className="relative inline-block">
+                                            <input
+                                                type="file"
+                                                accept=".xlsx,.xls"
+                                                onChange={handleImportFromExcel}
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                disabled={isImporting}
+                                            />
+                                            <Button
+                                                variant="outline"
+                                                className="flex items-center gap-2 pointer-events-none"
+                                                disabled={isImporting}
+                                            >
+                                                <Upload className="h-4 w-4" />
+                                                {isImporting ? "Importing..." : "Import Excel"}
+                                            </Button>
+                                        </div>
+                                    )}
 
-                                    {/* Bulk Actions Toolbar */}
-                                    {selectedEmployees.size > 0 && (
+                                    {/* Bulk Actions Toolbar - Only for Admin and Manager */}
+                                    {selectedEmployees.size > 0 && user?.role !== 'viewer' && (
                                         <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-md">
                                             <span className="text-sm text-blue-700 font-medium">
                                                 {selectedEmployees.size} employee{selectedEmployees.size > 1 ? 's' : ''} selected
@@ -2082,14 +2150,15 @@ const EmployeeManagement = () => {
                                         </div>
                                     )}
 
-                                    {/* Add Employee Button */}
-                                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                        <DialogTrigger asChild>
-                                            <Button onClick={() => openDialog()} className="flex items-center gap-2">
-                                                <Plus className="h-4 w-4" />
-                                                Add Employee
-                                            </Button>
-                                         </DialogTrigger>
+                                    {/* Add Employee Button - Only for Admin and Manager */}
+                                    {user?.role !== 'viewer' && (
+                                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                            <DialogTrigger asChild>
+                                                <Button onClick={() => openDialog()} className="flex items-center gap-2">
+                                                    <Plus className="h-4 w-4" />
+                                                    Add Employee
+                                                </Button>
+                                             </DialogTrigger>
                                          <DialogContent className="sm:max-w-md">
                                         <DialogHeader>
                                             <DialogTitle>
@@ -2188,6 +2257,7 @@ const EmployeeManagement = () => {
                                         </form>
                                     </DialogContent>
                                 </Dialog>
+                                )}
                             </div>
                         </div>
 
@@ -2348,73 +2418,79 @@ const EmployeeManagement = () => {
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <div className="flex justify-end space-x-2">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => openDialog(employee)}
-                                                                >
-                                                                    <Edit className="h-4 w-4" />
-                                                                </Button>
-                                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
-                                                        >
-                                                            <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent className="sm:max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-orange-50/30 rounded-lg" />
-                                                        <div className="relative z-10">
-                                                            <AlertDialogHeader className="text-center pb-6">
-                                                                <div className="mx-auto mb-6 relative">
-                                                                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-full blur-xl opacity-20 animate-pulse" />
-                                                                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200 border-4 border-white shadow-lg">
-                                                                        <Trash2 className="h-10 w-10 text-red-600 animate-bounce" style={{animationDuration: '2s'}} />
-                                                                    </div>
-                                                                </div>
-                                                                <AlertDialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
-                                                                    Delete Employee
-                                                                </AlertDialogTitle>
-                                                                <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full mx-auto mb-4" />
-                                                                <AlertDialogDescription className="text-base text-gray-700 leading-relaxed">
-                                                                    Are you sure you want to delete{' '}
-                                                                    <span className="font-bold text-gray-900 px-2 py-1 bg-gray-100 rounded-md">{employee.name}</span>?
-                                                                    <br /><br />
-                                                                    <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-r-lg p-4 shadow-sm">
-                                                                        <div className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-ping" />
-                                                                        <div className="flex items-start space-x-3">
-                                                                            <div className="flex-shrink-0 p-1 bg-amber-100 rounded-full">
-                                                                                <Shield className="h-5 w-5 text-amber-600" />
+                                                                {/* Edit button - restricted for viewers */}
+                                                                {user?.role !== 'viewer' && (
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={() => openDialog(employee)}
+                                                                    >
+                                                                        <Edit className="h-4 w-4" />
+                                                                    </Button>
+                                                                )}
+                                                                {/* Delete button - restricted for viewers */}
+                                                                {user?.role !== 'viewer' && (
+                                                                    <AlertDialog>
+                                                                        <AlertDialogTrigger asChild>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                            </Button>
+                                                                        </AlertDialogTrigger>
+                                                                        <AlertDialogContent className="sm:max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
+                                                                            <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-orange-50/30 rounded-lg" />
+                                                                            <div className="relative z-10">
+                                                                                <AlertDialogHeader className="text-center pb-6">
+                                                                                    <div className="mx-auto mb-6 relative">
+                                                                                        <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-full blur-xl opacity-20 animate-pulse" />
+                                                                                        <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200 border-4 border-white shadow-lg">
+                                                                                            <Trash2 className="h-10 w-10 text-red-600 animate-bounce" style={{animationDuration: '2s'}} />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <AlertDialogTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                                                                                        Delete Employee
+                                                                                    </AlertDialogTitle>
+                                                                                    <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-red-600 rounded-full mx-auto mb-4" />
+                                                                                    <AlertDialogDescription className="text-base text-gray-700 leading-relaxed">
+                                                                                        Are you sure you want to delete{' '}
+                                                                                        <span className="font-bold text-gray-900 px-2 py-1 bg-gray-100 rounded-md">{employee.name}</span>?
+                                                                                        <br /><br />
+                                                                                        <div className="relative bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-r-lg p-4 shadow-sm">
+                                                                                            <div className="absolute top-2 right-2 w-2 h-2 bg-amber-400 rounded-full animate-ping" />
+                                                                                            <div className="flex items-start space-x-3">
+                                                                                                <div className="flex-shrink-0 p-1 bg-amber-100 rounded-full">
+                                                                                                    <Shield className="h-5 w-5 text-amber-600" />
+                                                                                                </div>
+                                                                                                <div className="flex-1">
+                                                                                                    <h4 className="text-sm font-semibold text-amber-800 mb-1">⚠️ Critical Warning</h4>
+                                                                                                    <p className="text-sm text-amber-700 leading-relaxed">
+                                                                                                        This action will <strong>permanently delete</strong> all survey responses associated with this employee. This operation is <strong>irreversible</strong> and cannot be undone.
+                                                                                                    </p>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </AlertDialogDescription>
+                                                                                </AlertDialogHeader>
+                                                                                <AlertDialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
+                                                                                    <AlertDialogCancel className="w-full sm:w-auto order-2 sm:order-1 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
+                                                                                        <span className="mr-2">✕</span>
+                                                                                        Cancel
+                                                                                    </AlertDialogCancel>
+                                                                                    <AlertDialogAction 
+                                                                                        onClick={() => handleDelete(employee)}
+                                                                                        className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2 transition-all duration-300 hover:scale-105 font-semibold"
+                                                                                    >
+                                                                                        <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
+                                                                                        Delete Employee
+                                                                                    </AlertDialogAction>
+                                                                                </AlertDialogFooter>
                                                                             </div>
-                                                                            <div className="flex-1">
-                                                                                <h4 className="text-sm font-semibold text-amber-800 mb-1">⚠️ Critical Warning</h4>
-                                                                                <p className="text-sm text-amber-700 leading-relaxed">
-                                                                                    This action will <strong>permanently delete</strong> all survey responses associated with this employee. This operation is <strong>irreversible</strong> and cannot be undone.
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter className="flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
-                                                                <AlertDialogCancel className="w-full sm:w-auto order-2 sm:order-1 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md">
-                                                                    <span className="mr-2">✕</span>
-                                                                    Cancel
-                                                                </AlertDialogCancel>
-                                                                <AlertDialogAction 
-                                                                    onClick={() => handleDelete(employee)}
-                                                                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2 transition-all duration-300 hover:scale-105 font-semibold"
-                                                                >
-                                                                    <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
-                                                                    Delete Employee
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </div>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
+                                                                        </AlertDialogContent>
+                                                                    </AlertDialog>
+                                                                )}  
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>
@@ -2491,16 +2567,19 @@ const EmployeeManagement = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button 
-                                            onClick={() => openUserDialog()}
-                                            className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
-                                        >
-                                            <Plus className="h-4 w-4 mr-2" />
-                                            Add New User
-                                        </Button>
-                                    </DialogTrigger>
+                                {/* Only admin users can create new users */}
+                {user?.role === 'admin' && (
+                    <div>
+                        <Dialog open={isUserDialogOpen} onOpenChange={setIsUserDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button 
+                                onClick={() => openUserDialog()}
+                                className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
+                            >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Add New User
+                            </Button>
+                        </DialogTrigger>
                                     <DialogContent className="sm:max-w-md">
                                         <DialogHeader>
                                             <DialogTitle>
@@ -2651,6 +2730,7 @@ const EmployeeManagement = () => {
                                     </DialogContent>
                                 </Dialog>
                             </div>
+                        )}
 
                             {/* Users Table */}
                             <div className="border rounded-lg overflow-hidden">
@@ -2777,53 +2857,58 @@ const EmployeeManagement = () => {
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             <div className="flex justify-end space-x-2">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => openUserDialog(user)}
-                                                                    className="group relative text-blue-600 hover:text-white border-blue-200 hover:border-blue-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
-                                                                >
-                                                                    <Edit className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                                                                </Button>
-
-                                                                <AlertDialog>
-                                                                    <AlertDialogTrigger asChild>
+                                                                {/* Only admin users can edit/delete users */}
+                                                                {user?.role === 'admin' && (
+                                                                    <>
                                                                         <Button
                                                                             variant="outline"
                                                                             size="sm"
-                                                                            className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
+                                                                            onClick={() => openUserDialog(user)}
+                                                                            className="group relative text-blue-600 hover:text-white border-blue-200 hover:border-blue-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105"
                                                                         >
-                                                                            <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                            <Edit className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                                                                         </Button>
-                                                                    </AlertDialogTrigger>
-                                                                    <AlertDialogContent>
-                                                                        <div className="flex flex-col items-center text-center space-y-4">
-                                                                            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                                                                                <Trash2 className="h-6 w-6 text-red-600" />
-                                                                            </div>
-                                                                            <AlertDialogHeader>
-                                                                                <AlertDialogTitle className="text-lg font-semibold text-gray-900">
-                                                                                    Delete User Account
-                                                                                </AlertDialogTitle>
-                                                                                <AlertDialogDescription className="text-sm text-gray-500 max-w-sm">
-                                                                                    Are you sure you want to delete <span className="font-medium text-gray-900">{user.name}</span>? This action cannot be undone and will permanently remove their account and all associated data.
-                                                                                </AlertDialogDescription>
-                                                                            </AlertDialogHeader>
-                                                                            <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 w-full">
-                                                                                <AlertDialogCancel className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 border-gray-300 order-2 sm:order-1">
-                                                                                    Cancel
-                                                                                </AlertDialogCancel>
-                                                                                <AlertDialogAction
-                                                                                    onClick={() => handleDeleteUser(user.id)}
-                                                                                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2"
+
+                                                                        <AlertDialog>
+                                                                            <AlertDialogTrigger asChild>
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    size="sm"
+                                                                                    className="group relative text-red-600 hover:text-white border-red-200 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25 hover:scale-105"
                                                                                 >
-                                                                                    <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
-                                                                                    Delete User
-                                                                                </AlertDialogAction>
-                                                                            </AlertDialogFooter>
+                                                                                    <Trash2 className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                                                                                </Button>
+                                                                            </AlertDialogTrigger>
+                                                                    </>)}
+                                                                <AlertDialogContent>
+                                                                    <div className="flex flex-col items-center text-center space-y-4">
+                                                                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                                                                            <Trash2 className="h-6 w-6 text-red-600" />
                                                                         </div>
-                                                                    </AlertDialogContent>
+                                                                        <AlertDialogHeader>
+                                                                            <AlertDialogTitle className="text-lg font-semibold text-gray-900">
+                                                                                Delete User Account
+                                                                            </AlertDialogTitle>
+                                                                            <AlertDialogDescription className="text-sm text-gray-500 max-w-sm">
+                                                                                Are you sure you want to delete <span className="font-medium text-gray-900">{user.name}</span>? This action cannot be undone and will permanently remove their account and all associated data.
+                                                                            </AlertDialogDescription>
+                                                                        </AlertDialogHeader>
+                                                                        <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 w-full">
+                                                                            <AlertDialogCancel className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-900 border-gray-300 order-2 sm:order-1">
+                                                                                Cancel
+                                                                            </AlertDialogCancel>
+                                                                            <AlertDialogAction
+                                                                                onClick={() => handleDeleteUser(user.id)}
+                                                                                className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white border-0 shadow-lg hover:shadow-xl hover:shadow-red-500/25 focus:ring-4 focus:ring-red-500/20 order-1 sm:order-2"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
+                                                                                Delete User
+                                                                            </AlertDialogAction>
+                                                                        </AlertDialogFooter>
+                                                                    </div>
+                                                                </AlertDialogContent>
                                                                 </AlertDialog>
+                                                                )}
                                                             </div>
                                                         </TableCell>
                                                     </TableRow>

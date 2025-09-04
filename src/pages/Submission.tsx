@@ -56,6 +56,22 @@ const Submission = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [activeMenuItem, setActiveMenuItem] = useState("submission");
     const [resultsExpanded, setResultsExpanded] = useState(false);
+    
+    // Get current user role from session storage
+    const getCurrentUserRole = () => {
+        try {
+            const adminUser = sessionStorage.getItem("adminUser");
+            if (adminUser) {
+                const user = JSON.parse(adminUser);
+                return user.role?.toLowerCase() || 'viewer';
+            }
+        } catch (error) {
+            console.error('Error parsing admin user from session storage:', error);
+        }
+        return 'viewer';
+    };
+    
+    const currentUserRole = getCurrentUserRole();
     const [searchTerm, setSearchTerm] = useState("");
     const [departmentFilter, setDepartmentFilter] = useState("all");
     const [levelFilter, setLevelFilter] = useState("all");
@@ -271,21 +287,23 @@ const Submission = () => {
                             Submission
                         </button>
                         
-                        {/* 3. User Management */}
-                        <button
-                            onClick={() => {
-                                setActiveMenuItem("user-management");
-                                navigate("/user-management");
-                            }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
-                                activeMenuItem === "user-management"
-                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
-                            }`}
-                        >
-                            <Users className="mr-3 h-5 w-5" />
-                            User Management
-                        </button>
+                        {/* 3. User Management - Hidden for Manager role */}
+                        {currentUserRole !== 'manager' && (
+                            <button
+                                onClick={() => {
+                                    setActiveMenuItem("user-management");
+                                    navigate("/user-management");
+                                }}
+                                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+                                    activeMenuItem === "user-management"
+                                        ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
+                                }`}
+                            >
+                                <Users className="mr-3 h-5 w-5" />
+                                User Management
+                            </button>
+                        )}
                         
                         {/* 4. Results Menu with Sub-items */}
                         <div className="space-y-1">

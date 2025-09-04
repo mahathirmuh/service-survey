@@ -116,6 +116,22 @@ const SurveyResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Get current user role from session storage
+  const getCurrentUserRole = () => {
+    try {
+      const adminUser = sessionStorage.getItem("adminUser");
+      if (adminUser) {
+        const user = JSON.parse(adminUser);
+        return user.role?.toLowerCase() || 'viewer';
+      }
+    } catch (error) {
+      console.error('Error parsing admin user from session storage:', error);
+    }
+    return 'viewer';
+  };
+
+  const currentUserRole = getCurrentUserRole();
+
   // Check authentication
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("adminAuthenticated");
@@ -792,20 +808,23 @@ const SurveyResults = () => {
               <FileText className="mr-3 h-5 w-5" />
               Submission
             </button>
-            <button
-              onClick={() => {
-                setActiveMenuItem("user-management");
-                navigate("/user-management");
-              }}
-              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
-                activeMenuItem === "user-management"
-                  ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
-              }`}
-            >
-              <Users className="mr-3 h-5 w-5" />
-              User Management
-            </button>
+            {/* User Management - Hidden for Manager role */}
+            {currentUserRole !== 'manager' && (
+              <button
+                onClick={() => {
+                  setActiveMenuItem("user-management");
+                  navigate("/user-management");
+                }}
+                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+                  activeMenuItem === "user-management"
+                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
+                }`}
+              >
+                <Users className="mr-3 h-5 w-5" />
+                User Management
+              </button>
+            )}
             {/* Results Menu with Sub-items */}
             <div>
               <button
@@ -965,10 +984,13 @@ const SurveyResults = () => {
                   <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </Button>
-                <Button onClick={exportResults} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export CSV
-                </Button>
+                {/* Export CSV - Hidden for Viewer role */}
+                {currentUserRole !== 'viewer' && (
+                  <Button onClick={exportResults} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
+                )}
               </div>
             </div>
 
