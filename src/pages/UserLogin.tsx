@@ -23,14 +23,14 @@ const UserLogin = () => {
 
         try {
             // Query the admin_users table for authentication
-            const { data: users, error } = await supabase
+            const { data: user, error } = await supabase
                 .from("admin_users")
                 .select("*")
                 .eq("email", username)
                 .eq("status", "active")
                 .single();
 
-            if (error || !users) {
+            if (error || !user) {
                 toast({
                     title: "Login Failed",
                     description: "Invalid username or password",
@@ -42,10 +42,10 @@ const UserLogin = () => {
 
             // For now, we'll use a simple password check
             // In production, you should use bcrypt to compare hashed passwords
-            const isPasswordValid = users.password === password || 
-                                  (users.email === "andi.admin@example.com" && password === "admin123") ||
-                                  (users.email === "budi.manager@example.com" && password === "manager123") ||
-                                  (users.email === "citra.viewer@example.com" && password === "viewer123");
+            const isPasswordValid = user.password === password || 
+                                  (user.email === "andi.admin@example.com" && password === "admin123") ||
+                                  (user.email === "budi.manager@example.com" && password === "manager123") ||
+                                  (user.email === "citra.viewer@example.com" && password === "viewer123");
 
             if (!isPasswordValid) {
                 toast({
@@ -61,20 +61,20 @@ const UserLogin = () => {
             await supabase
                 .from("admin_users")
                 .update({ last_login: new Date().toISOString() })
-                .eq("id", users.id);
+                .eq("id", user.id);
 
             // Store admin session with user info
             sessionStorage.setItem("adminAuthenticated", "true");
             sessionStorage.setItem("adminUser", JSON.stringify({
-                id: users.id,
-                name: users.name,
-                email: users.email,
-                role: users.role
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
             }));
             
             toast({
                 title: "Login Successful",
-                description: `Welcome ${users.name}`,
+                description: `Welcome ${user.name}`,
                 variant: "default",
             });
             

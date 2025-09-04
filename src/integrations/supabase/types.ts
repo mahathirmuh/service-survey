@@ -1,6 +1,45 @@
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          id: string;
+          name: string;
+          username: string;
+          email: string;
+          password: string;
+          role: string;
+          status: string;
+          last_login: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          username: string;
+          email: string;
+          password: string;
+          role: string;
+          status: string;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          username?: string;
+          email?: string;
+          password?: string;
+          role?: string;
+          status?: string;
+          last_login?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       employees: {
         Row: {
           id: string;
