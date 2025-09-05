@@ -37,6 +37,7 @@ import {
   PieChart,
   Pie,
   Cell,
+  Legend,
   LineChart,
   Line
 } from "recharts";
@@ -101,7 +102,17 @@ interface OverallStats {
   lowestRatedSection: string;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+// Enhanced color palette for better accessibility and visual appeal
+const COLORS = [
+  '#3B82F6', // Blue - Professional and trustworthy
+  '#10B981', // Emerald - Success and growth
+  '#F59E0B', // Amber - Attention and energy
+  '#EF4444', // Red - Urgency and importance
+  '#8B5CF6', // Violet - Innovation and creativity
+  '#06B6D4', // Cyan - Fresh and modern
+  '#F97316', // Orange - Warmth and enthusiasm
+  '#84CC16'  // Lime - Nature and balance
+];
 
 const SurveyResults = () => {
   const [surveyData, setSurveyData] = useState<SurveyResponse[]>([]);
@@ -1157,10 +1168,16 @@ const SurveyResults = () => {
                     {/* Department Response Distribution */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>Response Distribution by Department</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                          Response Distribution by Department
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Survey participation across different departments
+                        </p>
                       </CardHeader>
                       <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
+                        <ResponsiveContainer width="100%" height={350}>
                           <PieChart>
                             <Pie
                               data={departmentStats.map((dept, index) => ({
@@ -1171,16 +1188,42 @@ const SurveyResults = () => {
                               cx="50%"
                               cy="50%"
                               labelLine={false}
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              outerRadius={80}
-                              fill="#8884d8"
+                              label={({ name, percent, value }) => 
+                                percent > 5 ? `${name}\n${(percent * 100).toFixed(1)}%` : ''
+                              }
+                              outerRadius={100}
+                              innerRadius={40}
+                              paddingAngle={2}
                               dataKey="value"
                             >
                               {departmentStats.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Cell 
+                                  key={`cell-${index}`} 
+                                  fill={COLORS[index % COLORS.length]}
+                                  stroke="#ffffff"
+                                  strokeWidth={2}
+                                />
                               ))}
                             </Pie>
-                            <Tooltip />
+                            <Tooltip 
+                              formatter={(value, name) => [
+                                `${value} responses (${((value as number) / departmentStats.reduce((sum, dept) => sum + dept.totalResponses, 0) * 100).toFixed(1)}%)`,
+                                'Department'
+                              ]}
+                              labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                              contentStyle={{ 
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                              }}
+                            />
+                            <Legend 
+                              verticalAlign="bottom" 
+                              height={36}
+                              iconType="circle"
+                              wrapperStyle={{ paddingTop: '20px' }}
+                            />
                           </PieChart>
                         </ResponsiveContainer>
                       </CardContent>
@@ -1189,30 +1232,97 @@ const SurveyResults = () => {
                     {/* Average Ratings by Department */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>Average Ratings by Department</CardTitle>
+                        <CardTitle className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+                          Average Ratings by Department
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Performance comparison across departments (Scale: 1-5)
+                        </p>
                       </CardHeader>
                       <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={departmentStats}>
-                            <CartesianGrid strokeDasharray="3 3" />
+                        <ResponsiveContainer width="100%" height={350}>
+                          <BarChart 
+                            data={departmentStats}
+                            margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                          >
+                            <defs>
+                              <linearGradient id="ratingGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>
+                                <stop offset="100%" stopColor="#1E40AF" stopOpacity={0.6}/>
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid 
+                              strokeDasharray="3 3" 
+                              stroke="#e5e7eb" 
+                              opacity={0.7}
+                            />
                             <XAxis 
                               dataKey="department" 
                               angle={-45}
                               textAnchor="end"
                               height={100}
+                              fontSize={12}
+                              stroke="#6b7280"
+                              tick={{ fill: '#6b7280' }}
                             />
-                            <YAxis domain={[0, 5]} />
+                            <YAxis 
+                              domain={[0, 5]} 
+                              fontSize={12}
+                              stroke="#6b7280"
+                              tick={{ fill: '#6b7280' }}
+                              label={{ 
+                                value: 'Average Rating', 
+                                angle: -90, 
+                                position: 'insideLeft',
+                                style: { textAnchor: 'middle', fill: '#6b7280', fontSize: '12px' }
+                              }}
+                            />
                             <Tooltip 
                               formatter={(value, name) => {
                                 if (name === 'averageRating') {
-                                  return [value.toFixed(2), 'averageRating'];
+                                  const rating = value as number;
+                                  const color = rating >= 4.5 ? '#10B981' : rating >= 3.5 ? '#F59E0B' : '#EF4444';
+                                  return [
+                                    <span style={{ color, fontWeight: 'bold' }}>
+                                      {rating.toFixed(2)} / 5.00
+                                    </span>, 
+                                    'Average Rating'
+                                  ];
                                 }
                                 return [value, name];
                               }}
+                              labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                              contentStyle={{ 
+                                backgroundColor: '#ffffff',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                              }}
                             />
-                            <Bar dataKey="averageRating" fill="#8884d8" />
+                            <Bar 
+                              dataKey="averageRating" 
+                              fill="url(#ratingGradient)"
+                              radius={[4, 4, 0, 0]}
+                              stroke="#1E40AF"
+                              strokeWidth={1}
+                            />
                           </BarChart>
                         </ResponsiveContainer>
+                        <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
+                           <div className="flex items-center gap-2">
+                             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                             <span>Excellent (4.5+)</span>
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                             <span>Good (3.5-4.4)</span>
+                           </div>
+                           <div className="flex items-center gap-2">
+                             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                             <span>Needs Improvement (&lt;3.5)</span>
+                           </div>
+                         </div>
                       </CardContent>
                     </Card>
                   </div>
