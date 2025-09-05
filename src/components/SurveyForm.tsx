@@ -602,8 +602,18 @@ const SurveyForm = () => {
                         }
                     });
             });
-            const { error } = await supabase.from("survey_responses").insert(insertData);
-            if (error) throw error;
+            // Try to insert with email first, fallback without email if column doesn't exist
+            let { error } = await supabase.from("survey_responses").insert(insertData);
+            
+            // If email column doesn't exist, try without it
+            if (error && (error.code === "PGRS7204" || error.message?.includes("Could not find the 'email' column"))) {
+                console.warn("Email column not found, inserting without email field");
+                const { email, ...insertDataWithoutEmail } = insertData;
+                const { error: retryError } = await supabase.from("survey_responses").insert(insertDataWithoutEmail);
+                if (retryError) throw retryError;
+            } else if (error) {
+                throw error;
+            }
             
             // Update employee status to 'Submitted'
             const { error: updateError } = await supabase
@@ -638,6 +648,23 @@ const SurveyForm = () => {
             }, 2000);
         } catch (error: any) {
             console.error("Error submitting survey:", error);
+            
+            // Handle missing email column error (database schema issue)
+            if (error?.code === "PGRS7204" || error?.message?.includes("Could not find the 'email' column")) {
+                toast({
+                    title: "Database Configuration Error",
+                    description: (
+                        <div>
+                            <p>There's a database configuration issue. Please contact the system administrator.</p>
+                            <p className="text-xs mt-2 text-muted-foreground">Error: Missing email column in survey_responses table</p>
+                        </div>
+                    ),
+                    variant: "destructive",
+                });
+                setIsSubmitting(false);
+                return;
+            }
+            
             /*
               If error code 23502 (NOT NULL violation),
               show missing questions instead of generic error.
