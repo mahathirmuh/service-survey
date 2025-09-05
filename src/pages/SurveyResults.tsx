@@ -70,10 +70,12 @@ interface SurveyResponse {
   level?: string;
   employee_department?: string;
   employee_name?: string;
+  employee_email?: string;
   employees?: {
     level: string;
     department: string;
     name: string;
+    email?: string;
   };
   [key: string]: any;
 }
@@ -244,19 +246,21 @@ const SurveyResults = () => {
           employees!inner(
             level,
             department,
-            name
+            name,
+            email
           )
         `)
         .order("created_at", { ascending: false });
 
       if (surveyError) throw surveyError;
 
-      // Transform data to include level from employees table
+      // Transform data to include level and email from employees table
       const enrichedData = (surveyData || []).map(response => ({
         ...response,
         level: response.employees?.level || 'Non Managerial',
         employee_department: response.employees?.department || response.department,
-        employee_name: response.employees?.name || response.name
+        employee_name: response.employees?.name || response.name,
+        employee_email: response.employees?.email || ''
       }));
 
       // Filter data based on current level filter
@@ -598,6 +602,7 @@ const SurveyResults = () => {
     const headers = [
       "Name",
       "ID Badge", 
+      "Email Address",
       "Department",
       "Submission Date",
       "Overall Average Rating",
@@ -666,6 +671,7 @@ const SurveyResults = () => {
         const row = [
           `"${response.name}"`,
           response.id_badge_number,
+          `"${response.employee_email || 'N/A'}"`,
           `"${response.department}"`,
           new Date(response.created_at).toLocaleDateString(),
           overallRating.toFixed(2),
