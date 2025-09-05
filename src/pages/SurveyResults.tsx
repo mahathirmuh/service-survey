@@ -753,7 +753,7 @@ const SurveyResults = () => {
     : departmentStats.filter(dept => dept.department === selectedDepartment);
 
   return (
-    <div className="h-screen bg-gray-100 overflow-hidden">
+    <div className="min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -956,7 +956,7 @@ const SurveyResults = () => {
           </div>
         </div>
 
-        <div className="w-full p-6 pt-24">
+        <div className="w-full p-6 pt-24 overflow-y-auto">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1331,7 +1331,12 @@ const SurveyResults = () => {
                             {new Date(response.created_at).toLocaleDateString()}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(response.created_at).toLocaleTimeString()}
+                            {new Date(response.created_at).toLocaleTimeString('en-US', { 
+                              hour12: false, 
+                              hour: '2-digit', 
+                              minute: '2-digit', 
+                              second: '2-digit' 
+                            })}
                           </p>
                         </div>
                       </div>
