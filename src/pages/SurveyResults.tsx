@@ -238,42 +238,79 @@ const SurveyResults = () => {
       console.log("🔄 Fetching survey data...");
       setLoading(true);
       
-      // Get all survey responses with employee level information using JOIN
+      // Get all survey responses with employee level information using LEFT JOIN on id_badge_number
+      // This ensures ALL survey responses are included, even if no matching employee record exists
+      // Using manual approach since there's no foreign key constraint
       const { data: surveyData, error: surveyError } = await supabase
         .from("survey_responses")
         .select(`
-          *,
-          employees!inner(
-            level,
-            department,
-            name,
-            email
-          )
+          *
         `)
         .order("created_at", { ascending: false });
 
       if (surveyError) throw surveyError;
 
+      // Manually fetch employee data for each survey response
+       const enrichedSurveyData = [];
+       for (const response of surveyData || []) {
+         const { data: employeeData } = await supabase
+           .from("employees")
+           .select("level, department, name, email")
+           .eq("id_badge_number", response.id_badge_number)
+           .single();
+         
+         enrichedSurveyData.push({
+           ...response,
+           employees: employeeData || null
+         });
+       }
+
+       console.log("📊 Raw survey responses from database:", surveyData?.length || 0);
+      
       // Transform data to include level and email from employees table
-      const enrichedData = (surveyData || []).map(response => ({
+      const enrichedData = (enrichedSurveyData || []).map(response => ({
         ...response,
-        level: response.employees?.level || 'Non Managerial',
+        level: (response.employees?.level || 'Non Managerial').replace('Non-Managerial', 'Non Managerial'),
         employee_department: response.employees?.department || response.department,
         employee_name: response.employees?.name || response.name,
         employee_email: response.employees?.email || ''
       }));
 
+      console.log("📊 Enriched survey responses:", enrichedData?.length || 0);
+      
+      // Log level distribution
+      const levelCounts = enrichedData.reduce((acc, response) => {
+        acc[response.level] = (acc[response.level] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      console.log("📊 Level distribution:", levelCounts);
+      
+      // Count responses without matching employee records
+      const responsesWithoutEmployeeMatch = enrichedData.filter(response => !response.employees).length;
+      if (responsesWithoutEmployeeMatch > 0) {
+        console.log("⚠️  Survey responses without matching employee records:", responsesWithoutEmployeeMatch);
+      }
+
       // Filter data based on current level filter
       let filteredData = enrichedData;
       if (levelFilter !== 'all') {
-        filteredData = enrichedData.filter(response => response.level === levelFilter);
+        console.log(`🔍 Filtering by level: "${levelFilter}"`);
+        filteredData = enrichedData.filter(response => {
+          // Handle both formats: 'Non Managerial' and 'Non-Managerial'
+          if (levelFilter === 'Non Managerial') {
+            return response.level === 'Non Managerial' || response.level === 'Non-Managerial';
+          }
+          return response.level === levelFilter;
+        });
+        console.log(`🔍 Filtered results: ${filteredData.length} out of ${enrichedData.length}`);
       }
 
-      console.log("📊 Fetched survey responses:", filteredData?.length || 0, "(Level filter:", levelFilter, ")");
+      console.log("📊 Final filtered survey responses:", filteredData?.length || 0, "(Level filter:", levelFilter, ")");
       console.log("📋 Sample response with level:", filteredData[0] ? {
         name: filteredData[0].name,
         level: filteredData[0].level,
-        department: filteredData[0].department
+        department: filteredData[0].department,
+        hasEmployeeMatch: !!filteredData[0].employees
       } : 'No responses');
       
       setSurveyData(filteredData);
@@ -969,7 +1006,7 @@ const SurveyResults = () => {
               <div>
                 <h1 className="text-3xl font-bold text-primary mb-2">
                   {levelFilter === 'Managerial' ? 'Managerial Results Employee' :
-                        levelFilter === 'Non-Managerial' ? 'Non Managerial Results Employee' :
+                        levelFilter === 'Non Managerial' ? 'Non Managerial Results Employee' :
                         'Survey Results Employee'}
                 </h1>
                 <p className="text-muted-foreground">
