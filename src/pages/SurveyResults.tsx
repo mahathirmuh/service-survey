@@ -1202,7 +1202,14 @@ const SurveyResults = () => {
                               height={100}
                             />
                             <YAxis domain={[0, 5]} />
-                            <Tooltip />
+                            <Tooltip 
+                              formatter={(value, name) => {
+                                if (name === 'averageRating') {
+                                  return [value.toFixed(2), 'averageRating'];
+                                }
+                                return [value, name];
+                              }}
+                            />
                             <Bar dataKey="averageRating" fill="#8884d8" />
                           </BarChart>
                         </ResponsiveContainer>
