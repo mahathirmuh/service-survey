@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -12,8 +12,26 @@ const UserLogin = () => {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
     const { toast } = useToast();
     const navigate = useNavigate();
+
+    // Load saved credentials on component mount
+    useEffect(() => {
+        const savedCredentials = localStorage.getItem('rememberedCredentials');
+        if (savedCredentials) {
+            try {
+                const { username: savedUsername, rememberMe: savedRememberMe } = JSON.parse(savedCredentials);
+                if (savedRememberMe) {
+                    setUsername(savedUsername);
+                    setRememberMe(true);
+                }
+            } catch (error) {
+                console.error('Error loading saved credentials:', error);
+                localStorage.removeItem('rememberedCredentials');
+            }
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,6 +78,16 @@ const UserLogin = () => {
                 .from("admin_users")
                 .update({ last_login: new Date().toISOString() })
                 .eq("id", user.id);
+
+            // Handle remember me functionality
+            if (rememberMe) {
+                localStorage.setItem('rememberedCredentials', JSON.stringify({
+                    username: username,
+                    rememberMe: true
+                }));
+            } else {
+                localStorage.removeItem('rememberedCredentials');
+            }
 
             // Store admin session with user info
             sessionStorage.setItem("adminAuthenticated", "true");
@@ -205,23 +233,18 @@ const UserLogin = () => {
                             </div>
                         </div>
                         
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="remember-me"
-                                    type="checkbox"
-                                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                                    Remember me
-                                </label>
-                            </div>
-                            <div className="text-sm">
-                                <a href="#" className="font-medium text-gray-600 hover:text-purple-600">
-                                    Forgot password?
-                                </a>
-                            </div>
+                        <div className="flex items-center">
+                            <input
+                                id="remember-me"
+                                name="remember-me"
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.target.checked)}
+                                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                                Remember me
+                            </label>
                         </div>
 
                         <Button
@@ -233,14 +256,7 @@ const UserLogin = () => {
                         </Button>
                     </form>
                     
-                    <div className="mt-8 text-center">
-                        <p className="text-sm text-gray-600">
-                            New here?{" "}
-                            <a href="#" className="font-medium text-purple-600 hover:text-purple-500">
-                                Create an Account
-                            </a>
-                        </p>
-                    </div>
+
                 </div>
             </div>
         </div>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remember Me Functionality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .pass { color: #28a745; }
+        .fail { color: #dc3545; }
+        .info { color: #007bff; }
+        code {
+            background: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Remember Me Functionality Test Guide</h1>
+    
+    <div class="test-section">
+        <h2>🔍 Test Overview</h2>
+        <p>This guide helps verify that the "Remember me" functionality in the UserLogin component works correctly across browser sessions.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Implementation Verification</h2>
+        <p><strong class="pass">IMPLEMENTED:</strong> The following features have been added:</p>
+        <ul>
+            <li>✓ State management for <code>rememberMe</code> checkbox</li>
+            <li>✓ <code>useEffect</code> hook to load saved credentials on component mount</li>
+            <li>✓ <code>localStorage</code> integration for persistent storage</li>
+            <li>✓ Controlled checkbox with <code>checked</code> and <code>onChange</code> props</li>
+            <li>✓ Credential saving/clearing logic in login handler</li>
+            <li>✓ Error handling for corrupted localStorage data</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Manual Testing Steps</h2>
+        <ol>
+            <li><strong>Initial Test:</strong>
+                <ul>
+                    <li>Navigate to <a href="http://localhost:5173/" target="_blank">http://localhost:5173/</a></li>
+                    <li>Verify the "Remember me" checkbox is present and unchecked</li>
+                    <li>Verify the checkbox is clickable and changes state</li>
+                </ul>
+            </li>
+            
+            <li><strong>Save Credentials Test:</strong>
+                <ul>
+                    <li>Enter a valid username (e.g., <code>andi.admin@example.com</code>)</li>
+                    <li>Enter the corresponding password (e.g., <code>admin123</code>)</li>
+                    <li>Check the "Remember me" checkbox</li>
+                    <li>Click "Sign In" to login successfully</li>
+                </ul>
+            </li>
+            
+            <li><strong>Persistence Test:</strong>
+                <ul>
+                    <li>After successful login, logout or navigate away</li>
+                    <li>Close the browser tab/window completely</li>
+                    <li>Reopen the browser and navigate back to the login page</li>
+                    <li><span class="pass">EXPECTED:</span> Username should be pre-filled</li>
+                    <li><span class="pass">EXPECTED:</span> "Remember me" checkbox should be checked</li>
+                </ul>
+            </li>
+            
+            <li><strong>Clear Credentials Test:</strong>
+                <ul>
+                    <li>Uncheck the "Remember me" checkbox</li>
+                    <li>Login again with valid credentials</li>
+                    <li>Close browser and reopen</li>
+                    <li><span class="pass">EXPECTED:</span> Username should be empty</li>
+                    <li><span class="pass">EXPECTED:</span> "Remember me" checkbox should be unchecked</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Developer Tools Verification</h2>
+        <p>Open browser Developer Tools (F12) and check:</p>
+        <ul>
+            <li><strong>Application/Storage Tab:</strong>
+                <ul>
+                    <li>Navigate to Local Storage → <code>http://localhost:5173</code></li>
+                    <li>When "Remember me" is checked: Look for <code>rememberedCredentials</code> key</li>
+                    <li>Value should contain: <code>{"username":"user@example.com","rememberMe":true}</code></li>
+                    <li>When unchecked: The key should be removed</li>
+                </ul>
+            </li>
+            <li><strong>Console Tab:</strong>
+                <ul>
+                    <li>No error messages related to localStorage operations</li>
+                    <li>No JSON parsing errors</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🛡️ Security Considerations</h2>
+        <p><strong class="info">IMPORTANT:</strong> The implementation correctly:</p>
+        <ul>
+            <li>✓ Only stores username (not password) for security</li>
+            <li>✓ Uses localStorage (persistent across sessions)</li>
+            <li>✓ Includes error handling for corrupted data</li>
+            <li>✓ Clears data when "Remember me" is unchecked</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Credentials</h2>
+        <p>Use these test accounts for verification:</p>
+        <ul>
+            <li><strong>Admin:</strong> <code>andi.admin@example.com</code> / <code>admin123</code></li>
+            <li><strong>Manager:</strong> <code>budi.manager@example.com</code> / <code>manager123</code></li>
+            <li><strong>Viewer:</strong> <code>citra.viewer@example.com</code> / <code>viewer123</code></li>
+        </ul>
+    </div>
+
+    <script>
+        // Add timestamp for when this test guide was generated
+        document.addEventListener('DOMContentLoaded', function() {
+            const timestamp = new Date().toLocaleString();
+            const footer = document.createElement('div');
+            footer.style.cssText = 'margin-top: 30px; padding: 10px; background: #e9ecef; border-radius: 5px; text-align: center; font-size: 0.9em; color: #6c757d;';
+            footer.innerHTML = `Test guide generated on: ${timestamp}`;
+            document.body.appendChild(footer);
+        });
+    </script>
+</body>
+</html>
