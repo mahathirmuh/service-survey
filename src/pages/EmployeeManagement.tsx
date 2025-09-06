@@ -1881,7 +1881,7 @@ const EmployeeManagement = () => {
                                             {activeMenuItem === "dashboard" && (
                                                 <>
                                                     <Shield className="h-6 w-6 text-purple-600" />
-                                                    Employee Dashboard
+                                                    Employee Management
                                                 </>
                                             )}
                                             {activeMenuItem === "submission" && (

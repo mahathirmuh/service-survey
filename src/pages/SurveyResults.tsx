@@ -58,7 +58,8 @@ import {
   LayoutDashboard,
   FileText,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 
@@ -121,6 +122,9 @@ const SurveyResults = () => {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isEmployeeLoading, setIsEmployeeLoading] = useState(false);
+  const [isSubmissionLoading, setIsSubmissionLoading] = useState(false);
+  const [isUserManagementLoading, setIsUserManagementLoading] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -877,11 +881,26 @@ const SurveyResults = () => {
         <div className="flex-1 mt-4 sm:mt-6 px-3 sm:px-4 overflow-y-auto" role="menu">
           <div className="space-y-2 sm:space-y-3">
             <button
-                            onClick={() => {
-                                setActiveMenuItem("dashboard");
-                                navigate("/employee");
+                            onClick={async () => {
+                                setIsEmployeeLoading(true);
+                                try {
+                                    // Simulate loading delay for better UX
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                    setActiveMenuItem("dashboard");
+                                    navigate("/employee");
+                                } catch (error) {
+                                    console.error('Navigation error:', error);
+                                    toast({
+                                        title: "Navigation Error",
+                                        description: "Failed to navigate to Employee Dashboard. Please try again.",
+                                        variant: "destructive",
+                                    });
+                                } finally {
+                                    setIsEmployeeLoading(false);
+                                }
                             }}
-                            className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
+                            disabled={isEmployeeLoading}
+                            className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                                 activeMenuItem === "dashboard"
                                     ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                                     : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -890,15 +909,34 @@ const SurveyResults = () => {
                             aria-label="Navigate to Employee Dashboard"
                             aria-current={activeMenuItem === "dashboard" ? "page" : undefined}
                         >
-                            <LayoutDashboard className="mr-3 h-5 w-5" aria-hidden="true" />
-                            Employee
+                            {isEmployeeLoading ? (
+                                <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
+                            ) : (
+                                <LayoutDashboard className="mr-3 h-5 w-5" aria-hidden="true" />
+                            )}
+                            {isEmployeeLoading ? "Loading..." : "Employee"}
                         </button>
             <button
-              onClick={() => {
-                setActiveMenuItem("submission");
-                navigate("/submission");
+              onClick={async () => {
+                setIsSubmissionLoading(true);
+                try {
+                  // Simulate loading delay for better UX
+                  await new Promise(resolve => setTimeout(resolve, 500));
+                  setActiveMenuItem("submission");
+                  navigate("/submission");
+                } catch (error) {
+                  console.error('Navigation error:', error);
+                  toast({
+                    title: "Navigation Error",
+                    description: "Failed to navigate to Submission page. Please try again.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setIsSubmissionLoading(false);
+                }
               }}
-              className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
+              disabled={isSubmissionLoading}
+              className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                 activeMenuItem === "submission"
                   ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -907,17 +945,36 @@ const SurveyResults = () => {
               aria-label="Navigate to Submission page"
               aria-current={activeMenuItem === "submission" ? "page" : undefined}
             >
-              <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
-              Submission
+              {isSubmissionLoading ? (
+                <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
+              )}
+              {isSubmissionLoading ? "Loading..." : "Submission"}
             </button>
             {/* User Management - Hidden for Manager role */}
             {currentUserRole !== 'manager' && (
               <button
-                onClick={() => {
-                  setActiveMenuItem("user-management");
-                  navigate("/user-management");
+                onClick={async () => {
+                  setIsUserManagementLoading(true);
+                  try {
+                    // Simulate loading delay for better UX
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    setActiveMenuItem("user-management");
+                    navigate("/user-management");
+                  } catch (error) {
+                    console.error('Navigation error:', error);
+                    toast({
+                      title: "Navigation Error",
+                      description: "Failed to navigate to User Management. Please try again.",
+                      variant: "destructive",
+                    });
+                  } finally {
+                    setIsUserManagementLoading(false);
+                  }
                 }}
-                className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
+                disabled={isUserManagementLoading}
+                className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
                   activeMenuItem === "user-management"
                     ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -926,76 +983,94 @@ const SurveyResults = () => {
                 aria-label="Navigate to User Management"
                 aria-current={activeMenuItem === "user-management" ? "page" : undefined}
               >
-                <Users className="mr-3 h-5 w-5" aria-hidden="true" />
-                User Management
+                {isUserManagementLoading ? (
+                  <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Users className="mr-3 h-5 w-5" aria-hidden="true" />
+                )}
+                {isUserManagementLoading ? "Loading..." : "User Management"}
               </button>
             )}
             {/* Results Menu with Sub-items */}
-            <div>
+            <div className="relative">
               <button
                 onClick={() => {
                   setResultsExpanded(!resultsExpanded);
                 }}
-                className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
+                className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-300 ease-in-out shadow-sm hover:scale-[1.02] hover:shadow-lg transform ${
                   activeMenuItem.includes("results")
-                    ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
+                    ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md scale-[1.01]"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
-                }`}
+                }} group`}
                 role="menuitem"
                 aria-label="Toggle Results submenu"
                 aria-expanded={resultsExpanded}
                 aria-controls="results-submenu"
               >
                 <div className="flex items-center">
-                  <BarChart3 className="mr-3 h-5 w-5" aria-hidden="true" />
-                  Results
+                  <BarChart3 className={`mr-3 h-5 w-5 transition-all duration-300 ${
+                    activeMenuItem.includes("results") ? "text-purple-600 scale-110" : "group-hover:scale-110"
+                  }`} aria-hidden="true" />
+                  <span className="transition-all duration-200 group-hover:translate-x-1">Results</span>
                 </div>
-                {resultsExpanded ? (
+                <div className={`transition-all duration-300 ease-in-out ${
+                  resultsExpanded ? "rotate-180" : "rotate-0"
+                }`}>
                   <ChevronDown className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
-                )}
+                </div>
               </button>
               
-              {/* Sub-menu items */}
-              {resultsExpanded && (
-                <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-4" id="results-submenu" role="menu">
+              {/* Sub-menu items with slide animation */}
+              <div 
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  resultsExpanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                }`}
+                id="results-submenu" 
+                role="menu"
+              >
+                <div className={`ml-4 mt-2 space-y-2 border-l-2 border-purple-200 pl-4 transform transition-all duration-300 ease-in-out ${
+                  resultsExpanded ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0"
+                }`}>
                   <button
                     onClick={() => {
                       setActiveMenuItem("results-managerial");
                       navigate("/results/managerial");
                     }}
-                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-200 hover:scale-[1.02] ${
+                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md transform group ${
                       activeMenuItem === "results-managerial"
-                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm"
+                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm scale-[1.01] border border-purple-200"
+                        : "text-gray-600 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:shadow-sm hover:border hover:border-purple-200"
                     }`}
                     role="menuitem"
                     aria-label="Navigate to Managerial Results"
                     aria-current={activeMenuItem === "results-managerial" ? "page" : undefined}
                   >
-                    <Users className="mr-3 h-4 w-4" aria-hidden="true" />
-                    Managerial
+                    <Users className={`mr-3 h-4 w-4 transition-all duration-300 ${
+                      activeMenuItem === "results-managerial" ? "text-purple-600 scale-110" : "group-hover:scale-110 group-hover:text-purple-600"
+                    }`} aria-hidden="true" />
+                    <span className="transition-all duration-200 group-hover:translate-x-1">Managerial</span>
                   </button>
                   <button
                     onClick={() => {
                       setActiveMenuItem("results-non-managerial");
                       navigate("/results/non-managerial");
                     }}
-                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-200 hover:scale-[1.02] ${
+                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-md transform group ${
                       activeMenuItem === "results-non-managerial"
-                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm"
+                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm scale-[1.01] border border-purple-200"
+                        : "text-gray-600 hover:text-purple-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:shadow-sm hover:border hover:border-purple-200"
                     }`}
                     role="menuitem"
                     aria-label="Navigate to Non-Managerial Results"
                     aria-current={activeMenuItem === "results-non-managerial" ? "page" : undefined}
                   >
-                    <Shield className="mr-3 h-4 w-4" aria-hidden="true" />
-                    Non Managerial
+                    <Shield className={`mr-3 h-4 w-4 transition-all duration-300 ${
+                      activeMenuItem === "results-non-managerial" ? "text-purple-600 scale-110" : "group-hover:scale-110 group-hover:text-purple-600"
+                    }`} aria-hidden="true" />
+                    <span className="transition-all duration-200 group-hover:translate-x-1">Non Managerial</span>
                   </button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         
