@@ -119,6 +119,8 @@ const SurveyResults = () => {
   const [departmentStats, setDepartmentStats] = useState<DepartmentStats[]>([]);
   const [overallStats, setOverallStats] = useState<OverallStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -244,10 +246,14 @@ const SurveyResults = () => {
     };
   }, []);
 
-  const fetchSurveyData = async () => {
+  const fetchSurveyData = async (isRefresh = false) => {
     try {
       console.log("🔄 Fetching survey data...");
-      setLoading(true);
+      if (isRefresh) {
+        setIsRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       
       // Get all survey responses with employee level information using LEFT JOIN on id_badge_number
       // This ensures ALL survey responses are included, even if no matching employee record exists
@@ -334,7 +340,11 @@ const SurveyResults = () => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setIsRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -645,8 +655,10 @@ const SurveyResults = () => {
     return ratingCount > 0 ? totalRating / ratingCount : 0;
   };
 
-  const exportResults = () => {
-    // Create detailed CSV with section-wise ratings
+  const exportResults = async () => {
+    try {
+      setIsExporting(true);
+      // Create detailed CSV with section-wise ratings
     const headers = [
       "Name",
       "ID Badge", 
@@ -769,14 +781,29 @@ const SurveyResults = () => {
       })
     ];
 
-    const csvContent = csvRows.join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `survey-results-detailed-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `survey-results-detailed-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export Successful",
+        description: "Survey results have been exported to CSV.",
+      });
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast({
+        title: "Export Failed",
+        description: "There was an error exporting the survey results.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const getRatingColor = (rating: number) => {
@@ -794,9 +821,20 @@ const SurveyResults = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-lg">Loading survey results...</p>
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="relative">
+            <RefreshCw className="h-12 w-12 animate-spin mx-auto text-blue-500" />
+            <div className="absolute inset-0 h-12 w-12 mx-auto rounded-full bg-blue-100 animate-pulse opacity-30"></div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-lg font-medium text-gray-700">Loading survey results...</p>
+            <p className="text-sm text-gray-500">Please wait while we fetch the latest data</p>
+          </div>
+          <div className="flex justify-center space-x-1 mt-4">
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+            <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+          </div>
         </div>
       </div>
     );
@@ -807,19 +845,23 @@ const SurveyResults = () => {
     : departmentStats.filter(dept => dept.department === selectedDepartment);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200 transform ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } transition-transform duration-300 ease-in-out lg:translate-x-0 flex flex-col`}>
-        <div className="flex items-center justify-between h-20 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 to-purple-700">
+      <nav 
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-md shadow-xl border-r border-gray-200/50 transform ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } transition-all duration-300 ease-in-out lg:translate-x-0 flex flex-col`}
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="flex items-center justify-between h-16 sm:h-20 px-4 sm:px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600">
           <div className="flex items-center space-x-3">
             <div className="bg-white p-2 rounded-lg shadow-sm">
               <img src={mtiLogo} alt="MTI Logo" className="h-8 w-auto" />
             </div>
             <div className="text-white">
-              <div className="text-lg font-bold">Employee Satisfaction</div>
-              <div className="text-sm opacity-90">Survey System</div>
+              <div className="text-base sm:text-lg font-bold leading-tight">Employee Satisfaction</div>
+              <div className="text-xs sm:text-sm opacity-90">Survey System</div>
             </div>
           </div>
           <Button
@@ -832,20 +874,23 @@ const SurveyResults = () => {
           </Button>
         </div>
         
-        <nav className="flex-1 mt-6 px-4 overflow-y-auto">
-          <div className="space-y-3">
+        <div className="flex-1 mt-4 sm:mt-6 px-3 sm:px-4 overflow-y-auto" role="menu">
+          <div className="space-y-2 sm:space-y-3">
             <button
                             onClick={() => {
                                 setActiveMenuItem("dashboard");
                                 navigate("/employee");
                             }}
-                            className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+                            className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                                 activeMenuItem === "dashboard"
-                                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
-                            }`}
+                                    ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
+                                    : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
+                            }}`}
+                            role="menuitem"
+                            aria-label="Navigate to Employee Dashboard"
+                            aria-current={activeMenuItem === "dashboard" ? "page" : undefined}
                         >
-                            <LayoutDashboard className="mr-3 h-5 w-5" />
+                            <LayoutDashboard className="mr-3 h-5 w-5" aria-hidden="true" />
                             Employee
                         </button>
             <button
@@ -853,13 +898,16 @@ const SurveyResults = () => {
                 setActiveMenuItem("submission");
                 navigate("/submission");
               }}
-              className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+              className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                 activeMenuItem === "submission"
-                  ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
-              }`}
+                  ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
+              }}`}
+              role="menuitem"
+              aria-label="Navigate to Submission page"
+              aria-current={activeMenuItem === "submission" ? "page" : undefined}
             >
-              <FileText className="mr-3 h-5 w-5" />
+              <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
               Submission
             </button>
             {/* User Management - Hidden for Manager role */}
@@ -869,13 +917,16 @@ const SurveyResults = () => {
                   setActiveMenuItem("user-management");
                   navigate("/user-management");
                 }}
-                className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+                className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                   activeMenuItem === "user-management"
-                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
+                    ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
                 }`}
+                role="menuitem"
+                aria-label="Navigate to User Management"
+                aria-current={activeMenuItem === "user-management" ? "page" : undefined}
               >
-                <Users className="mr-3 h-5 w-5" />
+                <Users className="mr-3 h-5 w-5" aria-hidden="true" />
                 User Management
               </button>
             )}
@@ -885,38 +936,45 @@ const SurveyResults = () => {
                 onClick={() => {
                   setResultsExpanded(!resultsExpanded);
                 }}
-                className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
+                className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                   activeMenuItem.includes("results")
-                    ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm border-l-4 border-transparent"
+                    ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
                 }`}
+                role="menuitem"
+                aria-label="Toggle Results submenu"
+                aria-expanded={resultsExpanded}
+                aria-controls="results-submenu"
               >
                 <div className="flex items-center">
-                  <BarChart3 className="mr-3 h-5 w-5" />
+                  <BarChart3 className="mr-3 h-5 w-5" aria-hidden="true" />
                   Results
                 </div>
                 {resultsExpanded ? (
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 )}
               </button>
               
               {/* Sub-menu items */}
               {resultsExpanded && (
-                <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-4">
+                <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-200 pl-4" id="results-submenu" role="menu">
                   <button
                     onClick={() => {
                       setActiveMenuItem("results-managerial");
                       navigate("/results/managerial");
                     }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-200 hover:scale-[1.02] ${
                       activeMenuItem === "results-managerial"
-                        ? "text-purple-600 bg-purple-50 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm"
                     }`}
+                    role="menuitem"
+                    aria-label="Navigate to Managerial Results"
+                    aria-current={activeMenuItem === "results-managerial" ? "page" : undefined}
                   >
-                    <Users className="mr-3 h-4 w-4" />
+                    <Users className="mr-3 h-4 w-4" aria-hidden="true" />
                     Managerial
                   </button>
                   <button
@@ -924,20 +982,24 @@ const SurveyResults = () => {
                       setActiveMenuItem("results-non-managerial");
                       navigate("/results/non-managerial");
                     }}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                    className={`w-full flex items-center px-2 sm:px-3 py-1.5 sm:py-2 text-sm font-medium rounded-md transition-all duration-200 hover:scale-[1.02] ${
                       activeMenuItem === "results-non-managerial"
-                        ? "text-purple-600 bg-purple-50 shadow-sm"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 hover:shadow-sm"
+                        ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm"
                     }`}
+                    role="menuitem"
+                    aria-label="Navigate to Non-Managerial Results"
+                    aria-current={activeMenuItem === "results-non-managerial" ? "page" : undefined}
                   >
-                    <Shield className="mr-3 h-4 w-4" />
+                    <Shield className="mr-3 h-4 w-4" aria-hidden="true" />
                     Non Managerial
                   </button>
                 </div>
               )}
             </div>
           </div>
-        </nav>
+        
+        </div>
         
         {/* Logout section */}
         <div className="border-t flex-shrink-0 p-4">
@@ -967,21 +1029,20 @@ const SurveyResults = () => {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </div>
-
-      {/* Overlay for mobile */}
-      {sidebarOpen && (
-        <div 
+      </nav>
+      
+      {sidebarOpen ? (
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
-      )}
+      ) : null}
 
       {/* Main Content */}
       <div className="flex-1 lg:ml-64">
         {/* Header */}
-        <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white shadow-sm border-b z-30">
-          <div className="w-full px-6 py-4">
+        <div className="fixed top-0 right-0 left-0 lg:left-64 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200/50 z-30">
+          <div className="w-full px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button
@@ -993,34 +1054,34 @@ const SurveyResults = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
                 <div className="lg:flex items-center space-x-4 hidden">
-                  <img src={mtiLogo} alt="MTI Logo" className="h-10 w-auto" />
+                  <img src={mtiLogo} alt="MTI Logo" className="h-8 sm:h-10 w-auto" />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                      <BarChart3 className="h-6 w-6 text-purple-600" />
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                      <BarChart3 className="h-5 sm:h-6 w-5 sm:w-6 text-purple-600" />
                       Survey Analytics Employee
                     </h1>
-                    <p className="text-gray-600">Employee Satisfaction Analysis & Insights</p>
+                    <p className="text-sm sm:text-base text-gray-600">Employee Satisfaction Analysis & Insights</p>
                   </div>
                 </div>
                 <div className="lg:hidden">
-                  <h1 className="text-xl font-bold text-gray-900">Analytics</h1>
+                  <h1 className="text-lg sm:text-xl font-bold text-gray-900">Analytics</h1>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full p-6 pt-24 overflow-y-auto">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <div className="w-full p-4 sm:p-6 pt-20 sm:pt-24 overflow-y-auto">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-primary mb-2">
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-2 leading-tight">
                   {levelFilter === 'Managerial' ? 'Managerial Results Employee' :
                         levelFilter === 'Non Managerial' ? 'Non Managerial Results Employee' :
                         'Survey Results Employee'}
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   {levelFilter === 'Managerial' ? 'Analysis of managerial employee satisfaction survey responses' :
                    levelFilter === 'Non Managerial' ? 'Analysis of non-managerial employee satisfaction survey responses' :
                    'Comprehensive analysis of employee satisfaction survey responses'}
@@ -1033,16 +1094,30 @@ const SurveyResults = () => {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2">
-                <Button onClick={fetchSurveyData} variant="outline" size="sm">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <Button 
+                  onClick={() => fetchSurveyData(true)} 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full sm:w-auto hover:scale-105 transition-transform" 
+                  disabled={isRefreshing || loading}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                  <span className="hidden sm:inline">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                  <span className="sm:hidden">{isRefreshing ? 'Refreshing...' : 'Refresh Data'}</span>
                 </Button>
                 {/* Export CSV - Hidden for Viewer role */}
                 {currentUserRole !== 'viewer' && (
-                  <Button onClick={exportResults} variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                  <Button 
+                    onClick={exportResults} 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full sm:w-auto hover:scale-105 transition-transform" 
+                    disabled={isExporting || loading}
+                  >
+                    <Download className={`h-4 w-4 mr-2 ${isExporting ? 'animate-pulse' : ''}`} />
+                    <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Export CSV'}</span>
+                    <span className="sm:hidden">{isExporting ? 'Exporting...' : 'Export'}</span>
                   </Button>
                 )}
               </div>
@@ -1050,53 +1125,61 @@ const SurveyResults = () => {
 
             {/* Overall Statistics Cards or Zero State */}
             {overallStats && overallStats.totalResponses > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-white to-blue-50/30">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Total Responses</p>
-                        <p className="text-2xl font-bold">{overallStats.totalResponses}</p>
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Responses</p>
+                        <p className="text-xl sm:text-2xl font-bold">{overallStats.totalResponses}</p>
                       </div>
-                      <Users className="h-8 w-8 text-primary" />
+                      <div className="bg-blue-100 p-2 sm:p-3 rounded-full">
+                        <Users className="h-6 sm:h-8 w-6 sm:w-8 text-blue-600" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent className="p-6">
+                <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-white to-yellow-50/30">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Average Rating</p>
-                        <p className={`text-2xl font-bold ${getRatingColor(overallStats.averageRating)}`}>
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Average Rating</p>
+                        <p className={`text-xl sm:text-2xl font-bold ${getRatingColor(overallStats.averageRating)}`}>
                           {overallStats.averageRating.toFixed(2)}
                         </p>
                       </div>
-                      <Star className="h-8 w-8 text-primary" />
+                      <div className="bg-yellow-100 p-2 sm:p-3 rounded-full">
+                        <Star className="h-6 sm:h-8 w-6 sm:w-8 text-yellow-600" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent className="p-6">
+                <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-white to-green-50/30">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Top Rated Section</p>
-                        <p className="text-lg font-bold text-green-600">{overallStats.topRatedSection}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Top Rated Section</p>
+                        <p className="text-sm sm:text-lg font-bold text-green-600 truncate">{overallStats.topRatedSection}</p>
                       </div>
-                      <Award className="h-8 w-8 text-primary" />
+                      <div className="bg-green-100 p-2 sm:p-3 rounded-full flex-shrink-0">
+                        <Award className="h-6 sm:h-8 w-6 sm:w-8 text-green-600" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent className="p-6">
+                <Card className="hover:shadow-lg transition-all duration-300 hover:scale-[1.02] bg-gradient-to-br from-white to-red-50/30">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Needs Attention</p>
-                        <p className="text-lg font-bold text-red-600">{overallStats.lowestRatedSection}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs sm:text-sm font-medium text-muted-foreground">Needs Attention</p>
+                        <p className="text-sm sm:text-lg font-bold text-red-600 truncate">{overallStats.lowestRatedSection}</p>
                       </div>
-                      <AlertCircle className="h-8 w-8 text-primary" />
+                      <div className="bg-red-100 p-2 sm:p-3 rounded-full flex-shrink-0">
+                        <AlertCircle className="h-6 sm:h-8 w-6 sm:w-8 text-red-600" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -1120,9 +1203,14 @@ const SurveyResults = () => {
                           : 'There are currently no survey responses available. Once employees start submitting their surveys, the analytics employee panel will display comprehensive insights and statistics here.'}
                       </p>
                     </div>
-                    <Button onClick={fetchSurveyData} variant="outline" className="mt-4">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Check for New Responses
+                    <Button 
+                      onClick={() => fetchSurveyData(true)} 
+                      variant="outline" 
+                      className="mt-4" 
+                      disabled={isRefreshing || loading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                      {isRefreshing ? 'Checking...' : 'Check for New Responses'}
                     </Button>
                   </div>
                 </CardContent>
@@ -1130,13 +1218,14 @@ const SurveyResults = () => {
             )}
 
             {/* Department Filter */}
-            <Card>
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-r from-white to-gray-50/50">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant={selectedDepartment === "all" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedDepartment("all")}
+                    className="hover:scale-105 transition-all duration-200"
                   >
                     All Departments
                   </Button>
@@ -1146,6 +1235,7 @@ const SurveyResults = () => {
                       variant={selectedDepartment === dept.department ? "default" : "outline"}
                       size="sm"
                       onClick={() => setSelectedDepartment(dept.department)}
+                      className="hover:scale-105 transition-all duration-200 text-xs sm:text-sm"
                     >
                       {dept.department}
                     </Button>
@@ -1155,24 +1245,24 @@ const SurveyResults = () => {
             </Card>
 
             {/* Charts and Analysis */}
-            <Tabs defaultValue="overview" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="departments">By Department</TabsTrigger>
-                <TabsTrigger value="sections">By Section</TabsTrigger>
+            <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+              <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-gray-100 to-gray-50">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">Overview</TabsTrigger>
+                <TabsTrigger value="departments" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">By Department</TabsTrigger>
+                <TabsTrigger value="sections" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">By Section</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-4">
                 {overallStats && overallStats.totalResponses > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {/* Department Response Distribution */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                    <Card className="hover:shadow-xl transition-all duration-500 hover:scale-[1.02] bg-gradient-to-br from-white via-blue-50/20 to-purple-50/20">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse"></div>
                           Response Distribution by Department
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                           Survey participation across different departments
                         </p>
                       </CardHeader>
@@ -1230,13 +1320,13 @@ const SurveyResults = () => {
                     </Card>
 
                     {/* Average Ratings by Department */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-full"></div>
+                    <Card className="hover:shadow-xl transition-all duration-500 hover:scale-[1.02] bg-gradient-to-br from-white via-green-50/20 to-blue-50/20">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                          <div className="w-3 h-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-pulse"></div>
                           Average Ratings by Department
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                           Performance comparison across departments (Scale: 1-5)
                         </p>
                       </CardHeader>
@@ -1347,38 +1437,40 @@ const SurveyResults = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="departments" className="space-y-4">
+              <TabsContent value="departments" className="space-y-4 sm:space-y-6">
                 {filteredStats.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     {filteredStats.map((dept) => (
-                      <Card key={dept.department}>
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Building2 className="h-5 w-5" />
-                            {dept.department}
+                      <Card key={dept.department} className="hover:shadow-lg transition-all duration-300 hover:scale-[1.01] bg-gradient-to-br from-white via-gray-50/30 to-blue-50/20">
+                        <CardHeader className="pb-4">
+                          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+                              <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                            </div>
+                            <span className="truncate">{dept.department}</span>
                           </CardTitle>
-                          <div className="flex items-center gap-4">
-                            <Badge variant="outline">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-2">
+                            <Badge variant="outline" className="text-xs px-2 py-1">
                               {dept.totalResponses} responses
                             </Badge>
-                            <Badge variant={getRatingBadgeVariant(dept.averageRating)}>
+                            <Badge variant={getRatingBadgeVariant(dept.averageRating)} className="text-xs px-2 py-1">
                               {dept.averageRating.toFixed(2)} avg rating
                             </Badge>
                           </div>
                         </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
+                        <CardContent className="pt-0">
+                          <div className="space-y-4">
                             {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
-                              <div key={sectionName} className="space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-sm font-medium">{sectionName}</span>
-                                  <span className={`text-sm font-bold ${getRatingColor(sectionData.averageRating)}`}>
+                              <div key={sectionName} className="p-3 bg-white/60 rounded-lg border border-gray-100 hover:bg-white/80 transition-colors duration-200">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-xs sm:text-sm font-medium truncate pr-2">{sectionName}</span>
+                                  <span className={`text-sm sm:text-base font-bold ${getRatingColor(sectionData.averageRating)} bg-white/80 px-2 py-1 rounded-md`}>
                                     {sectionData.averageRating.toFixed(2)}
                                   </span>
                                 </div>
                                 <Progress 
                                   value={(sectionData.averageRating / 5) * 100} 
-                                  className="h-2"
+                                  className="h-2 mb-2"
                                 />
                                 <p className="text-xs text-muted-foreground">
                                   {sectionData.responseCount} responses
@@ -1411,28 +1503,33 @@ const SurveyResults = () => {
                 )}
               </TabsContent>
 
-              <TabsContent value="sections" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Section Performance Analysis</CardTitle>
+              <TabsContent value="sections" className="space-y-4 sm:space-y-6">
+                <Card className="bg-gradient-to-br from-white via-purple-50/20 to-blue-50/20">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                      <div className="p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg">
+                        <Award className="h-5 w-5 text-white" />
+                      </div>
+                      Section Performance Analysis
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {filteredStats.length > 0 ? (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {filteredStats.map((dept) => (
                           <div key={dept.department}>
-                            <h4 className="font-semibold text-lg mb-3">{dept.department}</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            <h4 className="font-semibold text-base sm:text-lg mb-4 text-gray-800">{dept.department}</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
                               {Object.entries(dept.sections).map(([sectionName, sectionData]) => (
-                                <Card key={sectionName} className="p-4">
+                                <Card key={sectionName} className="p-3 sm:p-4 hover:shadow-md transition-all duration-300 hover:scale-[1.02] bg-white/80 backdrop-blur-sm">
                                   <div className="text-center">
-                                    <h5 className="font-medium mb-2">{sectionName}</h5>
-                                    <div className={`text-2xl font-bold mb-2 ${getRatingColor(sectionData.averageRating)}`}>
+                                    <h5 className="font-medium mb-3 text-xs sm:text-sm text-gray-700 truncate" title={sectionName}>{sectionName}</h5>
+                                    <div className={`text-xl sm:text-2xl font-bold mb-3 ${getRatingColor(sectionData.averageRating)}`}>
                                       {sectionData.averageRating.toFixed(2)}
                                     </div>
                                     <Progress 
                                       value={(sectionData.averageRating / 5) * 100} 
-                                      className="h-2 mb-2"
+                                      className="h-2 mb-3"
                                     />
                                     <p className="text-xs text-muted-foreground">
                                       {sectionData.responseCount} responses
@@ -1441,7 +1538,7 @@ const SurveyResults = () => {
                                 </Card>
                               ))}
                             </div>
-                            <Separator />
+                            <Separator className="my-6" />
                           </div>
                         ))}
                       </div>
@@ -1468,10 +1565,12 @@ const SurveyResults = () => {
             </Tabs>
 
             {/* Recent Submissions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
+            <Card className="bg-gradient-to-br from-white via-green-50/20 to-blue-50/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
                   Recent Submissions
                 </CardTitle>
               </CardHeader>
@@ -1479,10 +1578,10 @@ const SurveyResults = () => {
                 {surveyData.length > 0 ? (
                   <div className="space-y-3">
                     {surveyData.slice(0, 10).map((response) => (
-                      <div key={response.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div>
-                          <p className="font-medium">{response.name}</p>
-                          <p className="text-sm text-muted-foreground">
+                      <div key={response.id} className="flex items-center justify-between p-3 sm:p-4 bg-white/60 rounded-lg border border-gray-100 hover:bg-white/80 hover:shadow-md transition-all duration-200">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm sm:text-base truncate">{response.name}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">
                             {response.department} • ID: {response.id_badge_number}
                           </p>
                         </div>
