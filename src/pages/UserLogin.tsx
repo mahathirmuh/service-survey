@@ -240,63 +240,142 @@ const UserLogin = () => {
             </div>
             
             {/* Right Side - Login Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative overflow-hidden">
-                {/* Subtle Particle Animation for Login Form */}
-                <div className="absolute inset-0 pointer-events-none">
-                    {/* Floating Micro Particles */}
-                    <div className="absolute top-20 left-20 w-1 h-1 bg-purple-200/40 rounded-full animate-bounce" style={{animationDelay: '0s', animationDuration: '4s'}}></div>
-                    <div className="absolute top-32 right-24 w-0.5 h-0.5 bg-purple-300/50 rounded-full animate-bounce" style={{animationDelay: '1.2s', animationDuration: '3.5s'}}></div>
-                    <div className="absolute bottom-40 left-16 w-1.5 h-1.5 bg-purple-100/60 rounded-full animate-bounce" style={{animationDelay: '2.1s', animationDuration: '5s'}}></div>
-                    <div className="absolute top-1/3 right-1/4 w-0.5 h-0.5 bg-indigo-200/45 rounded-full animate-bounce" style={{animationDelay: '0.8s', animationDuration: '4.2s'}}></div>
-                    <div className="absolute bottom-24 right-20 w-1 h-1 bg-purple-200/35 rounded-full animate-bounce" style={{animationDelay: '1.7s', animationDuration: '3.8s'}}></div>
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-gray-50 via-white to-purple-50/30 relative overflow-hidden group transition-all duration-1000 hover:bg-gradient-to-br hover:from-purple-50/40 hover:via-white hover:to-indigo-50/40">
+                {/* Enhanced Particle Animation System for Login Form */}
+                <div className="absolute inset-0 pointer-events-none group-hover:scale-105 transition-transform duration-1000">
+                    {/* Primary Enhanced Particle System with Advanced Animations */}
+                    <div className="absolute top-20 left-20 w-2.5 h-2.5 bg-purple-400/50 rounded-full shadow-lg animate-float-complex" style={{animationDelay: '0s', animationDuration: '6s', filter: 'blur(0.3px)', boxShadow: '0 0 8px rgba(147, 51, 234, 0.3)'}}></div>
+                    <div className="absolute top-32 right-24 w-2 h-2 bg-indigo-400/60 rounded-full shadow-md animate-spiral" style={{animationDelay: '1.2s', animationDuration: '8s', filter: 'blur(0.2px)', boxShadow: '0 0 6px rgba(99, 102, 241, 0.4)'}}></div>
+                    <div className="absolute bottom-40 left-16 w-3 h-3 bg-purple-300/45 rounded-full shadow-xl animate-wave" style={{animationDelay: '2.1s', animationDuration: '10s', filter: 'blur(0.4px)', boxShadow: '0 0 10px rgba(147, 51, 234, 0.25)'}}></div>
+                    <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-indigo-300/55 rounded-full shadow-lg animate-zigzag" style={{animationDelay: '0.8s', animationDuration: '7s', filter: 'blur(0.2px)', boxShadow: '0 0 5px rgba(99, 102, 241, 0.35)'}}></div>
+                    <div className="absolute bottom-24 right-20 w-2.5 h-2.5 bg-purple-400/40 rounded-full shadow-md animate-orbit" style={{animationDelay: '1.7s', animationDuration: '12s', filter: 'blur(0.3px)', boxShadow: '0 0 7px rgba(147, 51, 234, 0.3)'}}></div>
                     
-                    {/* Gentle Pulsing Rings */}
-                    <div className="absolute top-16 right-32 w-4 h-4 border border-purple-200/30 rounded-full animate-ping" style={{animationDelay: '0s', animationDuration: '6s'}}></div>
-                    <div className="absolute bottom-32 left-24 w-3 h-3 border border-indigo-200/25 rounded-full animate-ping" style={{animationDelay: '3s', animationDuration: '8s'}}></div>
+                    {/* Secondary Particle Layer with Advanced Glow Animations */}
+                    <div className="absolute top-40 left-32 w-1.5 h-1.5 bg-cyan-400/50 rounded-full shadow-lg animate-drift" style={{animationDelay: '0.5s', animationDuration: '9s', boxShadow: '0 0 6px rgba(34, 211, 238, 0.4)'}}></div>
+                    <div className="absolute bottom-32 right-32 w-2 h-2 bg-pink-400/45 rounded-full shadow-md animate-pendulum" style={{animationDelay: '1.9s', animationDuration: '11s', boxShadow: '0 0 8px rgba(244, 114, 182, 0.35)'}}></div>
+                    <div className="absolute top-2/3 left-24 w-1 h-1 bg-yellow-400/60 rounded-full shadow-sm animate-twinkle" style={{animationDelay: '2.4s', animationDuration: '5s', boxShadow: '0 0 4px rgba(250, 204, 21, 0.5)'}}></div>
                     
-                    {/* Subtle Gradient Lines */}
-                    <div className="absolute top-28 left-32 w-8 h-0.5 bg-gradient-to-r from-purple-200/20 to-transparent transform rotate-12 animate-pulse" style={{animationDelay: '1s'}}></div>
-                    <div className="absolute bottom-36 right-28 w-6 h-0.5 bg-gradient-to-l from-indigo-200/25 to-transparent transform -rotate-6 animate-pulse" style={{animationDelay: '2.5s'}}></div>
+                    {/* Enhanced Pulsing Rings with Dynamic Animations */}
+                    <div className="absolute top-16 right-32 w-8 h-8 border-2 border-purple-400/50 rounded-full shadow-2xl animate-ripple" style={{animationDelay: '0s', animationDuration: '8s', boxShadow: '0 0 20px rgba(147, 51, 234, 0.3), inset 0 0 10px rgba(147, 51, 234, 0.1)'}}></div>
+                    <div className="absolute bottom-32 left-24 w-6 h-6 border-2 border-indigo-400/45 rounded-full shadow-xl animate-pulse-glow" style={{animationDelay: '2s', animationDuration: '10s', boxShadow: '0 0 15px rgba(99, 102, 241, 0.25), inset 0 0 8px rgba(99, 102, 241, 0.1)'}}></div>
+                    <div className="absolute top-2/3 right-16 w-10 h-10 border-2 border-purple-300/40 rounded-full shadow-2xl animate-expand-contract" style={{animationDelay: '1s', animationDuration: '12s', boxShadow: '0 0 25px rgba(147, 51, 234, 0.2), inset 0 0 12px rgba(147, 51, 234, 0.08)'}}></div>
                     
-                    {/* Floating Constellation */}
-                    <div className="absolute top-1/4 left-1/4">
-                        <div className="relative w-12 h-12">
-                            <div className="absolute top-0 left-0 w-0.5 h-0.5 bg-purple-300/40 rounded-full animate-pulse"></div>
-                            <div className="absolute top-1 right-2 w-0.5 h-0.5 bg-purple-200/35 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                            <div className="absolute bottom-2 left-3 w-0.5 h-0.5 bg-indigo-200/30 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-                            <svg className="absolute inset-0 w-full h-full text-purple-200/15" viewBox="0 0 48 48">
-                                <path d="M6,6 L12,8 L18,12 L24,24" stroke="currentColor" strokeWidth="0.3" fill="none" strokeDasharray="1,1" className="animate-dash" />
+                    {/* Dynamic Gradient Lines with Advanced Animations */}
+                    <div className="absolute top-28 left-32 w-16 h-1 bg-gradient-to-r from-purple-400/40 via-indigo-400/50 to-transparent transform rotate-12 shadow-lg animate-slide-rotate" style={{animationDelay: '1s', animationDuration: '8s', boxShadow: '0 0 8px rgba(147, 51, 234, 0.3)'}}></div>
+                    <div className="absolute bottom-36 right-28 w-12 h-0.5 bg-gradient-to-l from-indigo-400/50 via-purple-400/40 to-transparent transform -rotate-6 shadow-md animate-stretch-pulse" style={{animationDelay: '2.5s', animationDuration: '10s', boxShadow: '0 0 6px rgba(99, 102, 241, 0.35)'}}></div>
+                    <div className="absolute top-1/2 left-8 w-20 h-0.5 bg-gradient-to-r from-transparent via-purple-300/35 to-transparent transform rotate-8 shadow-lg animate-shimmer" style={{animationDelay: '1.8s', animationDuration: '6s', boxShadow: '0 0 5px rgba(147, 51, 234, 0.25)'}}></div>
+                    
+                    {/* Enhanced Floating Constellation with Advanced Animations */}
+                    <div className="absolute top-1/4 left-1/4 animate-constellation-rotate" style={{animationDuration: '20s'}}>
+                        <div className="relative w-16 h-16">
+                            <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-purple-400/60 rounded-full animate-twinkle shadow-lg" style={{animationDelay: '0s', animationDuration: '3s', boxShadow: '0 0 6px rgba(147, 51, 234, 0.4)'}}></div>
+                            <div className="absolute top-2 right-4 w-1 h-1 bg-indigo-400/55 rounded-full animate-drift shadow-md" style={{animationDelay: '0.5s', animationDuration: '4s', boxShadow: '0 0 4px rgba(99, 102, 241, 0.45)'}}></div>
+                            <div className="absolute bottom-4 left-6 w-1.5 h-1.5 bg-purple-300/50 rounded-full animate-float-complex shadow-lg" style={{animationDelay: '1s', animationDuration: '5s', boxShadow: '0 0 5px rgba(147, 51, 234, 0.35)'}}></div>
+                            <div className="absolute bottom-0 right-0 w-1 h-1 bg-indigo-300/60 rounded-full animate-twinkle shadow-md" style={{animationDelay: '1.5s', animationDuration: '2.5s', boxShadow: '0 0 4px rgba(99, 102, 241, 0.4)'}}></div>
+                            <svg className="absolute inset-0 w-full h-full text-purple-300/30 animate-pulse" viewBox="0 0 64 64" style={{animationDuration: '4s'}}>
+                                <path d="M8,8 L20,12 L32,20 L56,56" stroke="currentColor" strokeWidth="0.8" fill="none" strokeDasharray="3,2" className="animate-dash" style={{filter: 'drop-shadow(0 0 2px rgba(147, 51, 234, 0.3))'}} />
                             </svg>
                         </div>
                     </div>
                     
-                    {/* Orbiting Elements */}
-                    <div className="absolute top-1/2 right-1/4 transform -translate-y-1/2">
-                        <div className="relative w-16 h-16">
-                            <div className="absolute top-0 left-1/2 w-0.5 h-0.5 bg-purple-300/50 rounded-full transform -translate-x-1/2 animate-spin" style={{animationDuration: '12s'}}></div>
-                            <div className="absolute bottom-0 left-1/2 w-1 h-1 bg-indigo-200/40 rounded-full transform -translate-x-1/2 animate-spin" style={{animationDuration: '16s', animationDirection: 'reverse'}}></div>
+                    {/* Enhanced Orbiting Elements with Complex Animations */}
+                    <div className="absolute top-1/2 right-1/4 transform -translate-y-1/2 animate-orbital-dance" style={{animationDuration: '15s'}}>
+                        <div className="relative w-20 h-20">
+                            <div className="absolute top-0 left-1/2 w-1.5 h-1.5 bg-purple-400/60 rounded-full transform -translate-x-1/2 animate-orbit shadow-lg" style={{animationDuration: '8s', boxShadow: '0 0 6px rgba(147, 51, 234, 0.4)'}}></div>
+                            <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-indigo-400/50 rounded-full transform -translate-x-1/2 animate-spiral shadow-md" style={{animationDuration: '12s', animationDirection: 'reverse', boxShadow: '0 0 8px rgba(99, 102, 241, 0.35)'}}></div>
+                            <div className="absolute left-0 top-1/2 w-1 h-1 bg-cyan-400/55 rounded-full transform -translate-y-1/2 animate-wave shadow-sm" style={{animationDuration: '10s', boxShadow: '0 0 4px rgba(34, 211, 238, 0.4)'}}></div>
                         </div>
                     </div>
                     
-                    {/* Breathing Dots */}
-                    <div className="absolute bottom-16 left-1/3 w-2 h-2 border border-purple-200/25 rounded-full animate-breathe" style={{animationDelay: '2s'}}></div>
-                    <div className="absolute top-2/3 right-16 w-1.5 h-1.5 border border-indigo-200/30 rounded-full animate-breathe" style={{animationDelay: '4s'}}></div>
+                    {/* Enhanced Breathing Elements with Advanced Animations */}
+                    <div className="absolute bottom-16 right-1/3 w-12 h-12 border-2 border-purple-400/40 rounded-full animate-expand-contract shadow-lg" style={{boxShadow: '0 0 15px rgba(147, 51, 234, 0.25)', animationDuration: '8s'}}></div>
+                    <div className="absolute top-2/3 left-16 w-8 h-8 border border-indigo-400/45 rounded-full animate-pulse-glow shadow-md" style={{animationDelay: '1.5s', boxShadow: '0 0 10px rgba(99, 102, 241, 0.2)', animationDuration: '6s'}}></div>
                     
-                    {/* Particle Trail */}
-                    <div className="absolute top-12 right-1/3">
-                        <div className="flex space-x-0.5">
-                            <div className="w-0.5 h-0.5 bg-purple-300/50 rounded-full animate-bounce" style={{animationDelay: '0s'}}></div>
-                            <div className="w-0.5 h-0.5 bg-purple-300/40 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-0.5 h-0.5 bg-purple-300/30 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                            <div className="w-0.5 h-0.5 bg-purple-300/20 rounded-full animate-bounce" style={{animationDelay: '0.3s'}}></div>
+                    {/* Premium Staggered Grid Animation with Advanced Effects */}
+                    <div className="absolute bottom-20 right-20 animate-grid-wave" style={{animationDuration: '10s'}}>
+                        <div className="grid grid-cols-3 gap-1.5">
+                            {Array.from({length: 9}).map((_, i) => (
+                                <div key={i} className="w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-twinkle shadow-sm hover:bg-purple-400/60 transition-colors" 
+                                     style={{animationDelay: `${i * 0.2}s`, boxShadow: '0 0 4px rgba(147, 51, 234, 0.25)', animationDuration: `${3 + (i * 0.3)}s`}}></div>
+                            ))}
                         </div>
                     </div>
                     
-                    {/* Morphing Shape */}
-                    <div className="absolute bottom-1/4 left-20 w-3 h-3 bg-purple-100/30 transform rotate-45 animate-pulse hover:rotate-90 transition-transform duration-1000 cursor-pointer" style={{animationDelay: '3s'}}></div>
+                    {/* Particle Trail Effect with Advanced Motion */}
+                    <div className="absolute top-1/3 left-1/3 animate-trail-flow" style={{animationDuration: '12s'}}>
+                        <div className="relative w-24 h-2">
+                            <div className="absolute left-0 top-0 w-2 h-2 bg-purple-400/50 rounded-full animate-float-complex shadow-lg" style={{animationDelay: '0s', animationDuration: '4s', boxShadow: '0 0 6px rgba(147, 51, 234, 0.4)'}}></div>
+                            <div className="absolute left-4 top-0 w-1.5 h-1.5 bg-purple-300/45 rounded-full animate-wave shadow-md" style={{animationDelay: '0.2s', animationDuration: '5s', boxShadow: '0 0 4px rgba(147, 51, 234, 0.35)'}}></div>
+                            <div className="absolute left-8 top-0 w-1 h-1 bg-purple-200/40 rounded-full animate-drift shadow-sm" style={{animationDelay: '0.4s', animationDuration: '6s', boxShadow: '0 0 3px rgba(147, 51, 234, 0.3)'}}></div>
+                            <div className="absolute left-12 top-0 w-0.5 h-0.5 bg-purple-100/35 rounded-full animate-twinkle" style={{animationDelay: '0.6s', animationDuration: '3s'}}></div>
+                        </div>
+                    </div>
                     
-                    {/* Gradient Orb */}
-                    <div className="absolute top-1/3 left-12 w-6 h-6 bg-gradient-radial from-purple-200/20 via-purple-100/10 to-transparent rounded-full animate-pulse" style={{animationDelay: '1.5s', animationDuration: '5s'}}></div>
+                    {/* Morphing Shape with Complex Transformations */}
+                    <div className="absolute bottom-1/3 left-1/3">
+                        <div className="w-6 h-6 bg-gradient-to-br from-indigo-400/30 to-purple-400/40 rounded-full animate-expand-contract shadow-lg transform hover:rotate-45 transition-transform duration-1000" 
+                             style={{animationDuration: '10s', boxShadow: '0 0 12px rgba(99, 102, 241, 0.2)'}}></div>
+                    </div>
+                    
+                    {/* Enhanced Gradient Orb with Complex Animation */}
+                    <div className="absolute top-1/4 right-1/3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400/25 via-indigo-400/30 to-cyan-400/25 rounded-full animate-expand-contract shadow-xl" 
+                             style={{animationDuration: '8s', boxShadow: '0 0 20px rgba(147, 51, 234, 0.15), inset 0 0 10px rgba(99, 102, 241, 0.1)'}}></div>
+                        <div className="absolute inset-0 w-8 h-8 bg-gradient-to-tl from-pink-400/20 via-purple-400/25 to-indigo-400/20 rounded-full animate-orbital-dance" 
+                             style={{animationDelay: '2s', animationDuration: '12s', filter: 'blur(1px)'}}></div>
+                    </div>
+                    
+                    {/* Enhanced Dotted Pattern with Advanced Stagger */}
+                    <div className="absolute top-20 right-16">
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="w-1 h-1 bg-purple-400/50 rounded-full animate-twinkle shadow-sm" style={{animationDelay: '0s', boxShadow: '0 0 3px rgba(147, 51, 234, 0.3)'}}></div>
+                            <div className="w-1 h-1 bg-indigo-400/45 rounded-full animate-drift shadow-sm" style={{animationDelay: '0.3s', boxShadow: '0 0 3px rgba(99, 102, 241, 0.35)'}}></div>
+                            <div className="w-1 h-1 bg-cyan-400/40 rounded-full animate-float-complex shadow-sm" style={{animationDelay: '0.6s', boxShadow: '0 0 3px rgba(34, 211, 238, 0.3)'}}></div>
+                            <div className="w-1 h-1 bg-pink-400/45 rounded-full animate-spiral shadow-sm" style={{animationDelay: '0.9s', boxShadow: '0 0 3px rgba(244, 114, 182, 0.35)'}}></div>
+                        </div>
+                    </div>
+                    
+                    {/* Enhanced Floating Micro Elements */}
+                    <div className="absolute bottom-28 left-20">
+                        <div className="relative w-16 h-8">
+                            <div className="w-1 h-1 bg-purple-400/60 rounded-full animate-twinkle shadow-sm" style={{animationDelay: '0s', boxShadow: '0 0 4px rgba(147, 51, 234, 0.4)'}}></div>
+                            <div className="absolute top-2 left-4 w-0.5 h-0.5 bg-indigo-400/55 rounded-full animate-orbit shadow-sm" style={{animationDelay: '1s', boxShadow: '0 0 3px rgba(99, 102, 241, 0.45)'}}></div>
+                            <div className="absolute top-0 left-8 w-1.5 h-1.5 bg-cyan-400/50 rounded-full animate-wave shadow-sm" style={{animationDelay: '2s', boxShadow: '0 0 5px rgba(34, 211, 238, 0.4)'}}></div>
+                        </div>
+                    </div>
+                    
+                    {/* Additional Dynamic Elements */}
+                    <div className="absolute top-1/2 left-8 w-4 h-4 border border-purple-400/30 rounded-full animate-expand-contract" style={{animationDelay: '1s', animationDuration: '14s'}}></div>
+                    <div className="absolute bottom-1/4 right-8 w-6 h-6 bg-gradient-to-r from-indigo-400/20 to-purple-400/25 rounded-full animate-pulse-glow" style={{animationDelay: '2s', animationDuration: '16s'}}></div>
+                    
+                    {/* Cascading Particle Stream */}
+                    <div className="absolute top-16 left-1/2 transform -translate-x-1/2">
+                        <div className="flex flex-col space-y-2">
+                            <div className="w-1 h-1 bg-purple-400/50 rounded-full animate-drift" style={{animationDelay: '0s', animationDuration: '8s'}}></div>
+                            <div className="w-1.5 h-1.5 bg-indigo-400/45 rounded-full animate-float-complex" style={{animationDelay: '0.5s', animationDuration: '10s'}}></div>
+                            <div className="w-0.5 h-0.5 bg-cyan-400/40 rounded-full animate-twinkle" style={{animationDelay: '1s', animationDuration: '6s'}}></div>
+                            <div className="w-2 h-2 bg-purple-300/35 rounded-full animate-spiral" style={{animationDelay: '1.5s', animationDuration: '12s'}}></div>
+                        </div>
+                    </div>
+                    
+                    {/* Animated Border Elements */}
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-400/20 to-transparent animate-shimmer" style={{animationDuration: '8s'}}></div>
+                    <div className="absolute bottom-0 right-0 w-full h-1 bg-gradient-to-l from-transparent via-indigo-400/20 to-transparent animate-slide-rotate" style={{animationDuration: '10s', animationDelay: '2s'}}></div>
+                    <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-transparent via-purple-300/15 to-transparent animate-stretch-pulse" style={{animationDuration: '12s', animationDelay: '1s'}}></div>
+                    <div className="absolute right-0 top-0 w-1 h-full bg-gradient-to-t from-transparent via-indigo-300/15 to-transparent animate-wave" style={{animationDuration: '14s', animationDelay: '3s'}}></div>
+                    
+                    {/* Floating Geometric Shapes */}
+                    <div className="absolute top-1/3 right-1/5 w-3 h-3 border border-purple-400/30 transform rotate-45 animate-orbital-dance" style={{animationDuration: '18s'}}></div>
+                    <div className="absolute bottom-1/3 left-1/5 w-4 h-4 border-2 border-indigo-400/25 rounded-full animate-expand-contract" style={{animationDuration: '20s', animationDelay: '2s'}}></div>
+                    <div className="absolute top-2/3 left-1/3 w-2 h-6 bg-gradient-to-b from-purple-400/20 to-transparent animate-pendulum" style={{animationDuration: '16s', animationDelay: '1s'}}></div>
+                    
+                    {/* Interactive Hover Particles */}
+                    <div className="absolute top-1/4 left-1/6 w-2 h-2 bg-purple-400/40 rounded-full animate-twinkle group-hover:animate-spiral group-hover:bg-purple-400/60 transition-all duration-500" style={{animationDuration: '6s'}}></div>
+                    <div className="absolute bottom-1/4 right-1/6 w-1.5 h-1.5 bg-indigo-400/35 rounded-full animate-drift group-hover:animate-orbit group-hover:bg-indigo-400/55 transition-all duration-500" style={{animationDuration: '8s'}}></div>
+                    
+                    {/* Ambient Glow Effects */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-radial from-purple-400/5 via-indigo-400/3 to-transparent rounded-full animate-pulse-glow" style={{animationDuration: '20s', filter: 'blur(20px)'}}></div>
+                    <div className="absolute top-1/4 right-1/4 w-24 h-24 bg-gradient-radial from-indigo-400/4 via-purple-400/2 to-transparent rounded-full animate-expand-contract" style={{animationDuration: '24s', animationDelay: '4s', filter: 'blur(15px)'}}></div>
                 </div>
                 
                 <div className="w-full max-w-md relative z-10">
