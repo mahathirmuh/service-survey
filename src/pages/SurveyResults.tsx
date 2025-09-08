@@ -122,9 +122,7 @@ const SurveyResults = () => {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isEmployeeLoading, setIsEmployeeLoading] = useState(false);
-  const [isSubmissionLoading, setIsSubmissionLoading] = useState(false);
-  const [isUserManagementLoading, setIsUserManagementLoading] = useState(false);
+
   const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -881,26 +879,11 @@ const SurveyResults = () => {
         <div className="flex-1 mt-4 sm:mt-6 px-3 sm:px-4 overflow-y-auto" role="menu">
           <div className="space-y-2 sm:space-y-3">
             <button
-                            onClick={async () => {
-                                setIsEmployeeLoading(true);
-                                try {
-                                    // Simulate loading delay for better UX
-                                    await new Promise(resolve => setTimeout(resolve, 500));
-                                    setActiveMenuItem("dashboard");
-                                    navigate("/employee");
-                                } catch (error) {
-                                    console.error('Navigation error:', error);
-                                    toast({
-                                        title: "Navigation Error",
-                                        description: "Failed to navigate to Employee Dashboard. Please try again.",
-                                        variant: "destructive",
-                                    });
-                                } finally {
-                                    setIsEmployeeLoading(false);
-                                }
+                            onClick={() => {
+                                setActiveMenuItem("dashboard");
+                                navigate("/employee");
                             }}
-                            disabled={isEmployeeLoading}
-                            className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                            className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                                 activeMenuItem === "dashboard"
                                     ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                                     : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -909,34 +892,15 @@ const SurveyResults = () => {
                             aria-label="Navigate to Employee Dashboard"
                             aria-current={activeMenuItem === "dashboard" ? "page" : undefined}
                         >
-                            {isEmployeeLoading ? (
-                                <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
-                            ) : (
-                                <LayoutDashboard className="mr-3 h-5 w-5" aria-hidden="true" />
-                            )}
-                            {isEmployeeLoading ? "Loading..." : "Employee"}
+                            <LayoutDashboard className="mr-3 h-5 w-5" aria-hidden="true" />
+                            Employee
                         </button>
             <button
-              onClick={async () => {
-                setIsSubmissionLoading(true);
-                try {
-                  // Simulate loading delay for better UX
-                  await new Promise(resolve => setTimeout(resolve, 500));
-                  setActiveMenuItem("submission");
-                  navigate("/submission");
-                } catch (error) {
-                  console.error('Navigation error:', error);
-                  toast({
-                    title: "Navigation Error",
-                    description: "Failed to navigate to Submission page. Please try again.",
-                    variant: "destructive",
-                  });
-                } finally {
-                  setIsSubmissionLoading(false);
-                }
+              onClick={() => {
+                setActiveMenuItem("submission");
+                navigate("/submission");
               }}
-              disabled={isSubmissionLoading}
-              className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+              className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                 activeMenuItem === "submission"
                   ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -945,36 +909,17 @@ const SurveyResults = () => {
               aria-label="Navigate to Submission page"
               aria-current={activeMenuItem === "submission" ? "page" : undefined}
             >
-              {isSubmissionLoading ? (
-                <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
-              ) : (
-                <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
-              )}
-              {isSubmissionLoading ? "Loading..." : "Submission"}
+              <FileText className="mr-3 h-5 w-5" aria-hidden="true" />
+              Submission
             </button>
             {/* User Management - Hidden for Manager role */}
             {currentUserRole !== 'manager' && (
               <button
-                onClick={async () => {
-                  setIsUserManagementLoading(true);
-                  try {
-                    // Simulate loading delay for better UX
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    setActiveMenuItem("user-management");
-                    navigate("/user-management");
-                  } catch (error) {
-                    console.error('Navigation error:', error);
-                    toast({
-                      title: "Navigation Error",
-                      description: "Failed to navigate to User Management. Please try again.",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setIsUserManagementLoading(false);
-                  }
+                onClick={() => {
+                  setActiveMenuItem("user-management");
+                  navigate("/user-management");
                 }}
-                disabled={isUserManagementLoading}
-                className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 ${
+                className={`w-full flex items-center px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:scale-[1.02] ${
                   activeMenuItem === "user-management"
                     ? "text-purple-600 bg-gradient-to-r from-purple-50 to-indigo-50 border-l-4 border-purple-600 shadow-md"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 hover:shadow-sm border-l-4 border-transparent"
@@ -983,12 +928,8 @@ const SurveyResults = () => {
                 aria-label="Navigate to User Management"
                 aria-current={activeMenuItem === "user-management" ? "page" : undefined}
               >
-                {isUserManagementLoading ? (
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" aria-hidden="true" />
-                ) : (
-                  <Users className="mr-3 h-5 w-5" aria-hidden="true" />
-                )}
-                {isUserManagementLoading ? "Loading..." : "User Management"}
+                <Users className="mr-3 h-5 w-5" aria-hidden="true" />
+                User Management
               </button>
             )}
             {/* Results Menu with Sub-items */}
@@ -1322,9 +1263,9 @@ const SurveyResults = () => {
             {/* Charts and Analysis */}
             <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
               <TabsList className="grid w-full grid-cols-3 bg-gradient-to-r from-gray-100 to-gray-50">
-                <TabsTrigger value="overview" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">Overview</TabsTrigger>
-                <TabsTrigger value="departments" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">By Department</TabsTrigger>
-                <TabsTrigger value="sections" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-md transition-all duration-200">By Section</TabsTrigger>
+                <TabsTrigger value="overview" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md transition-all duration-200">Overview</TabsTrigger>
+                <TabsTrigger value="departments" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md transition-all duration-200">By Department</TabsTrigger>
+                <TabsTrigger value="sections" className="text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md transition-all duration-200">By Section</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-4">

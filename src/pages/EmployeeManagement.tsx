@@ -43,6 +43,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { repairEmployeesTable } from "@/utils/dbRepair";
 import { Plus, Edit, Trash2, LogOut, Users, Shield, Search, Upload, Download, LayoutDashboard, Menu, BarChart3, FileText, ChevronDown, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Eye, EyeOff } from "lucide-react";
 import mtiLogo from "@/assets/mti-logo.png";
 import * as XLSX from 'xlsx';
@@ -71,6 +72,24 @@ interface User {
     status: string;
     last_login?: string;
     created_at: string;
+}
+
+interface UserUpdateData {
+    username: string;
+    email: string;
+    role: string;
+    status: string;
+    password?: string;
+}
+
+interface BulkUpdateData {
+    department?: string;
+    level?: string;
+    email?: string;
+}
+
+interface ExcelRowData {
+    [key: string]: string | number | undefined;
 }
 
 const departments = [
@@ -291,10 +310,35 @@ const EmployeeManagement = () => {
     const fetchEmployees = async () => {
         setIsLoading(true);
         try {
+            // Check and repair database schema if needed
+            const repairResult = await repairEmployeesTable();
+            if (!repairResult.success && repairResult.repairInstructions) {
+                console.error('Database schema issue:', repairResult.error);
+                toast({
+                    title: "Database Schema Issue",
+                    description: `${repairResult.error}. Please check the console for repair instructions.`,
+                    variant: "destructive",
+                });
+                console.log('Repair Instructions:', repairResult.repairInstructions.message);
+                console.log('SQL to run:', repairResult.repairInstructions.sql);
+            }
+
             // Get all employees with their status from the database
+            // Use a more defensive approach for column selection
+            let selectColumns = "id, id_badge_number, name, department, created_at, updated_at";
+            if (repairResult.success || !repairResult.missingColumns?.includes('status')) {
+                selectColumns += ", status";
+            }
+            if (repairResult.success || !repairResult.missingColumns?.includes('email')) {
+                selectColumns += ", email";
+            }
+            if (repairResult.success || !repairResult.missingColumns?.includes('level')) {
+                selectColumns += ", level";
+            }
+
             const { data: employeesData, error: employeesError } = await supabase
                 .from("employees")
-                .select("*")
+                .select(selectColumns)
                 .order("created_at", { ascending: false });
 
             if (employeesError) throw employeesError;
@@ -313,21 +357,27 @@ const EmployeeManagement = () => {
             const employeesWithStatus = (employeesData || []).map(employee => {
                 const actualStatus = submittedIds.has(employee.id_badge_number) ? 'Submitted' : 'Not Submitted';
                 
-                // If database status doesn't match actual status, update it
-                if (employee.status !== actualStatus) {
+                // Only try to update status if the column exists and values don't match
+                if (employee.hasOwnProperty('status') && employee.status !== actualStatus) {
                     // Update in background without blocking UI
                     supabase
                         .from('employees')
                         .update({ status: actualStatus })
                         .eq('id', employee.id)
                         .then(({ error }) => {
-                            if (error) console.error('Error syncing employee status:', error);
+                            if (error) {
+                                console.error('Error syncing employee status:', error);
+                                // If it's a column not found error, provide helpful guidance
+                                if (error.message && error.message.includes('status')) {
+                                    console.log('Status column appears to be missing. Please run the database migration.');
+                                }
+                            }
                         });
                 }
                 
                 return {
                     ...employee,
-                    status: actualStatus
+                    status: employee.hasOwnProperty('status') ? actualStatus : 'Unknown'
                 };
             });
 
@@ -695,7 +745,7 @@ const EmployeeManagement = () => {
                     return;
                 }
                 
-                const updateData: any = {
+                const updateData: UserUpdateData = {
                     username: userFormData.username,
                     email: userFormData.email,
                     role: normalizedRole,
@@ -962,7 +1012,7 @@ const EmployeeManagement = () => {
     const handleBulkEdit = async () => {
         try {
             const selectedIds = Array.from(selectedEmployees);
-            const updateData: any = {};
+            const updateData: BulkUpdateData = {};
             
             // Only include fields that have values
             if (bulkFormData.department) {
@@ -1382,7 +1432,7 @@ const EmployeeManagement = () => {
                 const duplicatesInFile: string[] = [];
                 const seenIds = new Set<string>();
 
-                jsonData.forEach((row: any, index: number) => {
+                jsonData.forEach((row: ExcelRowData, index: number) => {
                     const rowNum = index + 2; // Excel row number (accounting for header)
                     
                     console.log(`Processing row ${rowNum}:`, row);
