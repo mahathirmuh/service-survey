@@ -181,7 +181,6 @@ const SurveyForm = () => {
 
     const validateEmployeeData = async (idBadge?: string, email?: string) => {
         setIdError("");
-        setEmailError("");
         const cleanIdBadge = (idBadge || formData.idBadgeNumber).replace(/\s/g, "").toUpperCase();
         const cleanEmail = (email || formData.email).trim();
         
@@ -224,6 +223,9 @@ const SurveyForm = () => {
                     return;
                 }
                 
+                // Clear any existing email error if validation passes
+                setEmailError("");
+                
                 // Auto-fill name and department if both ID and email are valid
                 setFormData((prev) => ({
                     ...prev,
@@ -248,10 +250,12 @@ const SurveyForm = () => {
     
     const validateEmail = async (value: string) => {
         // Update the email value first
-        setFormData((prev) => ({ ...prev, email: value }));
-        
-        // Then validate both ID and email together with current values
-        setTimeout(() => validateEmployeeData(formData.idBadgeNumber, value), 100);
+        setFormData((prev) => {
+            const newFormData = { ...prev, email: value };
+            // Then validate both ID and email together with current values
+            setTimeout(() => validateEmployeeData(newFormData.idBadgeNumber, value), 100);
+            return newFormData;
+        });
     };
 
     const updateDepartmentQuestions = useCallback(
