@@ -168,7 +168,15 @@ const SurveyForm = () => {
     const [idError, setIdError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
+    const [previousIdBadge, setPreviousIdBadge] = useState("");
+    const [previousEmail, setPreviousEmail] = useState("");
     const { toast } = useToast();
+
+    // Initialize previous values when component mounts
+    useEffect(() => {
+        setPreviousIdBadge(formData.idBadgeNumber);
+        setPreviousEmail(formData.email);
+    }, []);
 
     const updateFormData = (field: keyof FormData, value: string) => {
         if (field === "idBadgeNumber") {
@@ -242,20 +250,54 @@ const SurveyForm = () => {
     const validateIdBadge = async (value: string) => {
         // Update the ID badge value first
         const cleanValue = value.replace(/\s/g, "").toUpperCase();
-        setFormData((prev) => ({ ...prev, idBadgeNumber: cleanValue }));
+        
+        // Check if content is being deleted (new value is shorter than previous)
+        if (cleanValue.length < previousIdBadge.length) {
+            // Clear name and department when content is deleted
+            setFormData((prev) => ({ 
+                ...prev, 
+                idBadgeNumber: cleanValue,
+                name: "",
+                department: ""
+            }));
+        } else {
+            setFormData((prev) => ({ ...prev, idBadgeNumber: cleanValue }));
+        }
+        
+        // Update previous value
+        setPreviousIdBadge(cleanValue);
         
         // Then validate both ID and email together with current values
         setTimeout(() => validateEmployeeData(cleanValue, formData.email), 100);
     };
     
     const validateEmail = async (value: string) => {
-        // Update the email value first
-        setFormData((prev) => {
-            const newFormData = { ...prev, email: value };
-            // Then validate both ID and email together with current values
-            setTimeout(() => validateEmployeeData(newFormData.idBadgeNumber, value), 100);
-            return newFormData;
-        });
+        // Check if content is being deleted (new value is shorter than previous)
+        if (value.length < previousEmail.length) {
+            // Clear name and department when content is deleted
+            setFormData((prev) => {
+                const newFormData = { 
+                    ...prev, 
+                    email: value,
+                    name: "",
+                    department: ""
+                };
+                // Then validate both ID and email together with current values
+                setTimeout(() => validateEmployeeData(newFormData.idBadgeNumber, value), 100);
+                return newFormData;
+            });
+        } else {
+            // Update the email value first
+            setFormData((prev) => {
+                const newFormData = { ...prev, email: value };
+                // Then validate both ID and email together with current values
+                setTimeout(() => validateEmployeeData(newFormData.idBadgeNumber, value), 100);
+                return newFormData;
+            });
+        }
+        
+        // Update previous value
+        setPreviousEmail(value);
     };
 
     const updateDepartmentQuestions = useCallback(
