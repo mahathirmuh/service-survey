@@ -91,7 +91,7 @@ const UserLogin = () => {
 
             // Store admin session with user info
             sessionStorage.setItem("adminAuthenticated", "true");
-            const displayName = user.name || user.username || user.email.split('@')[0];
+            const displayName = user.username || user.email.split('@')[0];
             sessionStorage.setItem("adminUser", JSON.stringify({
                 id: user.id,
                 name: displayName,

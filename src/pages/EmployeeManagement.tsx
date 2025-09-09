@@ -92,6 +92,14 @@ interface ExcelRowData {
     [key: string]: string | number | undefined;
 }
 
+interface ValidatedEmployee {
+    id_badge_number: string;
+    name: string;
+    department: string;
+    level: string;
+    email?: string;
+}
+
 const departments = [
     "AIM Construction",
     "AIM Operation",
@@ -250,8 +258,8 @@ const EmployeeManagement = () => {
         if (!userSortField) return filteredUsers;
         
         return [...filteredUsers].sort((a, b) => {
-            let aValue = a[userSortField];
-            let bValue = b[userSortField];
+            let aValue: any = a[userSortField];
+            let bValue: any = b[userSortField];
             
             // Handle null/undefined values
             if (aValue === null || aValue === undefined) aValue = '';
@@ -261,12 +269,12 @@ const EmployeeManagement = () => {
             if (userSortField === 'created_at' || userSortField === 'last_login') {
                 aValue = new Date(aValue as string).getTime();
                 bValue = new Date(bValue as string).getTime();
-            }
-            
-            // Convert to string for comparison if not already
-            if (typeof aValue === 'string' && typeof bValue === 'string') {
-                aValue = aValue.toLowerCase();
-                bValue = bValue.toLowerCase();
+            } else {
+                // Convert to string for comparison if not already (only for non-date fields)
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    aValue = aValue.toLowerCase();
+                    bValue = bValue.toLowerCase();
+                }
             }
             
             if (aValue < bValue) {
@@ -355,29 +363,14 @@ const EmployeeManagement = () => {
 
             // Sync database status with actual survey responses
             const employeesWithStatus = (employeesData || []).map(employee => {
-                const actualStatus = submittedIds.has(employee.id_badge_number) ? 'Submitted' : 'Not Submitted';
+                const actualStatus = (employee as any).id_badge_number && submittedIds.has((employee as any).id_badge_number) ? 'Submitted' : 'Not Submitted';
                 
-                // Only try to update status if the column exists and values don't match
-                if (employee.hasOwnProperty('status') && employee.status !== actualStatus) {
-                    // Update in background without blocking UI
-                    supabase
-                        .from('employees')
-                        .update({ status: actualStatus })
-                        .eq('id', employee.id)
-                        .then(({ error }) => {
-                            if (error) {
-                                console.error('Error syncing employee status:', error);
-                                // If it's a column not found error, provide helpful guidance
-                                if (error.message && error.message.includes('status')) {
-                                    console.log('Status column appears to be missing. Please run the database migration.');
-                                }
-                            }
-                        });
-                }
+                // Note: Status column may not exist in database schema
+                // Skip database update for status to avoid schema errors
                 
                 return {
-                    ...employee,
-                    status: employee.hasOwnProperty('status') ? actualStatus : 'Unknown'
+                    ...(employee as any),
+                    status: (employee as any).hasOwnProperty('status') ? actualStatus : 'Unknown'
                 };
             });
 
@@ -477,8 +470,8 @@ const EmployeeManagement = () => {
         // Apply sorting
         if (sortField) {
             filtered.sort((a, b) => {
-                let aValue = a[sortField];
-                let bValue = b[sortField];
+                let aValue: any = a[sortField];
+                let bValue: any = b[sortField];
 
                 // Handle date fields
                 if (sortField === 'created_at') {
@@ -835,6 +828,7 @@ const EmployeeManagement = () => {
                 const { data, error } = await supabase
                     .from('admin_users')
                     .insert({
+                        name: userFormData.username, // Using username as display name
                         username: userFormData.username,
                         email: userFormData.email,
                         password: userFormData.password,
@@ -1042,22 +1036,8 @@ const EmployeeManagement = () => {
             if (error) throw error;
 
             // If level is being updated, sync survey responses for affected employees
-            if (updateData.level) {
-                const affectedEmployees = employees.filter(emp => selectedEmployees.has(emp.id));
-                const badgeNumbers = affectedEmployees.map(emp => emp.id_badge_number);
-                
-                if (badgeNumbers.length > 0) {
-                    const { error: syncError } = await supabase
-                        .from('survey_responses')
-                        .update({ level: updateData.level })
-                        .in('id_badge_number', badgeNumbers);
-                    
-                    if (syncError) {
-                        console.error('Error syncing survey response levels in bulk:', syncError);
-                        // Don't throw error here, just log it as it's not critical
-                    }
-                }
-            }
+            // Note: Level updates are only applied to employees table
+            // Survey responses table doesn't have level column
 
             // Update local state
             setEmployees(prev => prev.map(emp => 
@@ -1137,18 +1117,8 @@ const EmployeeManagement = () => {
 
                 if (error) throw error;
 
-                // If level changed, sync existing survey responses
-                if (editingEmployee.level !== formData.level) {
-                    const { error: syncError } = await supabase
-                        .from("survey_responses")
-                        .update({ level: formData.level })
-                        .eq("id_badge_number", formData.id_badge_number.toUpperCase());
-                    
-                    if (syncError) {
-                        console.error('Error syncing survey response levels:', syncError);
-                        // Don't throw error here, just log it as it's not critical
-                    }
-                }
+                // Note: Level updates are only applied to employees table
+                // Survey responses table doesn't have level column
 
                 toast({
                     title: "Success",
@@ -1421,12 +1391,7 @@ const EmployeeManagement = () => {
                 }
 
                 // Validate and process imported data
-                const validEmployees: Array<{
-                    id_badge_number: string;
-                    name: string;
-                    department: string;
-                    level: string;
-                }> = [];
+                const validEmployees: ValidatedEmployee[] = [];
 
                 const errors: string[] = [];
                 const duplicatesInFile: string[] = [];
@@ -2872,7 +2837,7 @@ const EmployeeManagement = () => {
                                                                                     Delete User Account
                                                                                 </AlertDialogTitle>
                                                                                 <AlertDialogDescription className="text-sm text-gray-500 max-w-sm">
-                                                                                    Are you sure you want to delete <span className="font-medium text-gray-900">{user.name}</span>? This action cannot be undone and will permanently remove their account and all associated data.
+                                                                                    Are you sure you want to delete <span className="font-medium text-gray-900">{user.username}</span>? This action cannot be undone and will permanently remove their account and all associated data.
                                                                                 </AlertDialogDescription>
                                                                             </AlertDialogHeader>
                                                                             <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-center sm:space-x-2 w-full">
