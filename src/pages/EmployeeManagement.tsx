@@ -103,15 +103,20 @@ interface ValidatedEmployee {
 const departments = [
     "AIM Construction",
     "AIM Operation",
+    "Acid Plant",
+    "Chloride Plant",
+    "Copper Cathode Plant",
     "Environment",
     "External Affair",
     "Finance",
+    "General Management",
     "Human Resources",
     "Maintenance",
     "Management",
     "Occupational Health and Safety",
     "Pyrite Plant",
-    "Supply Chain Management"
+    "Supply Chain Management",
+    "Technical Service"
 ];
 
 const EmployeeManagement = () => {
