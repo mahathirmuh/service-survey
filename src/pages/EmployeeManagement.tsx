@@ -110,6 +110,7 @@ const departments = [
     "External Affair",
     "Finance",
     "General Management",
+    "HPAL",
     "Human Resources",
     "Maintenance",
     "Management",
