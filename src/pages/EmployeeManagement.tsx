@@ -457,7 +457,8 @@ const EmployeeManagement = () => {
             filtered = filtered.filter(
                 (emp) =>
                     emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    emp.id_badge_number.toLowerCase().includes(searchTerm.toLowerCase())
+                    emp.id_badge_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    (emp.email && emp.email.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -2222,7 +2223,7 @@ const EmployeeManagement = () => {
                             <div className="flex flex-col sm:flex-row gap-4 mt-4">
                                 <div className="flex-1">
                                     <Input
-                                        placeholder="Search by name or ID badge number..."
+                                        placeholder="Search by name, ID badge number, or email..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="max-w-sm"
