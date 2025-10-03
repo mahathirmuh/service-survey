@@ -1740,7 +1740,10 @@ const EmployeeManagement = () => {
                 <nav className="flex-1 px-4 py-6 space-y-3 overflow-y-auto">
                         {/* 1. Employee */}
                         <button
-                            onClick={() => setActiveMenuItem("dashboard")}
+                            onClick={() => {
+                                setActiveMenuItem("dashboard");
+                                navigate("/employee");
+                            }}
                             className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 shadow-sm ${
                                 activeMenuItem === "dashboard"
                                     ? "text-purple-600 bg-purple-50 border-l-4 border-purple-600 shadow-md"
